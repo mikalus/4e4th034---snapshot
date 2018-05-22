@@ -1,0 +1,662 @@
+################################################################################
+#                                                                              #
+#      IAR Universal Linker V5.2.1.11                                          #
+#                                                                              #
+#           Link time     =  28/Apr/2012  03:06:23                             #
+#           Target CPU    =  MSP430                                            #
+#           List file     =  "C:\Dokumente und Einstellungen\All Users\Dokumen #
+#                            te\4e4th\Release0.34\List\4e4th.map"              #
+#           Output file 1 =  "C:\Dokumente und Einstellungen\All Users\Dokumen #
+#                            te\4e4th\Release0.34\Exe\4e4th.a43"               #
+#                            Format: intel-extended                            #
+#           Command line  =  "C:\Dokumente und Einstellungen\All Users\Dokumen #
+#                            te\4e4th\Release0.34\Obj\4e-core430G2553.r43"     #
+#                            "C:\Dokumente und Einstellungen\All Users\Dokumen #
+#                            te\4e4th\Release0.34\Obj\4e-infoBG2553.r43"       #
+#                            "C:\Dokumente und Einstellungen\All Users\Dokumen #
+#                            te\4e4th\Release0.34\Obj\4e-init430G2553.r43"     #
+#                            "C:\Dokumente und Einstellungen\All Users\Dokumen #
+#                            te\4e4th\Release0.34\Obj\4e-vecs430G2553.r43"     #
+#                            -o                                                #
+#                            "C:\Dokumente und Einstellungen\All Users\Dokumen #
+#                            te\4e4th\Release0.34\Exe\4e4th.a43"               #
+#                            -Fintel-extended -l                               #
+#                            "C:\Dokumente und Einstellungen\All Users\Dokumen #
+#                            te\4e4th\Release0.34\List\4e4th.map"              #
+#                            -xms                                              #
+#                            "-IC:\Programme\IAR Systems\Embedded Workbench 6. #
+#                            0 Kickstart\430\LIB\"                             #
+#                            -f                                                #
+#                            "C:\Dokumente und Einstellungen\All Users\Dokumen #
+#                            te\4e4th\4e-lnk430G2553.xcl"                      #
+#                            (-D_STACK_SIZE=80 -D_DATA16_HEAP_SIZE=80          #
+#                            -cmsp430 -QCODE_I=CODE_ID                         #
+#                            -Z(DATA)DATA16_I,DATA16_Z,DATA16_N,DATA16_HEAP+_D #
+#                            ATA16_HEAP_SIZE=0200-03FF                         #
+#                            -Z(DATA)CODE_I -Z(DATA)CSTACK+_STACK_SIZE#        #
+#                            -Z(CONST)INFO=1000-10FF                           #
+#                            -Z(CONST)INFOA=10C0-10FF                          #
+#                            -Z(CONST)INFOB=1080-10BF                          #
+#                            -Z(CONST)INFOC=1040-107F                          #
+#                            -Z(CONST)INFOD=1000-103F                          #
+#                            -Z(CONST)DATA16_C,DATA16_ID,DIFUNCT,CHECKSUM=C000 #
+#                            -FFDF                                             #
+#                            -Z(CODE)CSTART,ISR_CODE,CODE_ID=C000-FFDF         #
+#                            -P(CODE)CODE=E000-FFDF -Z(CODE)INTVEC=FFE0-FFFF   #
+#                            -Z(CODE)RESET=FFFE-FFFF)                          #
+#                                                                              #
+#                           Copyright (C) 1987-2011 IAR Systems AB.            #
+################################################################################
+
+
+
+
+
+                ****************************************
+                *                                      *
+                *           CROSS REFERENCE            *
+                *                                      *
+                ****************************************
+
+                  There are no program entries.
+
+
+                ****************************************
+                *                                      *
+                *    AUTOMATIC SYMBOL REDIRECTIONS     *
+                *                                      *
+                ****************************************
+
+                  There are no automatic symbol redirections.
+
+
+
+                ****************************************
+                *                                      *
+                *              MODULE MAP              *
+                *                                      *
+                ****************************************
+
+
+  DEFINED ABSOLUTE ENTRIES
+    *************************************************************************
+
+  DEFINED ABSOLUTE ENTRIES
+  PROGRAM MODULE, NAME : ?ABS_ENTRY_MOD
+
+Absolute parts
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _DATA16_HEAP_SIZE       0080 
+           _STACK_SIZE             0080 
+    *************************************************************************
+
+  FILE NAME : C:\Dokumente und Einstellungen\All Users\Dokumente\4e4th\Release0.34\Obj\4e-core430G2553.r43
+  PROGRAM MODULE, NAME : 4e-core430G2553
+
+Absolute parts
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           __MSP430G2203__         0000 
+  SEGMENTS IN THE MODULE
+  ======================
+<CODE> 1 (was CODE)
+  Relative segment, address: E000 - FD17 (0x1d18 bytes), align: 1
+  Segment part 0. ROOT.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           EXECUTE                 E026 
+           lit                     E036 
+           EXIT                    E04C 
+           DOCOLON                 E054 
+           VARIABLE                E068 
+           CONSTANT                E07E 
+           DOCON                   E086 
+           docreate                E086 
+           DOVAR                   E086 
+           DOROM                   E092 
+           USER                    E0A6 
+           DOUSER                  E0AE 
+           DOALIAS                 E0BE 
+           dodoes                  E0C2 
+           DUP                     E0DE 
+           QDUP                    E0F2 
+           DROP                    E104 
+           SWAP                    E114 
+           OVER                    E12A 
+           ROT                     E142 
+           NIP                     E15E 
+           TOR                     E16C 
+           RFROM                   E17C 
+           RFETCH                  E190 
+           SPFETCH                 E1A6 
+           SPSTORE                 E1BC 
+           RPFETCH                 E1CE 
+           RPSTORE                 E1E4 
+           TUCK                    E1F6 
+           FETCH                   E204 
+           STORE                   E212 
+           CFETCH                  E224 
+           CSTORE                  E232 
+           FLERASE                 E24C 
+           ISTORE                  E2B0 
+           ICSTORE                 E302 
+           DTOI                    E34C 
+           PLUS                    E3A2 
+           PLUSSTORE               E3B0 
+           MPLUS                   E3C2 
+           MINUS                   E3D8 
+           ANDD                    E3EC 
+           ORR                     E3FA 
+           XORR                    E40A 
+           INVERT                  E41C 
+           NEGATE                  E42E 
+           ONEPLUS                 E43E 
+           ONEMINUS                E44C 
+           SWAPBYTES               E45A 
+           TWOSTAR                 E468 
+           TWOSLASH                E476 
+           LSHIFT                  E488 
+           RSHIFT                  E4A8 
+           ZEROEQUAL               E4C6 
+           ZEROLESS                E4D6 
+           EQUAL                   E4E8 
+           NOTEQUAL                E4FC 
+           LESS                    E50A 
+           GREATER                 E51E 
+           ULESS                   E52C 
+           UGREATER                E53C 
+           bran                    E54E 
+           qbran                   E562 
+           xdo                     E578 
+           xloop                   E59E 
+           xplusloop               E5BE 
+           II                      E5DA 
+           JJ                      E5F0 
+           UNLOOP                  E60C 
+           UMSTAR                  E61E 
+           UMSLASHMOD              E64E 
+           FILL                    E688 
+           CMOVE                   E6AC 
+           CMOVEUP                 E6D0 
+           ITOD                    E6F8 
+           SKIP                    E702 
+           SCAN                    E728 
+           SEQUAL                  E74C 
+           NEQUAL                  E774 
+           EMIT                    E77E 
+           KEY                     E798 
+           KEYQ                    E7B6 
+           ZERO                    E7CE 
+           ALIGNN                  E7DC 
+           ALIGNED                 E7F6 
+           CELL                    E80C 
+           CELLPLUS                E81A 
+           CELLS                   E82A 
+           CHARPLUS                E836 
+           CHARS                   E842 
+           TOBODY                  E84E 
+           COMMAXT                 E85C 
+           STORECF                 E868 
+           COMMACF                 E874 
+           COMMACALL               E88C 
+           COMMAJMP                E8A0 
+           STORCOLON               E8B6 
+           CEXIT                   E8D0 
+           COMMABRANCH             E8E6 
+           COMMADEST               E8F4 
+           STOREDEST               E908 
+           COMMANONE               E91E 
+           U0                      E92C 
+           TOIN                    E938 
+           BASE                    E944 
+           STATE                   E952 
+           DDP                     E95C 
+           TICKSOURCE              E96C 
+           LATEST                  E97A 
+           HP                      E984 
+           LP                      E98E 
+           IDP                     E99A 
+           NEWEST                  E9A8 
+           APP                     E9B4 
+           CAPS                    E9C0 
+           PAD                     E9CC 
+           L0                      E9D6 
+           RZERO                   E9E0 
+           S0                      E9EA 
+           TIB                     E9F6 
+           TIBSIZE                 EA06 
+           BLANK                   EA10 
+           UINIT                   EA1E 
+           NINIT                   EA4A 
+           COR                     EA56 
+           INFOB                   EA64 
+           APPU0                   EA72 
+           STOD                    EA7E 
+           QNEGATE                 EA92 
+           ABBS                    EAA6 
+           DNEGATE                 EABA 
+           QDNEGATE                EAD8 
+           DABS                    EAEC 
+           MSTAR                   EAFA 
+           SMSLASHREM              EB1C 
+           FMSLASHMOD              EB4A 
+           STAR                    EB7C 
+           SLASHMOD                EB8C 
+           SLASH                   EB9E 
+           MODD                    EBAE 
+           SSMOD                   EBC0 
+           STARSLASH               EBD2 
+           MAX                     EBE2 
+           MIN                     EBFA 
+           TWOFETCH                EC10 
+           TWOSTORE                EC24 
+           TWODROP                 EC3C 
+           TWODUP                  EC4C 
+           TWOSWAP                 EC5E 
+           TWOOVER                 EC74 
+           COUNT                   EC8E 
+           CR                      ECA0 
+           SPACE                   ECBA 
+           SPACES                  ECCC 
+           UMIN                    ECE8 
+           UMAX                    ED00 
+           ACCEPT                  ED1A 
+           TYP                     ED7A 
+           XISQUOTE                EDA6 
+           XSQUOTE                 EDBE 
+           ISQUOTE                 EDEA 
+           DOTQUOTE                EE08 
+           IWORD                   EE1E 
+           IWORDC                  EE30 
+           UDSLASHMOD              EE44 
+           UDSTAR                  EE62 
+           HOLD                    EE80 
+           LESSNUM                 EE98 
+           TODIGIT                 EEAC 
+           NUM                     EECC 
+           NUMS                    EEE2 
+           NUMGREATER              EEF8 
+           SIGN                    EF10 
+           UDOT                    EF26 
+           DOT                     EF3C 
+           DECIMAL                 EF60 
+           HEX                     EF74 
+           HERE                    EF88 
+           ALLOT                   EF9A 
+           COMMA                   EFA8 
+           CCOMMA                  EFBE 
+           IHERE                   EFD8 
+           IALLOT                  EFEA 
+           ICOMMA                  EFF8 
+           ICCOMMA                 F010 
+           SOURCE                  F02A 
+           SLASHSTRING             F03E 
+           TOCOUNTED               F05A 
+           WORDD                   F070 
+           NFATOLFA                F0C2 
+           NFATOCFA                F0D8 
+           IMMEDQ                  F0F2 
+           FIND                    F10A 
+           UPC                     F148 
+           CAPITALIZE              F16A 
+           LITERAL                 F19C 
+           DIGITQ                  F1BA 
+           QSIGN                   F1F6 
+           TONUMBER                F22E 
+           QNUMBER                 F26E 
+           INTERPRET               F2B2 
+           EVALUATE                F31C 
+           DOTSTATUS               F33E 
+           PROMPT                  F34A 
+           QUIT                    F368 
+           QUITIP                  F36A 
+           ABORT                   F398 
+           QABORT                  F3AA 
+           ABORTQUOTE              F3C4 
+           TICK                    F3D6 
+           CHARR                   F3F2 
+           BRACCHAR                F408 
+           PAREN                   F41C 
+           HEADR                   F432 
+           BUILDS                  F460 
+           CREATE                  F476 
+           XDOES                   F492 
+           DOES                    F4AA 
+           RECURSE                 F4C6 
+           LEFTBRACKET             F4D8 
+           RIGHTBRACKET            F4E8 
+           HIDE                    F4FC 
+           REVEAL                  F51C 
+           IMMEDIATE               F536 
+           COLON                   F54C 
+           SEMICOLON               F55E 
+           BRACTICK                F570 
+           POSTPONE                F58A 
+           IFF                     F5BE 
+           THEN                    F5D4 
+           ELSS                    F5E6 
+           BEGIN                   F602 
+           UNTIL                   F612 
+           AGAIN                   F628 
+           WHILE                   F63E 
+           REPEAT                  F650 
+           TOL                     F65E 
+           LFROM                   F674 
+           DO                      F68C 
+           ENDLOOP                 F6A8 
+           LOO                     F6C6 
+           PLUSLOOP                F6DA 
+           LEAV                    F6EE 
+           WITHIN                  F70E 
+           MOVE                    F726 
+           DEPTH                   F752 
+           ENVIRONMENTQ            F770 
+           NOOP                    F780 
+           FLALIGNED               F792 
+           MARKER                  F7B0 
+           WORDS                   F806 
+           UDOTR                   F832 
+           DUMP                    F856 
+           DOTS                    F8C2 
+           CCRC                    F90A 
+           PCRC                    F946 
+           CRC                     F970 
+           ITHERE                  F986 
+           APPCRC                  F9B2 
+           VALIDQ                  F9D6 
+           SAVE                    F9EC 
+           BOOT                    FA10 
+           BOOTIP                  FA12            Segment part 1 (4e-init430G2553)
+           WARM                    FA4E 
+           DOTCOLD                 FA5C            Segment part 0 (4e-infoBG2553)
+           COLD                    FA72 
+           FACTORY                 FA90 
+           FACTORYIP               FA92 
+           WIPE                    FAA6 
+           TWOCONSTANT             FACE 
+           DOTWOCON                FAD8 
+           BACKSLASH               FAEE 
+           DOTVER                  FB02 
+           BELL                    FB26 
+           ESCPAR                  FB30 
+           PN                      FB40 
+           SEMIPN                  FB54 
+           ATXY                    FB6A 
+           PAGEE                   FB8A 
+           BIN                     FBA6 
+           ONEMS                   FBBA 
+           MS                      FBDC 
+           wset                    FBF2 
+           cset                    FC08 
+           wclr                    FC1E 
+           cclr                    FC34 
+           ctoggle                 FC4E 
+           cget                    FC64 
+           MEMBOT                  FC82 
+           MEMTOP                  FC90 
+           MEM                     FC9C 
+           UNUSED                  FCB2 
+           P1                      FCC4 
+           P2                      FCCE 
+           P3                      FCD8 
+           red                     FCE4 
+           green                   FCF4 
+           S2                      FD00 
+           SQEST                   FD0E 
+           lastword                FD09            Segment part 0 (4e-infoBG2553)
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           version                 E000 
+           verend                  E01A 
+           ver0                    E001 
+           PUSHTOS                 E0E0 
+           NODUP                   E0F8 
+           FLE_1                   E252 
+           FLE_X                   E2A4 
+           FLE_INFO                E262 
+           FLE_OK                  E26E 
+           FL_INFO                 E29E 
+           IST_X                   E2F4 
+           IST_INFO                E2C8 
+           IST_OK                  E2D4 
+           IST_RAM                 E2E2 
+           ICST_INFO               E316 
+           ICST_OK                 E322 
+           ICST_RAM                E330 
+           DTOI_X                  E396 
+           DTOI_LOOP               E356 
+           DTOI_BYTE               E37E 
+           DTOI_WORD               E36C 
+           DTOI_END                E384 
+           LSH_X                   E498 
+           LSH_1                   E492 
+           RSH_X                   E4BA 
+           RSH_1                   E4B2 
+           TOSTRUE                 E512 
+           TOSFALSE                E4F0 
+           dobran                  E550 
+           MPYU                    E622 
+           MACU                    E626 
+           L$002                   E62A 
+           L$01                    E632 
+           DIVIDE                  E654 
+           DIV1                    E65A 
+           DIV2                    E660 
+           DIV4                    E676 
+           DIV3                    E674 
+           FILL_X                  E69C 
+           FILL_1                  E692 
+           CMOVE_X                 E6C0 
+           CMOVE_1                 E6B6 
+           CMOVU_X                 E6EA 
+           CMOVU_1                 E6DE 
+           SKIP_X                  E716 
+           SKIP_1                  E70C 
+           SCAN_X                  E73C 
+           SCAN_1                  E732 
+           SEQU_X                  E76A 
+           SEQU_1                  E756 
+           SMISMATCH               E764 
+           EMITLOOP                E780 
+           KEYLOOP                 E79A 
+           donoop                  E7AA 
+           donext                  E7AA 
+           QNEG1                   EA9C 
+           DNEG1                   EAE2 
+           FMMOD1                  EB70 
+           MAX1                    EBEE 
+           MIN1                    EC06 
+           SPCS1                   ECCE 
+           SPCS2                   ECDC 
+           UMIN1                   ECF4 
+           UMAX1                   ED0C 
+           ACC1                    ED24 
+           ACC5                    ED68 
+           ACC3                    ED5A 
+           ACC4                    ED64 
+           TYP4                    ED98 
+           TYP3                    ED8A 
+           TYP5                    ED9A 
+           IWORD1                  EE22 
+           NUMS1                   EEE4 
+           SIGN1                   EF1E 
+           WORD1                   F094 
+           FIND1                   F110 
+           FIND2                   F128 
+           FIND3                   F146 
+           UPC1                    F162 
+           CAPS2                   F18E 
+           CAPS1                   F180 
+           LITER1                  F1AE 
+           QSIGN1                  F220 
+           TONUM1                  F230 
+           TONUM3                  F260 
+           TONUM2                  F246 
+           QNUM1                   F292 
+           QNUM3                   F2A2 
+           QNUM2                   F29E 
+           INTER1                  F2BE 
+           INTER9                  F30C 
+           INTER4                  F2EE 
+           INTER2                  F2E8 
+           INTER3                  F2EA 
+           INTER8                  F308 
+           INTER5                  F2FA 
+           INTER6                  F308 
+           PROMPT1                 F35E 
+           QUIT1                   F37A 
+           QABO1                   F3B6 
+           POST1                   F5B4 
+           POST2                   F5B6 
+           LOOP1                   F6AE 
+           LOOP2                   F6BC 
+           MOVE1                   F742 
+           MOVE2                   F746 
+           WDS1                    F80C 
+           LDUMP1                  F860 
+           LDUMP2                  F87A 
+           LDUMP3                  F898 
+           DOTS2                   F900 
+           DOTS1                   F8F2 
+           ccrc1                   F91C 
+           pcrc2                   F964 
+           pcrc1                   F956 
+           pcrc3                   F966 
+           ih1                     F98A 
+           boot1                   FA44 
+           invalid                 FA24 
+           valid                   FA22 
+           reset                   FA32 
+           warm1                   FA58 
+           warm0                   FA53 
+           dotcold1                FA66 
+           dotcold0                FA61 
+           wipmsg1                 FAB2 
+           wipmsg0                 FAAB 
+           ESC1                    FB94 
+           ESC0                    FB91 
+           onems1                  FBC4 
+           onems2                  FBCC 
+           ms1                     FBE2 
+           cget1                   FC70 
+           cget2                   FC72 
+           CF430FRend              FD18 
+
+    *************************************************************************
+
+  FILE NAME : C:\Dokumente und Einstellungen\All Users\Dokumente\4e4th\Release0.34\Obj\4e-infoBG2553.r43
+  PROGRAM MODULE, NAME : 4e-infoBG2553
+
+Absolute parts
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           __MSP430G2203__         0000 
+  SEGMENTS IN THE MODULE
+  ======================
+INFOB
+  Relative segment, address: 1080 - 10A1 (0x22 bytes), align: 1
+  Segment part 0. ROOT.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           infoB                   1080            Segment part 0 (4e-core430G2553)
+           AppU0                   1082            Segment part 0 (4e-core430G2553)
+           crcval                  1080            Segment part 0 (4e-core430G2553)
+
+    *************************************************************************
+
+  FILE NAME : C:\Dokumente und Einstellungen\All Users\Dokumente\4e4th\Release0.34\Obj\4e-init430G2553.r43
+  PROGRAM MODULE, NAME : 4e-init430G2553
+
+Absolute parts
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           TIB_SIZE                0054            Segment part 0 (4e-core430G2553)
+           UAREA_SIZE              0010            Segment part 0 (4e-core430G2553)
+  SEGMENTS IN THE MODULE
+  ======================
+DATA16_Z
+  Relative segment, address: 0200 - 03C5 (0x1c6 bytes), align: 1
+  Segment part 0. ROOT.       Intra module refs:   Segment part 1
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           PADAREA                 031E            Segment part 0 (4e-core430G2553)
+           LSTACK                  0224            Segment part 0 (4e-core430G2553)
+           PSTACK                  0290            Segment part 0 (4e-core430G2553)
+           RSTACK                  02FC            Segment part 0 (4e-core430G2553)
+           TIBAREA                 0372            Segment part 0 (4e-core430G2553)
+           UAREA                   0202            Segment part 0 (4e-core430G2553)
+           UP                      0200            Segment part 0 (4e-core430G2553)
+           cor                     0222            Segment part 0 (4e-core430G2553)
+           RAMDICT                 03C6            Segment part 0 (4e-core430G2553)
+                                                   Segment part 0 (4e-infoBG2553)
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           HOLDAREA                031E 
+    -------------------------------------------------------------------------
+<CODE> 1 (was CODE)
+  Relative segment, address: FD18 - FD99 (0x82 bytes), align: 1
+  Segment part 1. ROOT.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           reset                   FD18            Segment part 1 (4e-vecs430G2553)
+           main                    FD18 
+           ROMDICT                 FD9A 
+           nullirq                 FD98            intvecs (4e-vecs430G2553)
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           start_init              FD18 
+           init_end                FD98 
+           isr_start               FD98 
+           isr_end                 FD9A 
+
+    *************************************************************************
+
+  FILE NAME : C:\Dokumente und Einstellungen\All Users\Dokumente\4e4th\Release0.34\Obj\4e-vecs430G2553.r43
+  PROGRAM MODULE, NAME : 4e-vecs430G2553
+
+  SEGMENTS IN THE MODULE
+  ======================
+INTVEC
+  Relative segment, address: FFE0 - FFFD (0x1e bytes), align: 1
+  Segment part 0. ROOT.
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           intvecs                 FFE0 
+    -------------------------------------------------------------------------
+RESET
+  Relative segment, address: FFFE - FFFF (0x2 bytes), align: 1
+  Segment part 1. ROOT.
+
+
+
+
+                ****************************************
+                *                                      *
+                *      SEGMENTS IN ADDRESS ORDER       *
+                *                                      *
+                ****************************************
+
+
+SEGMENT              SPACE    START ADDRESS   END ADDRESS     SIZE  TYPE  ALIGN
+=======              =====    =============   ===========     ====  ====  =====
+DATA16_I                                  0200                       dse    0
+DATA16_Z                               0200 - 03C5             1C6   rel    1
+INFOB                                  1080 - 10A1              22   rel    1
+<CODE> 1                               E000 - FD99            1D9A   rel    1
+INTVEC                                 FFE0 - FFFD              1E   rel    1
+RESET                                  FFFE - FFFF               2   rel    1
+
+                ****************************************
+                *                                      *
+                *        END OF CROSS REFERENCE        *
+                *                                      *
+                ****************************************
+
+ 7 610 bytes of CODE  memory
+   454 bytes of DATA  memory
+    34 bytes of CONST memory
+
+Errors: none
+Warnings: none
+

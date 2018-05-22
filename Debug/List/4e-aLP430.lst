@@ -1,0 +1,2640 @@
+###############################################################################
+#                                                                             #
+#     IAR Assembler V6.30.1.934/W32  for MSP430 22/May/2018  23:30:01         #
+#     Copyright 1996-2015 IAR Systems AB.                                     #
+#                                                                             #
+#           Target option =  MSP430                                           #
+#           Source file   =  C:\Users\mka\Documents\GitHub\4e4th034\4e-aLP430.s43#
+#           List file     =  C:\Users\mka\Documents\GitHub\4e4th034\Debug\List\4e-aLP430.lst#
+#           Object file   =  C:\Users\mka\Documents\GitHub\4e4th034\Debug\Obj\4e-aLP430.r43#
+#           Command line  =  C:\Users\mka\Documents\GitHub\4e4th034\4e-aLP430.s43 #
+#                            -OC:\Users\mka\Documents\GitHub\4e4th034\Debug\Obj\ #
+#                            -s+ -M<> -w+                                     #
+#                            -LC:\Users\mka\Documents\GitHub\4e4th034\Debug\List\ #
+#                            -t8 -xDI -r -D__MSP430G2553__                    #
+#                            -IC:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2\430\INC\ #
+#                                                                             #
+###############################################################################
+
+      1    000000              ; Build 4e4th on MSP430 LaunchPad.
+      2    000000              
+      3    000000              ; ----------------------------------------------
+                               ------------------------
+      4    000000              ; 4e4th is a Forth based on CamelForth
+                                
+      5    000000              ; for the Texas Instruments MSP430 
+      6    000000              ; 
+      7    000000              ; This program is free software; you can
+                                redistribute it and/or modify
+      8    000000              ; it under the terms of the GNU General Public
+                                License as published by
+      9    000000              ; the Free Software Foundation; either version 3
+                                of the License, or
+     10    000000              ; (at your option) any later version.
+     11    000000              ; 
+     12    000000              ; This program is distributed in the hope that
+                                it will be useful,
+     13    000000              ; but WITHOUT ANY WARRANTY; without even the
+                                implied warranty of
+     14    000000              ; MERCHANTABILITY or FITNESS FOR A PARTICULAR
+                                PURPOSE.  See the
+     15    000000              ; GNU General Public License for more details.
+     16    000000              ;
+     17    000000              ; You should have received a copy of the GNU
+                                General Public License
+     18    000000              ; along with this program.  If not, see
+                                <http://www.gnu.org/licenses/>.
+     19    000000              ; 
+     20    000000              ; See LICENSE TERMS in Brads file readme.txt as
+                                well.
+     21    000000              ; ----------------------------------------------
+                               ------------------------
+     22    000000              
+     23    000000              #include "msp430.h"                     ;
+                                #define controlled include file
+     24    000000              #include "4e-CF430G2553forth.h"         ; header
+                                macros and register defs
+     25    000000              
+     26    000000                      EXTERN  UP,UAREA,PADAREA,LSTACK,PSTACK,R
+ STACK
+     27    000000                      EXTERN  TIBAREA,RAMDICT,ROMDICT
+     28    000000                      EXTERN  TIB_SIZE,UAREA_SIZE,VARAREA,VAR_
+                               SIZE,nullirq
+     29    000000              
+     30    000000                      RSEG    CODE                    ; place
+  program in 'CODE' segment
+     31    000000              
+     32    000000              link    SET 0           ; initial dictionary
+                                link
+     33    000000              
+     34    000000              ; ----------------------------------------------
+                               ------------------------
+     35    000000              ; chip ident
+     36    000000              
+     37    000000              
+     38    000000              ; production fuse 
+     39    000000 FFFF         PROFUSE:  DW 0xFFFF  ; burn fuse to prohibit
+                                                     WIPE 
+     40    000002              
+     41    000002              ; version strings 
+     42    000002 1F           version:  DB (verend-ver0)
+     43    000003 204D53503433*ver0:     DB ' MSP430G2553 LaunchPad - 4E4th '
+                                               
+     44    000022                        EVEN 0x20 ; use blank as padding
+                                byte
+     45    000022              verend:
+     46    000022              
+     47    000022 16           stamp:    DB (stampend-stamp0)
+     48    000023 4D6179203232*stamp0:   DB __date__,' ',__time__
+     49    000039              stampend: 
+     50    000039              
+     51    000039              ; ----------------------------------------------
+                               ------------------------
+     52    000039              ; We #include the following source files, rather
+                                than compiling them 
+     53    000039              ; separately, so that they can inherit the value
+                                of 'link'.
+     54    000039              
+     55    000039              ; This is minimum for 4e4th ...
+     56    000039              #include "4e-deps430G2553.s43" ; MCU dependent
+                                code.
+     57    0001CC              #include "4e-core430.s43"      ; Assembled
+                                words, former called 'primitives'.
+     58    00099E              #include "4e-hilvl430.s43"     ; forth kernel
+                                coded 'high level'.
+     59    001DE4              #include "4e-boot.s43"         ; 4e4th boot
+                                procedure.´
+     60    001F5E              ; ... here we have a running forth kernel.
+     61    001F5E              
+     62    001F5E              ; Include some features...
+     63    001F5E              #include "4e-vecarea.s43"      ; handling of
+                                flash memory vector area.
+     64    00208C              #include "4e-asmscripting.s43" ; basics for
+                                cross assembling. 
+     65    0020F6              #include "4e-onewire.s43"      ; if you like add
+                                onewire bascics
+     66    0021A6              #include "4e-LPM.s43"          ; handlinf
+                                sleepmodes
+     67    00222E              ;   #include "4e-WAS430G2553.s43" ; Willems
+                                Assembler
+     68    00222E              #include "4e-LaunchPad.s43"    ; ... and finaly
+                                some board specific words.
+     69    00226A              
+     70    00226A              
+     71    00226A              /*
+     72    00226A              ; DEBUG FORTH EXECUTION 
+     73    00226A              ; debug serieal
+     74    00226A                PUBLIC DEBUGIP
+     75    00226A              DEBUGIP: 
+     76    00226A              ;  DW  DOTID
+     77    00226A              DEBUG1: 
+     78    00226A              ;   DW TASK
+     79    00226A                 DW  KEY  ; 1@A0 test 1=rot,@=grün,A=beide,0=a
+                               us
+     80    00226A                 DW  DUP  ;,DOTS,CR
+     81    00226A                 DW  STORELEDS
+     82    00226A              ;   DW  COLD
+     83    00226A                 DW  EMIT 
+     84    00226A                 DW  lit,0,qbran
+     85    00226A                 DW  DEBUG1-$
+     86    00226A                 DW  bran,-2
+     87    00226A              
+     88    00226A              /*
+     89    00226A              ; debugging only
+     90    00226A                HEADLESS CREATE,DOCOLON
+     91    00226A                HEADLESS ALLOT,DOCOLON
+     92    00226A                HEADLESS BUILDS,DOCOLON
+     93    00226A                HEADLESS ICOMMA,DOCOLON
+     94    00226A                HEADLESS XDOES,DOCOLON
+     95    00226A                HEADLESS IHERE,DOCOLON
+     96    00226A                HEADLESS IALLOT,DOCOLON
+     97    00226A                HEADLESS CELL,DOCOLON
+     98    00226A                HEADLESS PJOUT,DOCOLON
+     99    00226A              */
+    100    00226A              
+    101    00226A              
+    102    000000              PUBLIC lastword
+    103    00226A              lastword equ link
+    104    00226A              
+    105    00226A              ; for debug map only:
+    106    00226A              CamelForthEnd:
+    107    00226A              
+    108    00226A                      END
+
+
+EOF                  DELIMITER 
+\n                   DELIMITER 
+                     DELIMITER 
+!                    OPERATOR 
+!=                   OPERATOR 
+%                    OPERATOR 
+&                    OPERATOR 
+&&                   OPERATOR 
+(                    OPERATOR 
+(                    DELIMITER 
+)                    OPERATOR 
+)                    DELIMITER 
+*                    OPERATOR 
++                    OPERATOR 
+,                    DELIMITER 
+-                    OPERATOR 
+.                    Target symbol: 24 
+.                    DELIMITER 
+.CFI                 DIRECTIVE 
+.DOUBLE              DIRECTIVE 
+.FLOAT               DIRECTIVE 
+.REQUIRE             DIRECTIVE 
+/                    OPERATOR 
+:                    DELIMITER 
+;                    DELIMITER 
+;                    Target symbol: 23 
+<                    OPERATOR 
+<<                   OPERATOR 
+<=                   OPERATOR 
+<>                   OPERATOR 
+<>                   DELIMITER 
+=                    OPERATOR 
+=                    DELIMITER 
+=                    DIRECTIVE 
+==                   OPERATOR 
+>                    OPERATOR 
+>=                   OPERATOR 
+>>                   OPERATOR 
+ACCVIE               #define, value: (0x20), line:     137:2  
+ACCVIFG              #define, value: (0x0004u), line:     453:2  
+ADC                  MNEMONIC 
+ADC10AE0_            #define, value: (0x004Au), line:     172:2      173:2
+ADC10B1              #define, value: (0x002), line:     276:2  
+ADC10BUSY            #define, value: (0x0001u), line:     216:2  
+ADC10CT              #define, value: (0x004), line:     277:2  
+ADC10CTL0_           #define, value: (0x01B0u), line:     175:2      176:2
+ADC10CTL1_           #define, value: (0x01B2u), line:     177:2      178:2
+ADC10DF              #define, value: (0x0200u), line:     225:2  
+ADC10DISABLE         #define, value: (0x000), line:     279:2  
+ADC10DIV0            #define, value: (0x0020u), line:     221:2  
+ADC10DIV1            #define, value: (0x0040u), line:     222:2  
+ADC10DIV2            #define, value: (0x0080u), line:     223:2  
+ADC10DIV_0           #define, value: (0*0x20u), line:     243:2  
+ADC10DIV_1           #define, value: (1*0x20u), line:     244:2  
+ADC10DIV_2           #define, value: (2*0x20u), line:     245:2  
+ADC10DIV_3           #define, value: (3*0x20u), line:     246:2  
+ADC10DIV_4           #define, value: (4*0x20u), line:     247:2  
+ADC10DIV_5           #define, value: (5*0x20u), line:     248:2  
+ADC10DIV_6           #define, value: (6*0x20u), line:     249:2  
+ADC10DIV_7           #define, value: (7*0x20u), line:     250:2  
+ADC10DTC0_           #define, value: (0x0048u), line:     168:2      169:2
+ADC10DTC1_           #define, value: (0x0049u), line:     170:2      171:2
+ADC10FETCH           #define, value: (0x001), line:     275:2  
+ADC10IE              #define, value: (0x008), line:     188:2  
+ADC10IFG             #define, value: (0x004), line:     187:2  
+ADC10MEM_            #define, value: (0x01B4u), line:     179:2      180:2
+ADC10ON              #define, value: (0x010), line:     189:2  
+ADC10SA_             #define, value: (0x01BCu), line:     181:2      182:2
+ADC10SC              #define, value: (0x001), line:     185:2  
+ADC10SHT0            #define, value: (0x800), line:     196:2  
+ADC10SHT1            #define, value: (0x1000u), line:     197:2  
+ADC10SHT_0           #define, value: (0*0x800u), line:     201:2  
+ADC10SHT_1           #define, value: (1*0x800u), line:     202:2  
+ADC10SHT_2           #define, value: (2*0x800u), line:     203:2  
+ADC10SHT_3           #define, value: (3*0x800u), line:     204:2  
+ADC10SR              #define, value: (0x400), line:     195:2  
+ADC10SSEL0           #define, value: (0x0008u), line:     219:2  
+ADC10SSEL1           #define, value: (0x0010u), line:     220:2  
+ADC10SSEL_0          #define, value: (0*8u), line:     238:2  
+ADC10SSEL_1          #define, value: (1*8u), line:     239:2  
+ADC10SSEL_2          #define, value: (2*8u), line:     240:2  
+ADC10SSEL_3          #define, value: (3*8u), line:     241:2  
+ADC10TB              #define, value: (0x008), line:     278:2  
+ADC10_VECTOR         #define, value: (5 * 2u), line:    1014:2  
+ADD                  MNEMONIC 
+ADDC                 MNEMONIC 
+ALIAS                DIRECTIVE 
+ALIGN                DIRECTIVE 
+ALIGNRAM             DIRECTIVE 
+AND                  OPERATOR 
+AND                  MNEMONIC 
+ASEG                 DIRECTIVE 
+ASEGN                DIRECTIVE 
+ASSIGN               DIRECTIVE 
+B                    SUFFIX 
+BCSCTL1_             #define, value: (0x0057u), line:     288:2      289:2
+BCSCTL2_             #define, value: (0x0058u), line:     290:2      291:2
+BCSCTL3_             #define, value: (0x0053u), line:     292:2      293:2
+BIC                  MNEMONIC 
+BIS                  MNEMONIC 
+BIT                  SEGMENT TYPE 
+BIT                  MNEMONIC 
+BIT0                 #define, value: (0x0001u), line:      62:2  
+BIT1                 #define, value: (0x0002u), line:      63:2  
+BIT2                 #define, value: (0x0004u), line:      64:2  
+BIT3                 #define, value: (0x0008u), line:      65:2     120:10   121:10   122:10   128:10
+                                                                   137:10   143:10   215:10   216:10
+                                                                   224:10   231:10   240:10
+BIT4                 #define, value: (0x0010u), line:      66:2  
+BIT5                 #define, value: (0x0020u), line:      67:2  
+BIT6                 #define, value: (0x0040u), line:      68:2  
+BIT7                 #define, value: (0x0080u), line:      69:2  
+BIT8                 #define, value: (0x0100u), line:      70:2  
+BIT9                 #define, value: (0x0200u), line:      71:2  
+BITA                 #define, value: (0x0400u), line:      72:2  
+BITAND               OPERATOR 
+BITB                 #define, value: (0x0800u), line:      73:2  
+BITC                 #define, value: (0x1000u), line:      74:2  
+BITD                 #define, value: (0x2000u), line:      75:2  
+BITE                 #define, value: (0x4000u), line:      76:2  
+BITF                 #define, value: (0x8000u), line:      77:2  
+BITNOT               OPERATOR 
+BITOR                OPERATOR 
+BITXOR               OPERATOR 
+BLKWRT               #define, value: (0x0080u), line:     428:2  
+BLOCK                DIRECTIVE 
+BR                   MNEMONIC 
+BRANCH               MNEMONIC 
+BUSY                 #define, value: (0x0001u), line:     451:2  
+BYTE                 Target symbol: 524288 
+C                    #define, value: (0x0001u), line:      83:2  
+CACTL1_              #define, value: (0x0059u), line:     370:2      371:2
+CACTL2_              #define, value: (0x005Au), line:     372:2      373:2
+CAEX                 #define, value: (0x80), line:     384:2  
+CAF                  #define, value: (0x02), line:     392:2  
+CAIE                 #define, value: (0x02), line:     378:2  
+CAIES                #define, value: (0x04), line:     379:2  
+CAIFG                #define, value: (0x01), line:     377:2  
+CALBC1_12MHZ_        #define, value: (0x10FBu), line:     953:2      954:2
+CALBC1_16MHZ_        #define, value: (0x10F9u), line:     949:2      950:2
+CALBC1_1MHZ_         #define, value: (0x10FFu), line:     961:2      962:2
+CALBC1_8MHZ_         #define, value: (0x10FDu), line:     957:2      958:2
+CALDCO_12MHZ_        #define, value: (0x10FAu), line:     951:2      952:2
+CALDCO_16MHZ_        #define, value: (0x10F8u), line:     947:2      948:2
+CALDCO_1MHZ_         #define, value: (0x10FEu), line:     959:2      960:2
+CALDCO_8MHZ_         #define, value: (0x10FCu), line:     955:2      956:2
+CALL                 MNEMONIC 
+CALL_GRAPH_ROOT      DIRECTIVE 
+CAL_ADC_15T30        #define, value: (0x0003u), line:     992:2  
+CAL_ADC_15T85        #define, value: (0x0004u), line:     991:2  
+CAL_ADC_15VREF_FACTOR #define, value: (0x0002u), line:     993:2  
+CAL_ADC_25T30        #define, value: (0x0006u), line:     989:2  
+CAL_ADC_25T85        #define, value: (0x0007u), line:     988:2  
+CAL_ADC_25VREF_FACTOR #define, value: (0x0005u), line:     990:2  
+CAL_ADC_GAIN_FACTOR  #define, value: (0x0000u), line:     995:2  
+CAL_ADC_OFFSET       #define, value: (0x0001u), line:     994:2  
+CAL_BC1_12MHZ        #define, value: (0x0003u), line:    1000:2  
+CAL_BC1_16MHZ        #define, value: (0x0001u), line:     998:2  
+CAL_BC1_1MHZ         #define, value: (0x0007u), line:    1004:2  
+CAL_BC1_8MHZ         #define, value: (0x0005u), line:    1002:2  
+CAL_DCO_12MHZ        #define, value: (0x0002u), line:     999:2  
+CAL_DCO_16MHZ        #define, value: (0x0000u), line:     997:2  
+CAL_DCO_1MHZ         #define, value: (0x0006u), line:    1003:2  
+CAL_DCO_8MHZ         #define, value: (0x0004u), line:    1001:2  
+CAON                 #define, value: (0x08), line:     380:2  
+CAOUT                #define, value: (0x01), line:     391:2  
+CAP                  #define, value: (0x0100u), line:     609:2  
+CAPD0                #define, value: (0x01), line:     400:2  
+CAPD1                #define, value: (0x02), line:     401:2  
+CAPD2                #define, value: (0x04), line:     402:2  
+CAPD3                #define, value: (0x08), line:     403:2  
+CAPD4                #define, value: (0x10), line:     404:2  
+CAPD5                #define, value: (0x20), line:     405:2  
+CAPD6                #define, value: (0x40), line:     406:2  
+CAPD7                #define, value: (0x80), line:     407:2  
+CAPD_                #define, value: (0x005Bu), line:     374:2      375:2
+CAREF0               #define, value: (0x10), line:     381:2  
+CAREF1               #define, value: (0x20), line:     382:2  
+CAREF_0              #define, value: (0x00), line:     386:2  
+CAREF_1              #define, value: (0x10), line:     387:2  
+CAREF_2              #define, value: (0x20), line:     388:2  
+CAREF_3              #define, value: (0x30), line:     389:2  
+CARSEL               #define, value: (0x40), line:     383:2  
+CASEOFF              DIRECTIVE 
+CASEON               DIRECTIVE 
+CASHORT              #define, value: (0x80), line:     398:2  
+CCI                  #define, value: (0x0008u), line:     614:2  
+CCIE                 #define, value: (0x0010u), line:     613:2  
+CCIFG                #define, value: (0x0001u), line:     617:2  
+CCIS0                #define, value: (0x1000u), line:     606:2  
+CCIS1                #define, value: (0x2000u), line:     605:2  
+CCIS_0               #define, value: (0*0x1000u), line:     627:2  
+CCIS_1               #define, value: (1*0x1000u), line:     628:2  
+CCIS_2               #define, value: (2*0x1000u), line:     629:2  
+CCIS_3               #define, value: (3*0x1000u), line:     630:2  
+CCR0                 #define, value: TACCR0, line:     570:2  
+CCR0_                #define, value: TACCR0_, line:     576:2  
+CCR1                 #define, value: TACCR1, line:     571:2  
+CCR1_                #define, value: TACCR1_, line:     577:2  
+CCR2                 #define, value: TACCR2, line:     572:2  
+CCR2_                #define, value: TACCR2_, line:     578:2  
+CCTL0                #define, value: TACCTL0, line:     567:2  
+CCTL0_               #define, value: TACCTL0_, line:     573:2  
+CCTL1                #define, value: TACCTL1, line:     568:2  
+CCTL1_               #define, value: TACCTL1_, line:     574:2  
+CCTL2                #define, value: TACCTL2, line:     569:2  
+CCTL2_               #define, value: TACCTL2_, line:     575:2  
+CFI                  DIRECTIVE 
+CG1                  REGISTER 
+CG2                  REGISTER 
+CLR                  MNEMONIC 
+CLRC                 MNEMONIC 
+CLRN                 MNEMONIC 
+CLRZ                 MNEMONIC 
+CM0                  #define, value: (0x4000u), line:     604:2  
+CM1                  #define, value: (0x8000u), line:     603:2  
+CMP                  MNEMONIC 
+CM_0                 #define, value: (0*0x4000u), line:     631:2  
+CM_1                 #define, value: (1*0x4000u), line:     632:2  
+CM_2                 #define, value: (2*0x4000u), line:     633:2  
+CM_3                 #define, value: (3*0x4000u), line:     634:2  
+CODE                 SEGMENT TYPE 
+COL                  DIRECTIVE 
+COMMON               DIRECTIVE 
+COMPARATORA_VECTOR   #define, value: (11 * 2u), line:    1020:2  
+CONSEQ0              #define, value: (0x0002u), line:     217:2  
+CONSEQ1              #define, value: (0x0004u), line:     218:2  
+CONSEQ_0             #define, value: (0*2u), line:     233:2  
+CONSEQ_1             #define, value: (1*2u), line:     234:2  
+CONSEQ_2             #define, value: (2*2u), line:     235:2  
+CONSEQ_3             #define, value: (3*2u), line:     236:2  
+CONST                SEGMENT TYPE 
+CONST                DIRECTIVE 
+COV                  #define, value: (0x0002u), line:     616:2  
+CPUOFF               #define, value: (0x0010u), line:      88:2      45:11    53:11    63:11
+DADC                 MNEMONIC 
+DADD                 MNEMONIC 
+DATA                 SEGMENT TYPE 
+DATE                 OPERATOR 
+DB                   DIRECTIVE 
+DC16                 DIRECTIVE 
+DC24                 DIRECTIVE 
+DC32                 DIRECTIVE 
+DC8                  DIRECTIVE 
+DCO0                 #define, value: (0x20), line:     300:2  
+DCO1                 #define, value: (0x40), line:     301:2  
+DCO2                 #define, value: (0x80), line:     302:2  
+DCOCTL_              #define, value: (0x0056u), line:     286:2      287:2
+DEC                  MNEMONIC 
+DECD                 MNEMONIC 
+DEFC                 #define,            line:      47:2      133:2    140:2    148:2    156:2
+                                                                    169:2    171:2    173:2    287:2
+                                                                    289:2    291:2    293:2    371:2
+                                                                    373:2    375:2    467:2    469:2
+                                                                    471:2    473:2    475:2    477:2
+                                                                    479:2    481:2    483:2    486:2
+                                                                    488:2    490:2    492:2    494:2
+                                                                    496:2    498:2    500:2    502:2
+                                                                    510:2    512:2    514:2    516:2
+                                                                    518:2    520:2    684:2    686:2
+                                                                    688:2    690:2    692:2    694:2
+                                                                    696:2    698:2    700:2    702:2
+                                                                    704:2    709:2    711:2    713:2
+                                                                    715:2    717:2    719:2    721:2
+                                                                    723:2    948:2    950:2    952:2
+                                                                    954:2    956:2    958:2    960:2
+                                                                    962:2    979:2    981:2    983:2
+                                                                    985:2
+DEFINE               DIRECTIVE 
+DEFW                 #define,            line:      48:2      176:2    178:2    180:2    182:2
+                                                                    415:2    417:2    419:2    528:2
+                                                                    530:2    532:2    534:2    536:2
+                                                                    538:2    540:2    542:2    544:2
+                                                                    650:2    652:2    654:2    656:2
+                                                                    658:2    660:2    662:2    664:2
+                                                                    666:2    725:2    727:2    900:2
+                                                                    977:2
+DELAY                MACRO 
+DEST                 MACRO 
+DF                   DIRECTIVE 
+DF32                 DIRECTIVE 
+DF64                 DIRECTIVE 
+DFTI32               DIRECTIVE 
+DFTI40               DIRECTIVE 
+DINT                 MNEMONIC 
+DIVA0                #define, value: (0x10), line:     308:2  
+DIVA1                #define, value: (0x20), line:     309:2  
+DIVA_0               #define, value: (0x00), line:     313:2  
+DIVA_1               #define, value: (0x10), line:     314:2  
+DIVA_2               #define, value: (0x20), line:     315:2  
+DIVA_3               #define, value: (0x30), line:     316:2  
+DIVM0                #define, value: (0x10), line:     321:2  
+DIVM1                #define, value: (0x20), line:     322:2  
+DIVM_0               #define, value: (0x00), line:     331:2  
+DIVM_1               #define, value: (0x10), line:     332:2  
+DIVM_2               #define, value: (0x20), line:     333:2  
+DIVM_3               #define, value: (0x30), line:     334:2  
+DIVS0                #define, value: (0x02), line:     318:2  
+DIVS1                #define, value: (0x04), line:     319:2  
+DIVS_0               #define, value: (0x00), line:     326:2  
+DIVS_1               #define, value: (0x02), line:     327:2  
+DIVS_2               #define, value: (0x04), line:     328:2  
+DIVS_3               #define, value: (0x06), line:     329:2  
+DL                   DIRECTIVE 
+DS                   DIRECTIVE 
+DS16                 DIRECTIVE 
+DS24                 DIRECTIVE 
+DS32                 DIRECTIVE 
+DS8                  DIRECTIVE 
+DW                   DIRECTIVE 
+EINT                 MNEMONIC 
+ELIF                 DIRECTIVE 
+ELSE                 DIRECTIVE 
+EMEX                 #define, value: (0x0020u), line:     456:2  
+ENC                  #define, value: (0x002), line:     186:2  
+END                  DIRECTIVE 
+ENDIF                DIRECTIVE 
+ENDM                 DIRECTIVE 
+ENDMOD               DIRECTIVE 
+ENDR                 DIRECTIVE 
+EQ                   OPERATOR 
+EQU                  DIRECTIVE 
+ERASE                #define, value: (0x0002u), line:     425:2      317:5     33:8
+EVEN                 DIRECTIVE 
+EXITM                DIRECTIVE 
+EXPORT               DIRECTIVE 
+EXTERN               DIRECTIVE 
+FAIL                 #define, value: (0x0080u), line:     458:2  
+FAR                  SEGMENT TYPE 
+FARCODE              SEGMENT TYPE 
+FARCONST             SEGMENT TYPE 
+FARDATA              SEGMENT TYPE 
+FCTL1_               #define, value: (0x0128u), line:     414:2      415:2
+FCTL2_               #define, value: (0x012Au), line:     416:2      417:2
+FCTL3_               #define, value: (0x012Cu), line:     418:2      419:2
+FN0                  #define, value: (0x0001u), line:     431:2  
+FN1                  #define, value: (0x0002u), line:     432:2  
+FN2                  #define, value: (0x0004u), line:     434:2  
+FN3                  #define, value: (0x0008u), line:     437:2  
+FN4                  #define, value: (0x0010u), line:     440:2  
+FN5                  #define, value: (0x0020u), line:     442:2  
+FRKEY                #define, value: (0x9600u), line:     421:2  
+FSSEL0               #define, value: (0x0040u), line:     443:2  
+FSSEL1               #define, value: (0x0080u), line:     444:2  
+FSSEL_0              #define, value: (0x0000u), line:     446:2  
+FSSEL_1              #define, value: (0x0040u), line:     447:2  
+FSSEL_2              #define, value: (0x0080u), line:     448:2  
+FSSEL_3              #define, value: (0x00C0u), line:     449:2  
+FUNCTION             DIRECTIVE 
+FWKEY                #define, value: (0xA500u), line:     422:2      316:5    317:5    319:5    320:5
+                                                                    361:5    362:5    365:5    366:5
+                                                                    394:5    395:5    398:5    399:5
+                                                                    429:5    430:5    448:5    449:5
+                                                                     15:8     16:8     18:8     19:8
+                                                                     32:8     33:8     35:8     36:8
+FXKEY                #define, value: (0x3300u), line:     423:2  
+GE                   OPERATOR 
+GIE                  #define, value: (0x0008u), line:      87:2      45:11    53:11    63:11
+GT                   OPERATOR 
+HALLOT               #define, value: IALLOT, line:     827:6     1237:6
+HCCOMMA              #define, value: ICCOMMA, line:     829:6     1235:6
+HCFETCH              #define, value: ICFETCH, line:     830:6      938:6   1237:6
+HCOMMA               #define, value: ICOMMA, line:     828:6     1234:6
+HCOUNT               #define, value: ICOUNT, line:     674:6      932:6   1559:6
+HCSTORE              #define, value: ICSTORE, line:     832:6     1306:6
+HEADER               MACRO 
+HEADERLESS           MACRO 
+HEADLESS             MACRO 
+HFETCH               #define, value: IFETCH, line:     831:6      961:6   1296:6   1560:6
+HHERE                #define, value: IHERE, line:     826:6     1236:6
+HIGH                 OPERATOR 
+HSTORE               #define, value: ISTORE, line:     833:6  
+HTYPE                #define, value: ITYPE, line:     675:6     1559:6
+HUGE                 SEGMENT TYPE 
+HUGECODE             SEGMENT TYPE 
+HUGECONST            SEGMENT TYPE 
+HUGEDATA             SEGMENT TYPE 
+HWORD                #define, value: IWORDC, line:     676:6     1237:6
+HWRD                 OPERATOR 
+ICFETCH              #define, value: CFETCH, line:     412:5      595:6    938:6   1237:6
+ICOUNT               #define, value: COUNT, line:     551:6      582:6    932:6   1559:6
+ID0                  #define, value: (0x0040u), line:     583:2  
+ID1                  #define, value: (0x0080u), line:     582:2  
+IDATA                SEGMENT TYPE 
+ID_0                 #define, value: (0*0x40u), line:     594:2  
+ID_1                 #define, value: (1*0x40u), line:     595:2  
+ID_2                 #define, value: (2*0x40u), line:     596:2  
+ID_3                 #define, value: (3*0x40u), line:     597:2  
+IE1_                 #define, value: (0x0000u), line:     132:2      133:2
+IE2_                 #define, value: (0x0001u), line:     147:2      148:2
+IF                   DIRECTIVE 
+IFETCH               #define, value: FETCH, line:     411:5      594:6    961:6   1296:6   1523:6
+                                                                   1524:6   1525:6   1560:6     37:7
+IFG1_                #define, value: (0x0002u), line:     139:2      140:2
+IFG2_                #define, value: (0x0003u), line:     155:2      156:2
+IMMED                MACRO 
+IMPORT               DIRECTIVE 
+INC                  MNEMONIC 
+INCD                 MNEMONIC 
+INCH0                #define, value: (0x1000u), line:     228:2  
+INCH1                #define, value: (0x2000u), line:     229:2  
+INCH2                #define, value: (0x4000u), line:     230:2  
+INCH3                #define, value: (0x8000u), line:     231:2  
+INCH_0               #define, value: (0*0x1000u), line:     257:2  
+INCH_1               #define, value: (1*0x1000u), line:     258:2  
+INCH_10              #define, value: (10*0x1000u), line:     267:2  
+INCH_11              #define, value: (11*0x1000u), line:     268:2  
+INCH_12              #define, value: (12*0x1000u), line:     269:2  
+INCH_13              #define, value: (13*0x1000u), line:     270:2  
+INCH_14              #define, value: (14*0x1000u), line:     271:2  
+INCH_15              #define, value: (15*0x1000u), line:     272:2  
+INCH_2               #define, value: (2*0x1000u), line:     259:2  
+INCH_3               #define, value: (3*0x1000u), line:     260:2  
+INCH_4               #define, value: (4*0x1000u), line:     261:2  
+INCH_5               #define, value: (5*0x1000u), line:     262:2  
+INCH_6               #define, value: (6*0x1000u), line:     263:2  
+INCH_7               #define, value: (7*0x1000u), line:     264:2  
+INCH_8               #define, value: (8*0x1000u), line:     265:2  
+INCH_9               #define, value: (9*0x1000u), line:     266:2  
+INDEX                #define, value: R8, line:      51:3      647:5    650:5    651:5    660:5
+                                                                    664:5    672:5    677:5    685:5
+                                                                    699:5
+INFOEND              #define, value: (0x10FF), line:      28:3      308:5    352:5    385:5
+INFOSEG              #define, value: (128), line:      36:3      329:5    330:5
+INFOSTART            #define, value: (0x1000), line:      27:3      306:5    350:5    383:5
+INV                  MNEMONIC 
+IP                   #define, value: R5, line:      46:3       45:4     56:4     82:4     45:5
+                                                                     46:5     50:5     51:5     59:5
+                                                                     60:5     61:5     89:5     99:5
+                                                                    111:5    139:5    140:5    141:5
+                                                                    142:5    158:5    164:5    169:5
+                                                                    176:5    184:5    192:5    197:5
+                                                                    207:5    214:5    221:5    228:5
+                                                                    234:5    241:5    247:5    258:5
+                                                                    264:5    269:5    276:5    333:5
+                                                                    370:5    455:5    462:5    468:5
+                                                                    475:5    482:5    487:5    492:5
+                                                                    497:5    502:5    508:5    513:5
+                                                                    518:5    523:5    528:5    533:5
+                                                                    544:5    556:5    564:5    571:5
+                                                                    579:5    591:5    626:5    626:5
+                                                                    627:5    634:5    635:5    653:5
+                                                                    663:5    666:5    676:5    679:5
+                                                                    687:5    695:5    701:5    729:5
+                                                                    760:5    775:5    792:5    809:5
+                                                                    832:5    847:5    866:5   1658:6
+                                                                   1689:6   1822:6   1829:6   1836:6
+                                                                   1843:6   1850:6   1860:6     23:8
+                                                                     39:8     42:9   154:10   250:10
+                                                                    32:11    37:11    57:11    67:11
+IRACL                #define, value: R12, line:      67:3      711:5    719:5    727:5    740:5
+                                                                    745:5    759:5
+IRACM                #define, value: R13, line:      68:3      712:5    720:5    728:5
+IRBT                 #define, value: W, line:      69:3      716:5    717:5    724:5    741:5
+                                                                    747:5
+IROP1                #define, value: TOS, line:      64:3      717:5    742:5    744:5    752:5
+IROP2L               #define, value: R10, line:      65:3      708:5    719:5    721:5    735:5
+                                                                    749:5
+IROP2M               #define, value: R11, line:      66:3      715:5    720:5    722:5    734:5
+                                                                    742:5    744:5    750:5    752:5
+                                                                    758:5
+ISREND               #define, value: (0xFFDF), line:      34:3      301:5
+ISRSTART             #define, value: (0xFE00), line:      33:3      299:5
+ISSH                 #define, value: (0x0100u), line:     224:2  
+ITYPE                #define, value: TYP, line:     550:6      653:6   1151:6   1189:6   1559:6
+                                                                   1699:6   1700:6   1748:6      9:7
+                                                                     81:7     90:7    148:7
+JC                   MNEMONIC 
+JEQ                  MNEMONIC 
+JGE                  MNEMONIC 
+JHS                  MNEMONIC 
+JL                   MNEMONIC 
+JLO                  MNEMONIC 
+JMP                  MNEMONIC 
+JN                   MNEMONIC 
+JNC                  MNEMONIC 
+JNE                  MNEMONIC 
+JNZ                  MNEMONIC 
+JZ                   MNEMONIC 
+KEYV                 #define, value: (0x0002u), line:     452:2  
+LE                   OPERATOR 
+LFXT1OF              #define, value: (0x01), line:     341:2  
+LFXT1S0              #define, value: (0x10), line:     345:2  
+LFXT1S1              #define, value: (0x20), line:     346:2  
+LFXT1S_0             #define, value: (0x00), line:     355:2  
+LFXT1S_1             #define, value: (0x10), line:     356:2  
+LFXT1S_2             #define, value: (0x20), line:     357:2  
+LFXT1S_3             #define, value: (0x30), line:     358:2  
+LIBRARY              DIRECTIVE 
+LIMIT                #define, value: R9, line:      52:3      646:5    648:5    649:5    651:5
+                                                                    665:5    678:5    686:5    700:5
+LOCAL                DIRECTIVE 
+LOCK                 #define, value: (0x0010u), line:     455:2      320:5    366:5    399:5    449:5
+                                                                     19:8     36:8
+LOCKA                #define, value: (0x0040u), line:     457:2  
+LOW                  OPERATOR 
+LPM0                 #define, value: (CPUOFF), line:      96:2      63:11
+LPM1                 #define, value: (SCG0+CPUOFF), line:      97:2  
+LPM2                 #define, value: (SCG1+CPUOFF), line:      98:2  
+LPM3                 #define, value: (SCG1+SCG0+CPUOFF), line:      99:2  
+LPM4                 #define, value: (SCG1+SCG0+OSCOFF+CPUOFF), line:     100:2      45:11    53:11
+LSTCND               DIRECTIVE 
+LSTCOD               DIRECTIVE 
+LSTEXP               DIRECTIVE 
+LSTMAC               DIRECTIVE 
+LSTOUT               DIRECTIVE 
+LSTPAG               DIRECTIVE 
+LSTREP               DIRECTIVE 
+LSTSAS               DIRECTIVE 
+LSTXRF               DIRECTIVE 
+LT                   OPERATOR 
+LWRD                 OPERATOR 
+MACRO                DIRECTIVE 
+MAINSEG              #define, value: (512), line:      35:3      329:5
+MC0                  #define, value: (0x0010u), line:     585:2  
+MC1                  #define, value: (0x0020u), line:     584:2  
+MC_0                 #define, value: (0*0x10u), line:     590:2  
+MC_1                 #define, value: (1*0x10u), line:     591:2  
+MC_2                 #define, value: (2*0x10u), line:     592:2  
+MC_3                 #define, value: (3*0x10u), line:     593:2  
+MERAS                #define, value: (0x0004u), line:     426:2  
+MOD                  OPERATOR 
+MOD0                 #define, value: (0x01), line:     295:2  
+MOD1                 #define, value: (0x02), line:     296:2  
+MOD2                 #define, value: (0x04), line:     297:2  
+MOD3                 #define, value: (0x08), line:     298:2  
+MOD4                 #define, value: (0x10), line:     299:2  
+MODULE               DIRECTIVE 
+MOV                  MNEMONIC 
+MSC                  #define, value: (0x080), line:     192:2  
+N                    #define, value: (0x0004u), line:      85:2  
+NAME                 DIRECTIVE 
+NE                   OPERATOR 
+NEAR                 SEGMENT TYPE 
+NEARCODE             SEGMENT TYPE 
+NEARCONST            SEGMENT TYPE 
+NEARDATA             SEGMENT TYPE 
+NEXT                 MACRO 
+NMIIE                #define, value: (0x10), line:     136:2  
+NMIIFG               #define, value: (0x10), line:     145:2  
+NMI_VECTOR           #define, value: (14 * 2u), line:    1023:2  
+NOALLOC              SEGMENT TYPE 
+NOP                  MNEMONIC 
+NOROOT               SEGMENT TYPE 
+NOT                  OPERATOR 
+NPAGE                SEGMENT TYPE 
+ODD                  DIRECTIVE 
+OFIE                 #define, value: (0x02), line:     135:2  
+OFIFG                #define, value: (0x02), line:     142:2  
+OR                   OPERATOR 
+ORG                  DIRECTIVE 
+OSCOFF               #define, value: (0x0020u), line:      89:2      45:11    53:11
+OUT                  #define, value: (0x0004u), line:     615:2  
+OUTMOD0              #define, value: (0x0020u), line:     612:2  
+OUTMOD1              #define, value: (0x0040u), line:     611:2  
+OUTMOD2              #define, value: (0x0080u), line:     610:2  
+OUTMOD_0             #define, value: (0*0x20u), line:     619:2  
+OUTMOD_1             #define, value: (1*0x20u), line:     620:2  
+OUTMOD_2             #define, value: (2*0x20u), line:     621:2  
+OUTMOD_3             #define, value: (3*0x20u), line:     622:2  
+OUTMOD_4             #define, value: (4*0x20u), line:     623:2  
+OUTMOD_5             #define, value: (5*0x20u), line:     624:2  
+OUTMOD_6             #define, value: (6*0x20u), line:     625:2  
+OUTMOD_7             #define, value: (7*0x20u), line:     626:2  
+OWBIT                #define, value: BIT3, line:     73:10     120:10   121:10   122:10   128:10
+                                                                   137:10   143:10   215:10   216:10
+                                                                   224:10   231:10   240:10
+OWDIR                #define, value: P2DIR, line:     71:10     120:10   128:10   137:10   215:10
+                                                                   224:10   240:10
+OWIN                 #define, value: P2IN, line:     69:10     143:10   231:10
+OWOUT                #define, value: P2OUT, line:     70:10     121:10   216:10
+OWREN                #define, value: P2REN, line:     72:10     122:10
+P1DIR_               #define, value: (0x0022u), line:     470:2      471:2
+P1IES_               #define, value: (0x0024u), line:     474:2      475:2
+P1IE_                #define, value: (0x0025u), line:     476:2      477:2
+P1IFG_               #define, value: (0x0023u), line:     472:2      473:2
+P1IN_                #define, value: (0x0020u), line:     466:2      467:2
+P1OUT_               #define, value: (0x0021u), line:     468:2      469:2
+P1REN_               #define, value: (0x0027u), line:     482:2      483:2
+P1SEL2_              #define, value: (0x0041u), line:     480:2      481:2
+P1SEL_               #define, value: (0x0026u), line:     478:2      479:2
+P2CA0                #define, value: (0x04), line:     393:2  
+P2CA1                #define, value: (0x08), line:     394:2  
+P2CA2                #define, value: (0x10), line:     395:2  
+P2CA3                #define, value: (0x20), line:     396:2  
+P2CA4                #define, value: (0x40), line:     397:2  
+P2DIR_               #define, value: (0x002Au), line:     489:2      490:2
+P2IES_               #define, value: (0x002Cu), line:     493:2      494:2
+P2IE_                #define, value: (0x002Du), line:     495:2      496:2
+P2IFG_               #define, value: (0x002Bu), line:     491:2      492:2
+P2IN_                #define, value: (0x0028u), line:     485:2      486:2
+P2OUT_               #define, value: (0x0029u), line:     487:2      488:2
+P2REN_               #define, value: (0x002Fu), line:     501:2      502:2
+P2SEL2_              #define, value: (0x0042u), line:     499:2      500:2
+P2SEL_               #define, value: (0x002Eu), line:     497:2      498:2
+P3DIR_               #define, value: (0x001Au), line:     513:2      514:2
+P3IN_                #define, value: (0x0018u), line:     509:2      510:2
+P3OUT_               #define, value: (0x0019u), line:     511:2      512:2
+P3REN_               #define, value: (0x0010u), line:     519:2      520:2
+P3SEL2_              #define, value: (0x0043u), line:     517:2      518:2
+P3SEL_               #define, value: (0x001Bu), line:     515:2      516:2
+PAGE                 DIRECTIVE 
+PAGSIZ               DIRECTIVE 
+PC                   REGISTER 
+POP                  MNEMONIC 
+PORIFG               #define, value: (0x04), line:     143:2  
+PORT1_VECTOR         #define, value: (2 * 2u), line:    1012:2  
+PORT2_VECTOR         #define, value: (3 * 2u), line:    1013:2  
+PREFIXPROMPT         #define, value: 0, line:    1129:6     1135:6   1144:6
+PROGRAM              DIRECTIVE 
+PSP                  #define, value: R4, line:      45:3       44:4     52:4     53:4     37:5
+                                                                     43:5     44:5     86:5     87:5
+                                                                     96:5     97:5    107:5    108:5
+                                                                    136:5    137:5    156:5    157:5
+                                                                    168:5    173:5    174:5    180:5
+                                                                    181:5    182:5    188:5    189:5
+                                                                    190:5    191:5    196:5    206:5
+                                                                    211:5    212:5    218:5    219:5
+                                                                    225:5    226:5    227:5    232:5
+                                                                    233:5    238:5    239:5    246:5
+                                                                    262:5    263:5    273:5    275:5
+                                                                    285:5    332:5    339:5    369:5
+                                                                    374:5    422:5    423:5    454:5
+                                                                    461:5    466:5    467:5    472:5
+                                                                    473:5    474:5    479:5    486:5
+                                                                    491:5    496:5    537:5    548:5
+                                                                    575:5    587:5    599:5    612:5
+                                                                    613:5    632:5    649:5    652:5
+                                                                    673:5    683:5    684:5    691:5
+                                                                    692:5    708:5    727:5    734:5
+                                                                    735:5    758:5    766:5    767:5
+                                                                    774:5    783:5    784:5    791:5
+                                                                    797:5    798:5    808:5    821:5
+                                                                    822:5    830:5    836:5    837:5
+                                                                    845:5    851:5    852:5    886:5
+                                                                    887:5   1651:6   1685:6   1686:6
+                                                                   1688:6   1819:6   1820:6   1821:6
+                                                                   1826:6   1827:6   1828:6   1833:6
+                                                                   1834:6   1835:6   1840:6   1841:6
+                                                                   1842:6   1847:6   1848:6   1849:6
+                                                                   1854:6   1859:6      8:8     22:8
+                                                                   113:10   114:10
+PUBLIC               DIRECTIVE 
+PUBWEAK              DIRECTIVE 
+PUSH                 MNEMONIC 
+Q                    #define, value: R12, line:      57:3      438:5    439:5    440:5
+R0                   REGISTER 
+R1                   REGISTER 
+R10                  REGISTER 
+R11                  REGISTER 
+R12                  REGISTER 
+R13                  REGISTER 
+R14                  REGISTER 
+R15                  REGISTER 
+R2                   REGISTER 
+R3                   REGISTER 
+R4                   REGISTER 
+R5                   REGISTER 
+R6                   REGISTER 
+R7                   REGISTER 
+R8                   REGISTER 
+R9                   REGISTER 
+RADIX                DIRECTIVE 
+RAMEND               #define, value: (0x0400), line:      30:3     1898:6
+RAMSTART             #define, value: (0x0200), line:      29:3  
+READ                 Target symbol: 2048 
+READ_ONLY            #define, value: const, line:      55:2      467:2    486:2    510:2    528:2
+                                                                    650:2    696:2    721:2    948:2
+                                                                    950:2    952:2    954:2    956:2
+                                                                    958:2    960:2    962:2    977:2
+                                                                    979:2    981:2    983:2    985:2
+REF2_5V              #define, value: (0x040), line:     191:2  
+REFBURST             #define, value: (0x100), line:     193:2  
+REFON                #define, value: (0x020), line:     190:2  
+REFOUT               #define, value: (0x200), line:     194:2  
+REGISTER             SEGMENT TYPE 
+REORDER              SEGMENT TYPE 
+REPT                 DIRECTIVE 
+REPTC                DIRECTIVE 
+REPTI                DIRECTIVE 
+REQUIRE              DIRECTIVE 
+RESET_VECTOR         #define, value: (15 * 2u), line:    1024:2  
+RET                  MNEMONIC 
+RETI                 MNEMONIC 
+RLA                  MNEMONIC 
+RLC                  MNEMONIC 
+ROOT                 SEGMENT TYPE 
+RRA                  MNEMONIC 
+RRC                  MNEMONIC 
+RSEG                 DIRECTIVE 
+RSEL0                #define, value: (0x01), line:     304:2  
+RSEL1                #define, value: (0x02), line:     305:2  
+RSEL2                #define, value: (0x04), line:     306:2  
+RSEL3                #define, value: (0x08), line:     307:2  
+RSP                  #define, value: SP, line:      42:3       50:5    213:5    220:5    240:5
+                                                                    245:5    645:5    646:5    647:5
+                                                                    664:5    665:5    677:5    678:5
+                                                                    693:5    694:5    699:5    700:5
+                                                                    45:11
+RSTIFG               #define, value: (0x08), line:     144:2  
+RTMODEL              DIRECTIVE 
+SBC                  MNEMONIC 
+SCCI                 #define, value: (0x0400u), line:     608:2  
+SCG0                 #define, value: (0x0040u), line:      90:2      45:11    53:11
+SCG1                 #define, value: (0x0080u), line:      91:2      45:11    53:11
+SCS                  #define, value: (0x0800u), line:     607:2  
+SEGWRT               #define, value: (0x0080u), line:     429:2  
+SELM0                #define, value: (0x40), line:     323:2  
+SELM1                #define, value: (0x80), line:     324:2  
+SELM_0               #define, value: (0x00), line:     336:2  
+SELM_1               #define, value: (0x40), line:     337:2  
+SELM_2               #define, value: (0x80), line:     338:2  
+SELM_3               #define, value: (0xC0), line:     339:2  
+SELS                 #define, value: (0x08), line:     320:2  
+SET                  DIRECTIVE 
+SETC                 MNEMONIC 
+SETN                 MNEMONIC 
+SETZ                 MNEMONIC 
+SFB                  OPERATOR 
+SFE                  OPERATOR 
+SFRB                 DIRECTIVE 
+SFRTYPE              DIRECTIVE 
+SFRW                 DIRECTIVE 
+SHL                  OPERATOR 
+SHR                  OPERATOR 
+SHS0                 #define, value: (0x0400u), line:     226:2  
+SHS1                 #define, value: (0x0800u), line:     227:2  
+SHS_0                #define, value: (0*0x400u), line:     252:2  
+SHS_1                #define, value: (1*0x400u), line:     253:2  
+SHS_2                #define, value: (2*0x400u), line:     254:2  
+SHS_3                #define, value: (3*0x400u), line:     255:2  
+SIZEOF               OPERATOR 
+SORT                 SEGMENT TYPE 
+SP                   REGISTER 
+SR                   REGISTER 
+SREF0                #define, value: (0x2000u), line:     198:2  
+SREF1                #define, value: (0x4000u), line:     199:2  
+SREF2                #define, value: (0x8000u), line:     200:2  
+SREF_0               #define, value: (0*0x2000u), line:     206:2  
+SREF_1               #define, value: (1*0x2000u), line:     207:2  
+SREF_2               #define, value: (2*0x2000u), line:     208:2  
+SREF_3               #define, value: (3*0x2000u), line:     209:2  
+SREF_4               #define, value: (4*0x2000u), line:     210:2  
+SREF_5               #define, value: (5*0x2000u), line:     211:2  
+SREF_6               #define, value: (6*0x2000u), line:     212:2  
+SREF_7               #define, value: (7*0x2000u), line:     213:2  
+STACK                DIRECTIVE 
+SUB                  MNEMONIC 
+SUBC                 MNEMONIC 
+SUPPRESS_CPU40_WARNING DIRECTIVE 
+SUPPRESS_NOP_AFTER_DINT_WARNING DIRECTIVE 
+SUPPRESS_NOP_AFTER_LPM_WARNING DIRECTIVE 
+SUPPRESS_NOP_BEFORE_EINT_WARNING
+                     DIRECTIVE 
+SUPPRESS_THIS_GIE_NOP_WARNING DIRECTIVE 
+SWPB                 MNEMONIC 
+SXT                  MNEMONIC 
+SYMBOL               DIRECTIVE 
+T                    #define, value: R13, line:      58:3  
+TA0CCR0_             #define, value: (0x0172u), line:     539:2      540:2
+TA0CCR1_             #define, value: (0x0174u), line:     541:2      542:2
+TA0CCR2_             #define, value: (0x0176u), line:     543:2      544:2
+TA0CCTL0_            #define, value: (0x0162u), line:     531:2      532:2
+TA0CCTL1_            #define, value: (0x0164u), line:     533:2      534:2
+TA0CCTL2_            #define, value: (0x0166u), line:     535:2      536:2
+TA0CTL_              #define, value: (0x0160u), line:     529:2      530:2
+TA0IV_               #define, value: (0x012Eu), line:     527:2      528:2
+TA0IV_6              #define, value: (0x0006u), line:     640:2  
+TA0IV_8              #define, value: (0x0008u), line:     641:2  
+TA0IV_NONE           #define, value: (0x0000u), line:     637:2  
+TA0IV_TACCR1         #define, value: (0x0002u), line:     638:2  
+TA0IV_TACCR2         #define, value: (0x0004u), line:     639:2  
+TA0IV_TAIFG          #define, value: (0x000Au), line:     642:2  
+TA0R_                #define, value: (0x0170u), line:     537:2      538:2
+TA1CCR0_             #define, value: (0x0192u), line:     661:2      662:2
+TA1CCR1_             #define, value: (0x0194u), line:     663:2      664:2
+TA1CCR2_             #define, value: (0x0196u), line:     665:2      666:2
+TA1CCTL0_            #define, value: (0x0182u), line:     653:2      654:2
+TA1CCTL1_            #define, value: (0x0184u), line:     655:2      656:2
+TA1CCTL2_            #define, value: (0x0186u), line:     657:2      658:2
+TA1CTL_              #define, value: (0x0180u), line:     651:2      652:2
+TA1IV_               #define, value: (0x011Eu), line:     649:2      650:2
+TA1IV_6              #define, value: (0x0006u), line:     674:2  
+TA1IV_8              #define, value: (0x0008u), line:     675:2  
+TA1IV_NONE           #define, value: (0x0000u), line:     671:2  
+TA1IV_TACCR1         #define, value: (0x0002u), line:     672:2  
+TA1IV_TACCR2         #define, value: (0x0004u), line:     673:2  
+TA1IV_TAIFG          #define, value: (0x000Au), line:     676:2  
+TA1R_                #define, value: (0x0190u), line:     659:2      660:2
+TACCR0               #define, value: TA0CCR0, line:     553:2  
+TACCR0_              #define, value: TA0CCR0_, line:     562:2  
+TACCR1               #define, value: TA0CCR1, line:     554:2  
+TACCR1_              #define, value: TA0CCR1_, line:     563:2  
+TACCR2               #define, value: TA0CCR2, line:     555:2  
+TACCR2_              #define, value: TA0CCR2_, line:     564:2  
+TACCTL0              #define, value: TA0CCTL0, line:     549:2  
+TACCTL0_             #define, value: TA0CCTL0_, line:     558:2  
+TACCTL1              #define, value: TA0CCTL1, line:     550:2  
+TACCTL1_             #define, value: TA0CCTL1_, line:     559:2  
+TACCTL2              #define, value: TA0CCTL2, line:     551:2  
+TACCTL2_             #define, value: TA0CCTL2_, line:     560:2  
+TACLR                #define, value: (0x0004u), line:     586:2  
+TACTL                #define, value: TA0CTL, line:     548:2  
+TACTL_               #define, value: TA0CTL_, line:     557:2  
+TAG_ADC10_1          #define, value: (0x08), line:     972:2  
+TAG_DCO_30           #define, value: (0x01), line:     971:2  
+TAG_EMPTY            #define, value: (0xFE), line:     973:2  
+TAIE                 #define, value: (0x0002u), line:     587:2  
+TAIFG                #define, value: (0x0001u), line:     588:2  
+TAIV                 #define, value: TA0IV, line:     547:2  
+TAIV_                #define, value: TA0IV_, line:     556:2  
+TAR                  #define, value: TA0R, line:     552:2  
+TAR_                 #define, value: TA0R_, line:     561:2  
+TASSEL0              #define, value: (0x0100u), line:     581:2  
+TASSEL1              #define, value: (0x0200u), line:     580:2  
+TASSEL_0             #define, value: (0*0x100u), line:     598:2  
+TASSEL_1             #define, value: (1*0x100u), line:     599:2  
+TASSEL_2             #define, value: (2*0x100u), line:     600:2  
+TASSEL_3             #define, value: (3*0x100u), line:     601:2  
+TIMER0_A0_VECTOR     #define, value: (9 * 2u), line:    1018:2  
+TIMER0_A1_VECTOR     #define, value: (8 * 2u), line:    1017:2  
+TIMER1_A0_VECTOR     #define, value: (13 * 2u), line:    1022:2  
+TIMER1_A1_VECTOR     #define, value: (12 * 2u), line:    1021:2  
+TLV_ADC10_1_LEN_     #define, value: (0x10DBu), line:     984:2      985:2
+TLV_ADC10_1_TAG_     #define, value: (0x10DAu), line:     982:2      983:2
+TLV_CHECKSUM_        #define, value: (0x10C0u), line:     976:2      977:2
+TLV_DCO_30_LEN_      #define, value: (0x10F7u), line:     980:2      981:2
+TLV_DCO_30_TAG_      #define, value: (0x10F6u), line:     978:2      979:2
+TOS                  #define, value: R7, line:      48:3       43:4     44:4     53:4     54:4
+                                                                     81:4     36:5     37:5     44:5
+                                                                     45:5     87:5     88:5     97:5
+                                                                     98:5    108:5    109:5    110:5
+                                                                    137:5    138:5    157:5    162:5
+                                                                    168:5    174:5    175:5    182:5
+                                                                    183:5    189:5    190:5    205:5
+                                                                    206:5    212:5    213:5    219:5
+                                                                    220:5    226:5    227:5    232:5
+                                                                    233:5    239:5    240:5    245:5
+                                                                    246:5    257:5    257:5    262:5
+                                                                    263:5    268:5    268:5    274:5
+                                                                    275:5    286:5    288:5    332:5
+                                                                    340:5    342:5    345:5    347:5
+                                                                    350:5    352:5    364:5    369:5
+                                                                    375:5    378:5    380:5    383:5
+                                                                    385:5    397:5    424:5    433:5
+                                                                    443:5    452:5    454:5    461:5
+                                                                    466:5    467:5    472:5    474:5
+                                                                    480:5    481:5    486:5    491:5
+                                                                    496:5    501:5    506:5    507:5
+                                                                    512:5    517:5    522:5    527:5
+                                                                    527:5    532:5    538:5    541:5
+                                                                    543:5    549:5    553:5    555:5
+                                                                    562:5    563:5    563:5    568:5
+                                                                    568:5    569:5    569:5    570:5
+                                                                    576:5    578:5    588:5    590:5
+                                                                    600:5    610:5    613:5    631:5
+                                                                    632:5    650:5    652:5    672:5
+                                                                    673:5    684:5    685:5    686:5
+                                                                    692:5    693:5    694:5    717:5
+                                                                    728:5    742:5    744:5    752:5
+                                                                    759:5    770:5    774:5    785:5
+                                                                    789:5    791:5    799:5    801:5
+                                                                    802:5    806:5    808:5    825:5
+                                                                    831:5    840:5    846:5    853:5
+                                                                    858:5    863:5    863:5    864:5
+                                                                    864:5    865:5    887:5   1649:6
+                                                                   1650:6   1651:6   1653:6   1655:6
+                                                                   1686:6   1687:6   1819:6   1821:6
+                                                                   1826:6   1828:6   1833:6   1835:6
+                                                                   1840:6   1842:6   1847:6   1849:6
+                                                                   1854:6   1856:6   1858:6      9:8
+                                                                     11:8     17:8     22:8     41:9
+                                                                   114:10   117:10   145:10   209:10
+                                                                   222:10   233:10   234:10
+TRAPINT_VECTOR       #define, value: (0 * 2u), line:    1011:2  
+TST                  MNEMONIC 
+UC0IE                #define, value: IE2, line:     149:2  
+UC0IFG               #define, value: IFG2, line:     157:2  
+UC7BIT               #define, value: (0x10), line:     733:2  
+UCA0ABCTL_           #define, value: (0x005Du), line:     699:2      700:2
+UCA0BR0_             #define, value: (0x0062u), line:     687:2      688:2
+UCA0BR1_             #define, value: (0x0063u), line:     689:2      690:2
+UCA0CTL0_            #define, value: (0x0060u), line:     683:2      684:2
+UCA0CTL1_            #define, value: (0x0061u), line:     685:2      686:2
+UCA0IRRCTL_          #define, value: (0x005Fu), line:     703:2      704:2
+UCA0IRTCTL_          #define, value: (0x005Eu), line:     701:2      702:2
+UCA0MCTL_            #define, value: (0x0064u), line:     691:2      692:2
+UCA0RXBUF_           #define, value: (0x0066u), line:     695:2      696:2
+UCA0RXIE             #define, value: (0x01), line:     150:2      31:11    36:11
+UCA0RXIFG            #define, value: (0x01), line:     158:2       50:4    888:5
+UCA0STAT_            #define, value: (0x0065u), line:     693:2      694:2
+UCA0TXBUF_           #define, value: (0x0067u), line:     697:2      698:2
+UCA0TXIE             #define, value: (0x02), line:     151:2  
+UCA0TXIFG            #define, value: (0x02), line:     159:2       41:4
+UCA10                #define, value: (0x80), line:     745:2  
+UCABDEN              #define, value: (0x01), line:     869:2  
+UCADDR               #define, value: (0x02), line:     823:2  
+UCALIE               #define, value: (0x01), line:     834:2  
+UCALIFG              #define, value: (0x01), line:     842:2  
+UCB0BR0_             #define, value: (0x006Au), line:     712:2      713:2
+UCB0BR1_             #define, value: (0x006Bu), line:     714:2      715:2
+UCB0CTL0_            #define, value: (0x0068u), line:     708:2      709:2
+UCB0CTL1_            #define, value: (0x0069u), line:     710:2      711:2
+UCB0I2CIE_           #define, value: (0x006Cu), line:     716:2      717:2
+UCB0I2COA_           #define, value: (0x0118u), line:     724:2      725:2
+UCB0I2CSA_           #define, value: (0x011Au), line:     726:2      727:2
+UCB0RXBUF_           #define, value: (0x006Eu), line:     720:2      721:2
+UCB0RXIE             #define, value: (0x04), line:     152:2  
+UCB0RXIFG            #define, value: (0x04), line:     160:2  
+UCB0STAT_            #define, value: (0x006Du), line:     718:2      719:2
+UCB0TXBUF_           #define, value: (0x006Fu), line:     722:2      723:2
+UCB0TXIE             #define, value: (0x08), line:     153:2  
+UCB0TXIFG            #define, value: (0x08), line:     161:2  
+UCBBUSY              #define, value: (0x10), line:     838:2  
+UCBRF0               #define, value: (0x10), line:     785:2  
+UCBRF1               #define, value: (0x20), line:     784:2  
+UCBRF2               #define, value: (0x40), line:     783:2  
+UCBRF3               #define, value: (0x80), line:     782:2  
+UCBRF_0              #define, value: (0x00), line:     791:2  
+UCBRF_1              #define, value: (0x10), line:     792:2  
+UCBRF_10             #define, value: (0xA0), line:     801:2  
+UCBRF_11             #define, value: (0xB0), line:     802:2  
+UCBRF_12             #define, value: (0xC0), line:     803:2  
+UCBRF_13             #define, value: (0xD0), line:     804:2  
+UCBRF_14             #define, value: (0xE0), line:     805:2  
+UCBRF_15             #define, value: (0xF0), line:     806:2  
+UCBRF_2              #define, value: (0x20), line:     793:2  
+UCBRF_3              #define, value: (0x30), line:     794:2  
+UCBRF_4              #define, value: (0x40), line:     795:2  
+UCBRF_5              #define, value: (0x50), line:     796:2  
+UCBRF_6              #define, value: (0x60), line:     797:2  
+UCBRF_7              #define, value: (0x70), line:     798:2  
+UCBRF_8              #define, value: (0x80), line:     799:2  
+UCBRF_9              #define, value: (0x90), line:     800:2  
+UCBRK                #define, value: (0x08), line:     821:2  
+UCBRKIE              #define, value: (0x10), line:     758:2  
+UCBRS0               #define, value: (0x02), line:     788:2  
+UCBRS1               #define, value: (0x04), line:     787:2  
+UCBRS2               #define, value: (0x08), line:     786:2  
+UCBRS_0              #define, value: (0x00), line:     808:2  
+UCBRS_1              #define, value: (0x02), line:     809:2  
+UCBRS_2              #define, value: (0x04), line:     810:2  
+UCBRS_3              #define, value: (0x06), line:     811:2  
+UCBRS_4              #define, value: (0x08), line:     812:2  
+UCBRS_5              #define, value: (0x0A), line:     813:2  
+UCBRS_6              #define, value: (0x0C), line:     814:2  
+UCBRS_7              #define, value: (0x0E), line:     815:2  
+UCBTOE               #define, value: (0x04), line:     867:2  
+UCBUSY               #define, value: (0x01), line:     824:2  
+UCCKPH               #define, value: (0x80), line:     740:2  
+UCCKPL               #define, value: (0x40), line:     741:2  
+UCDELIM0             #define, value: (0x10), line:     865:2  
+UCDELIM1             #define, value: (0x20), line:     864:2  
+UCDORM               #define, value: (0x08), line:     759:2  
+UCFE                 #define, value: (0x40), line:     818:2  
+UCGC                 #define, value: (0x20), line:     837:2  
+UCGCEN               #define, value: (0x8000u), line:     871:2  
+UCIDLE               #define, value: (0x02), line:     825:2  
+UCIREN               #define, value: (0x01), line:     851:2  
+UCIRRXFE             #define, value: (0x01), line:     860:2  
+UCIRRXFL0            #define, value: (0x04), line:     858:2  
+UCIRRXFL1            #define, value: (0x08), line:     857:2  
+UCIRRXFL2            #define, value: (0x10), line:     856:2  
+UCIRRXFL3            #define, value: (0x20), line:     855:2  
+UCIRRXFL4            #define, value: (0x40), line:     854:2  
+UCIRRXFL5            #define, value: (0x80), line:     853:2  
+UCIRRXPL             #define, value: (0x02), line:     859:2  
+UCIRTXCLK            #define, value: (0x02), line:     850:2  
+UCIRTXPL0            #define, value: (0x04), line:     849:2  
+UCIRTXPL1            #define, value: (0x08), line:     848:2  
+UCIRTXPL2            #define, value: (0x10), line:     847:2  
+UCIRTXPL3            #define, value: (0x20), line:     846:2  
+UCIRTXPL4            #define, value: (0x40), line:     845:2  
+UCIRTXPL5            #define, value: (0x80), line:     844:2  
+UCLISTEN             #define, value: (0x80), line:     817:2  
+UCMM                 #define, value: (0x20), line:     747:2  
+UCMODE0              #define, value: (0x02), line:     736:2  
+UCMODE1              #define, value: (0x04), line:     735:2  
+UCMODE_0             #define, value: (0x00), line:     749:2  
+UCMODE_1             #define, value: (0x02), line:     750:2  
+UCMODE_2             #define, value: (0x04), line:     751:2  
+UCMODE_3             #define, value: (0x06), line:     752:2  
+UCMSB                #define, value: (0x20), line:     732:2  
+UCMST                #define, value: (0x08), line:     742:2  
+UCNACKIE             #define, value: (0x08), line:     831:2  
+UCNACKIFG            #define, value: (0x08), line:     839:2  
+UCOA0                #define, value: (0x0001u), line:     881:2  
+UCOA1                #define, value: (0x0002u), line:     880:2  
+UCOA2                #define, value: (0x0004u), line:     879:2  
+UCOA3                #define, value: (0x0008u), line:     878:2  
+UCOA4                #define, value: (0x0010u), line:     877:2  
+UCOA5                #define, value: (0x0020u), line:     876:2  
+UCOA6                #define, value: (0x0040u), line:     875:2  
+UCOA7                #define, value: (0x0080u), line:     874:2  
+UCOA8                #define, value: (0x0100u), line:     873:2  
+UCOA9                #define, value: (0x0200u), line:     872:2  
+UCOE                 #define, value: (0x20), line:     819:2  
+UCOS16               #define, value: (0x01), line:     789:2  
+UCPAR                #define, value: (0x40), line:     731:2  
+UCPE                 #define, value: (0x10), line:     820:2  
+UCPEN                #define, value: (0x80), line:     730:2  
+UCRXEIE              #define, value: (0x20), line:     757:2  
+UCRXERR              #define, value: (0x04), line:     822:2  
+UCSA0                #define, value: (0x0001u), line:     892:2  
+UCSA1                #define, value: (0x0002u), line:     891:2  
+UCSA2                #define, value: (0x0004u), line:     890:2  
+UCSA3                #define, value: (0x0008u), line:     889:2  
+UCSA4                #define, value: (0x0010u), line:     888:2  
+UCSA5                #define, value: (0x0020u), line:     887:2  
+UCSA6                #define, value: (0x0040u), line:     886:2  
+UCSA7                #define, value: (0x0080u), line:     885:2  
+UCSA8                #define, value: (0x0100u), line:     884:2  
+UCSA9                #define, value: (0x0200u), line:     883:2  
+UCSCLLOW             #define, value: (0x40), line:     836:2  
+UCSLA10              #define, value: (0x40), line:     746:2  
+UCSPB                #define, value: (0x08), line:     734:2  
+UCSSEL0              #define, value: (0x40), line:     756:2  
+UCSSEL1              #define, value: (0x80), line:     755:2  
+UCSSEL_0             #define, value: (0x00), line:     777:2  
+UCSSEL_1             #define, value: (0x40), line:     778:2  
+UCSSEL_2             #define, value: (0x80), line:     779:2  
+UCSSEL_3             #define, value: (0xC0), line:     780:2  
+UCSTOE               #define, value: (0x08), line:     866:2  
+UCSTPIE              #define, value: (0x04), line:     832:2  
+UCSTPIFG             #define, value: (0x04), line:     840:2  
+UCSTTIE              #define, value: (0x02), line:     833:2  
+UCSTTIFG             #define, value: (0x02), line:     841:2  
+UCSWRST              #define, value: (0x01), line:     762:2  
+UCSYNC               #define, value: (0x01), line:     737:2  
+UCTR                 #define, value: (0x10), line:     773:2  
+UCTXADDR             #define, value: (0x04), line:     760:2  
+UCTXBRK              #define, value: (0x02), line:     761:2  
+UCTXNACK             #define, value: (0x08), line:     774:2  
+UCTXSTP              #define, value: (0x04), line:     775:2  
+UCTXSTT              #define, value: (0x02), line:     776:2  
+UGT                  OPERATOR 
+ULT                  OPERATOR 
+UNTYPED              SEGMENT TYPE 
+USCIAB0RX_VECTOR     #define, value: (7 * 2u), line:    1016:2      72:11
+USCIAB0TX_VECTOR     #define, value: (6 * 2u), line:    1015:2  
+USERFLASHEND         #define, value: (0xD1FF), line:      32:3      293:5    327:5    347:5    380:5
+                                                                   1888:6    142:7
+USERFLASHSTART       #define, value: (0xC000), line:      31:3      291:5    325:5    345:5    378:5
+                                                                    203:6   1884:6    142:7
+V                    #define, value: (0x0100u), line:      86:2  
+VAR                  DIRECTIVE 
+W                    #define, value: R6, line:      47:3       45:4     45:4     56:4     56:4
+                                                                     82:4     82:4     36:5     38:5
+                                                                     46:5     46:5     51:5     51:5
+                                                                     60:5     61:5     61:5     88:5
+                                                                     89:5     89:5     98:5     99:5
+                                                                     99:5    109:5    111:5    111:5
+                                                                    119:5    119:5    120:5    138:5
+                                                                    140:5    142:5    142:5    158:5
+                                                                    158:5    164:5    164:5    169:5
+                                                                    169:5    173:5    175:5    176:5
+                                                                    176:5    180:5    183:5    184:5
+                                                                    184:5    188:5    191:5    192:5
+                                                                    192:5    197:5    197:5    207:5
+                                                                    207:5    214:5    214:5    221:5
+                                                                    221:5    228:5    228:5    234:5
+                                                                    234:5    241:5    241:5    247:5
+                                                                    247:5    258:5    258:5    264:5
+                                                                    264:5    269:5    269:5    273:5
+                                                                    274:5    276:5    276:5    285:5
+                                                                    286:5    288:5    291:5    293:5
+                                                                    299:5    301:5    306:5    308:5
+                                                                    318:5    325:5    327:5    329:5
+                                                                    330:5    333:5    333:5    339:5
+                                                                    342:5    364:5    370:5    370:5
+                                                                    374:5    375:5    397:5    422:5
+                                                                    435:5    441:5    442:5    445:5
+                                                                    446:5    455:5    455:5    462:5
+                                                                    462:5    468:5    468:5    475:5
+                                                                    475:5    479:5    480:5    481:5
+                                                                    482:5    482:5    487:5    487:5
+                                                                    492:5    492:5    497:5    497:5
+                                                                    502:5    502:5    508:5    508:5
+                                                                    513:5    513:5    518:5    518:5
+                                                                    523:5    523:5    528:5    528:5
+                                                                    533:5    533:5    537:5    540:5
+                                                                    540:5    543:5    544:5    544:5
+                                                                    548:5    552:5    555:5    556:5
+                                                                    556:5    564:5    564:5    571:5
+                                                                    571:5    575:5    576:5    579:5
+                                                                    579:5    587:5    588:5    591:5
+                                                                    591:5    599:5    600:5    627:5
+                                                                    627:5    635:5    635:5    653:5
+                                                                    653:5    666:5    666:5    679:5
+                                                                    679:5    687:5    687:5    695:5
+                                                                    695:5    701:5    701:5    716:5
+                                                                    717:5    724:5    729:5    729:5
+                                                                    741:5    747:5    760:5    760:5
+                                                                    767:5    770:5    771:5    775:5
+                                                                    775:5    783:5    787:5    788:5
+                                                                    792:5    792:5    797:5    801:5
+                                                                    804:5    805:5    809:5    809:5
+                                                                    822:5    825:5    827:5    830:5
+                                                                    832:5    832:5    837:5    840:5
+                                                                    842:5    845:5    847:5    847:5
+                                                                    851:5    855:5    866:5    866:5
+                                                                   1652:6   1656:6   1658:6   1658:6
+                                                                   1687:6   1688:6   1689:6   1689:6
+                                                                   1822:6   1822:6   1829:6   1829:6
+                                                                   1836:6   1836:6   1843:6   1843:6
+                                                                   1850:6   1850:6   1860:6   1860:6
+                                                                      8:8     11:8     17:8     23:8
+                                                                     23:8     29:8     34:8     39:8
+                                                                     39:8     42:9     42:9   154:10
+                                                                   154:10   250:10   250:10    32:11
+                                                                    32:11    37:11    37:11    57:11
+                                                                    57:11    67:11    67:11
+WAIT                 #define, value: (0x0008u), line:     454:2  
+WDTCNTCL             #define, value: (0x0008u), line:     905:2  
+WDTCTL_              #define, value: (0x0120u), line:     899:2      900:2
+WDTHOLD              #define, value: (0x0080u), line:     909:2  
+WDTIE                #define, value: (0x01), line:     134:2  
+WDTIFG               #define, value: (0x01), line:     141:2  
+WDTIS0               #define, value: (0x0001u), line:     902:2  
+WDTIS1               #define, value: (0x0002u), line:     903:2  
+WDTNMI               #define, value: (0x0020u), line:     907:2  
+WDTNMIES             #define, value: (0x0040u), line:     908:2  
+WDTPW                #define, value: (0x5A00u), line:     911:2  
+WDTSSEL              #define, value: (0x0004u), line:     904:2  
+WDTTMSEL             #define, value: (0x0010u), line:     906:2  
+WDT_ADLY_1000        #define, value: (WDTPW+WDTTMSEL+WDTCNTCL+WDTSSEL), line:     920:2  
+WDT_ADLY_16          #define, value: (WDTPW+WDTTMSEL+WDTCNTCL+WDTSSEL+WDTIS1), line:     922:2  
+WDT_ADLY_1_9         #define, value: (WDTPW+WDTTMSEL+WDTCNTCL+WDTSSEL+WDTIS1+WDTIS0), line:     923:2  
+WDT_ADLY_250         #define, value: (WDTPW+WDTTMSEL+WDTCNTCL+WDTSSEL+WDTIS0), line:     921:2  
+WDT_ARST_1000        #define, value: (WDTPW+WDTCNTCL+WDTSSEL), line:     931:2  
+WDT_ARST_16          #define, value: (WDTPW+WDTCNTCL+WDTSSEL+WDTIS1), line:     933:2  
+WDT_ARST_1_9         #define, value: (WDTPW+WDTCNTCL+WDTSSEL+WDTIS1+WDTIS0), line:     934:2  
+WDT_ARST_250         #define, value: (WDTPW+WDTCNTCL+WDTSSEL+WDTIS0), line:     932:2  
+WDT_MDLY_0_064       #define, value: (WDTPW+WDTTMSEL+WDTCNTCL+WDTIS1+WDTIS0), line:     918:2  
+WDT_MDLY_0_5         #define, value: (WDTPW+WDTTMSEL+WDTCNTCL+WDTIS1), line:     917:2  
+WDT_MDLY_32          #define, value: (WDTPW+WDTTMSEL+WDTCNTCL), line:     915:2  
+WDT_MDLY_8           #define, value: (WDTPW+WDTTMSEL+WDTCNTCL+WDTIS0), line:     916:2  
+WDT_MRST_0_064       #define, value: (WDTPW+WDTCNTCL+WDTIS1+WDTIS0), line:     929:2  
+WDT_MRST_0_5         #define, value: (WDTPW+WDTCNTCL+WDTIS1), line:     928:2  
+WDT_MRST_32          #define, value: (WDTPW+WDTCNTCL), line:     926:2  
+WDT_MRST_8           #define, value: (WDTPW+WDTCNTCL+WDTIS0), line:     927:2  
+WDT_VECTOR           #define, value: (10 * 2u), line:    1019:2  
+WORD                 Target symbol: 1048576 
+WRITE                Target symbol: 4096 
+WRT                  #define, value: (0x0040u), line:     427:2      362:5    395:5    430:5     16:8
+X                    #define, value: R10, line:      55:3      423:5    437:5    438:5    445:5
+                                                                    766:5    768:5    772:5    784:5
+                                                                    787:5    798:5    802:5    803:5
+                                                                    805:5    821:5    823:5    828:5
+                                                                    831:5    836:5    838:5    843:5
+                                                                    846:5    852:5    855:5    857:5
+                                                                   125:10   125:10   131:10   131:10
+                                                                   140:10   140:10   151:10   151:10
+                                                                   219:10   219:10   228:10   228:10
+                                                                   237:10   237:10   246:10   246:10
+XCAP0                #define, value: (0x04), line:     343:2  
+XCAP1                #define, value: (0x08), line:     344:2  
+XCAP_0               #define, value: (0x00), line:     350:2  
+XCAP_1               #define, value: (0x04), line:     351:2  
+XCAP_2               #define, value: (0x08), line:     352:2  
+XCAP_3               #define, value: (0x0C), line:     353:2  
+XDATA                SEGMENT TYPE 
+XOR                  OPERATOR 
+XOR                  MNEMONIC 
+XT2OF                #define, value: (0x02), line:     342:2  
+XT2OFF               #define, value: (0x80), line:     311:2  
+XT2S0                #define, value: (0x40), line:     347:2  
+XT2S1                #define, value: (0x80), line:     348:2  
+XT2S_0               #define, value: (0x00), line:     360:2  
+XT2S_1               #define, value: (0x40), line:     361:2  
+XT2S_2               #define, value: (0x80), line:     362:2  
+XT2S_3               #define, value: (0xC0), line:     363:2  
+XTS                  #define, value: (0x40), line:     310:2  
+Y                    #define, value: R11, line:      56:3      437:5    440:5    441:5
+Z                    #define, value: (0x0002u), line:      84:2  
+ZPAGE                SEGMENT TYPE 
+^                    OPERATOR 
+__430X_CORE__        #define, value: 1, line:         0  
+__430X__             #define, value: 1, line:         0  
+__430_CORE__         #define, value: 0, line:         0  
+__430__              #define, value: 0, line:         0  
+__A430__             #define, value: 1, line:         0  
+__BUILD_NUMBER__     #define,            line:         0  
+__CORE__             #define, value: 0, line:         0  
+__DATE__             #define,            line:         0         48
+__FILE__             #define,            line:         0  
+__IAR_SYSTEMS_ASM    #define,            line:         0  
+__IAR_SYSTEMS_ASM__  #define,            line:         0  
+__LINE__             #define,            line:         0  
+__MSP430BT5190__     Target symbol: 0 
+__MSP430F5252__      Target symbol: 0 
+__MSP430F5253__      Target symbol: 0 
+__MSP430F5254__      Target symbol: 0 
+__MSP430F5255__      Target symbol: 0 
+__MSP430F5256__      Target symbol: 0 
+__MSP430F5257__      Target symbol: 0 
+__MSP430F5258__      Target symbol: 0 
+__MSP430F5259__      Target symbol: 0 
+__MSP430FR2032__     Target symbol: 0 
+__MSP430FR2033__     Target symbol: 0 
+__MSP430FR4131__     Target symbol: 0 
+__MSP430FR4132__     Target symbol: 0 
+__MSP430FR4133__     Target symbol: 0 
+__MSP430FR58471__    Target symbol: 0 
+__MSP430FR5847__     Target symbol: 0 
+__MSP430FR5848__     Target symbol: 0 
+__MSP430FR5849__     Target symbol: 0 
+__MSP430FR5857__     Target symbol: 0 
+__MSP430FR5858__     Target symbol: 0 
+__MSP430FR5859__     Target symbol: 0 
+__MSP430FR58671__    Target symbol: 0 
+__MSP430FR5867__     Target symbol: 0 
+__MSP430FR5868__     Target symbol: 0 
+__MSP430FR5869__     Target symbol: 0 
+__MSP430FR5870__     Target symbol: 0 
+__MSP430FR58721__    Target symbol: 0 
+__MSP430FR5872__     Target symbol: 0 
+__MSP430FR5887__     Target symbol: 0 
+__MSP430FR5888__     Target symbol: 0 
+__MSP430FR58891__    Target symbol: 0 
+__MSP430FR5889__     Target symbol: 0 
+__MSP430FR59471__    Target symbol: 0 
+__MSP430FR5947__     Target symbol: 0 
+__MSP430FR5948__     Target symbol: 0 
+__MSP430FR5949__     Target symbol: 0 
+__MSP430FR5957__     Target symbol: 0 
+__MSP430FR5958__     Target symbol: 0 
+__MSP430FR5959__     Target symbol: 0 
+__MSP430FR5967__     Target symbol: 0 
+__MSP430FR5968__     Target symbol: 0 
+__MSP430FR59691__    Target symbol: 0 
+__MSP430FR5969__     Target symbol: 0 
+__MSP430FR5970__     Target symbol: 0 
+__MSP430FR59721__    Target symbol: 0 
+__MSP430FR5972__     Target symbol: 0 
+__MSP430FR5986__     Target symbol: 0 
+__MSP430FR5987__     Target symbol: 0 
+__MSP430FR5988__     Target symbol: 0 
+__MSP430FR59891__    Target symbol: 0 
+__MSP430FR5989__     Target symbol: 0 
+__MSP430FR6820__     Target symbol: 0 
+__MSP430FR68221__    Target symbol: 0 
+__MSP430FR6822__     Target symbol: 0 
+__MSP430FR6870__     Target symbol: 0 
+__MSP430FR68721__    Target symbol: 0 
+__MSP430FR6872__     Target symbol: 0 
+__MSP430FR6877__     Target symbol: 0 
+__MSP430FR68791__    Target symbol: 0 
+__MSP430FR6879__     Target symbol: 0 
+__MSP430FR6887__     Target symbol: 0 
+__MSP430FR6888__     Target symbol: 0 
+__MSP430FR68891__    Target symbol: 0 
+__MSP430FR6889__     Target symbol: 0 
+__MSP430FR6920__     Target symbol: 0 
+__MSP430FR69221__    Target symbol: 0 
+__MSP430FR6922__     Target symbol: 0 
+__MSP430FR69271__    Target symbol: 0 
+__MSP430FR6927__     Target symbol: 0 
+__MSP430FR6928__     Target symbol: 0 
+__MSP430FR6970__     Target symbol: 0 
+__MSP430FR69721__    Target symbol: 0 
+__MSP430FR6972__     Target symbol: 0 
+__MSP430FR6977__     Target symbol: 0 
+__MSP430FR69791__    Target symbol: 0 
+__MSP430FR6979__     Target symbol: 0 
+__MSP430FR6987__     Target symbol: 0 
+__MSP430FR6988__     Target symbol: 0 
+__MSP430FR69891__    Target symbol: 0 
+__MSP430FR6989__     Target symbol: 0 
+__MSP430G2210__      Target symbol: 0 
+__MSP430G2230__      Target symbol: 0 
+__MSP430G2233__      Target symbol: 0 
+__MSP430G2303__      Target symbol: 0 
+__MSP430G2333__      Target symbol: 0 
+__MSP430G2403__      Target symbol: 0 
+__MSP430G2433__      Target symbol: 0 
+__MSP430G2444__      Target symbol: 0 
+__MSP430G2533__      Target symbol: 0 
+__MSP430G2544__      Target symbol: 0 
+__MSP430G2553        #define, value: , line:      18:2  
+__MSP430G2553__      #define, value: 1, line:         0  
+__MSP430G2744__      Target symbol: 0 
+__MSP430G2755__      Target symbol: 0 
+__MSP430G2855__      Target symbol: 0 
+__MSP430G2955__      Target symbol: 0 
+__MSP430GENERIC__    Target symbol: 0 
+__MSP430SL5438A__    Target symbol: 0 
+__MSP430TCH5E__      Target symbol: 0 
+__MSP430V541__       Target symbol: 0 
+__MSP430XGENERIC__   Target symbol: 0 
+__MSP430_HAS_ADC10__ #define, value: , line:     166:2  
+__MSP430_HAS_BC2__   #define, value: , line:     284:2  
+__MSP430_HAS_CAPLUS__ #define, value: , line:     368:2  
+__MSP430_HAS_FLASH2__ #define, value: , line:     412:2  
+__MSP430_HAS_PORT1_R__ #define, value: , line:     463:2  
+__MSP430_HAS_PORT2_R__ #define, value: , line:     464:2  
+__MSP430_HAS_PORT3_R__ #define, value: , line:     507:2  
+__MSP430_HAS_T1A3__  #define, value: , line:     647:2  
+__MSP430_HAS_TA3__   #define, value: , line:     525:2  
+__MSP430_HAS_USCI__  #define, value: , line:     681:2  
+__MSP430_HAS_WDT__   #define, value: , line:     897:2  
+__MSP430_HEADER_VERSION__ #define, value: 1157, line:      20:2  
+__MSP430i2020__      Target symbol: 0 
+__MSP430i2021__      Target symbol: 0 
+__MSP430i2030__      Target symbol: 0 
+__MSP430i2031__      Target symbol: 0 
+__MSP430i2040__      Target symbol: 0 
+__MSP430i2041__      Target symbol: 0 
+__RF430FRL152H_ROM__ Target symbol: 0 
+__RF430FRL152H__     Target symbol: 0 
+__RF430FRL153H_ROM__ Target symbol: 0 
+__RF430FRL153H__     Target symbol: 0 
+__RF430FRL154H_ROM__ Target symbol: 0 
+__RF430FRL154H__     Target symbol: 0 
+__SUBVERSION__       #define,            line:         0  
+__TID__              #define,            line:         0       28:2
+__TIME__             #define,            line:         0         48
+__VER__              #define,            line:         0  
+__msp430             #define, value: , line:       9:1  
+action               Target symbol: 0 
+address              Target symbol: 0 
+asmname              Target symbol: 0 
+define               PREPROCESSOR DIRECTIVE 
+defined              Target symbol: 0 
+elif                 PREPROCESSOR DIRECTIVE 
+else                 PREPROCESSOR DIRECTIVE 
+endif                PREPROCESSOR DIRECTIVE 
+error                PREPROCESSOR DIRECTIVE 
+if                   PREPROCESSOR DIRECTIVE 
+ifdef                PREPROCESSOR DIRECTIVE 
+ifndef               PREPROCESSOR DIRECTIVE 
+include              PREPROCESSOR DIRECTIVE 
+label                Target symbol: 0 
+length               Target symbol: 0 
+line                 PREPROCESSOR DIRECTIVE 
+litname              Target symbol: 0 
+message              PREPROCESSOR DIRECTIVE 
+pragma               PREPROCESSOR DIRECTIVE 
+undef                PREPROCESSOR DIRECTIVE 
+usec                 Target symbol: 0 
+|                    OPERATOR 
+||                   OPERATOR 
+~                    OPERATOR 
+
+Segment             Type 	Mode
+----------------------------------------
+CODE                UNTYPED  	REL 
+__EXTERNS           CODE  	ABS Org:0 
+
+Label               Mode   Type                   Segment    Value/Offset
+------------------------------------------------------------------------------
+ABBS                REL    CONST PUB UNTYP.       CODE       B6C 
+ABORT               REL    CONST PUB UNTYP.       CODE       1560 
+ABORTQUOTE          REL    CONST PUB UNTYP.       CODE       158C 
+ACC1                REL    CONST UNTYP.           CODE       E3A 
+ACC3                REL    CONST UNTYP.           CODE       E70 
+ACC4                REL    CONST UNTYP.           CODE       E7C 
+ACC5                REL    CONST UNTYP.           CODE       E80 
+ACCEPT              REL    CONST PUB UNTYP.       CODE       E30 
+ADC10AE0            ABS    CONST UNTYP.           ASEG       4A 
+ADC10CTL0           ABS    CONST UNTYP.           ASEG       1B0 
+ADC10CTL1           ABS    CONST UNTYP.           ASEG       1B2 
+ADC10DTC0           ABS    CONST UNTYP.           ASEG       48 
+ADC10DTC1           ABS    CONST UNTYP.           ASEG       49 
+ADC10MEM            ABS    CONST UNTYP.           ASEG       1B4 
+ADC10SA             ABS    CONST UNTYP.           ASEG       1BC 
+ADRTOIN             REL    CONST PUB UNTYP.       CODE       11E0 
+AGAIN               REL    CONST PUB UNTYP.       CODE       17F0 
+ALIGNED             REL    CONST PUB UNTYP.       CODE       9A 
+ALIGNN              REL    CONST PUB UNTYP.       CODE       80 
+ALLOT               REL    CONST PUB UNTYP.       CODE       10EE 
+ANDD                REL    CONST PUB UNTYP.       CODE       5B2 
+APP                 REL    CONST PUB UNTYP.       CODE       A2C 
+APPCRC              REL    CONST PUB UNTYP.       CODE       1E1E 
+APPU0               REL    CONST PUB UNTYP.       CODE       B38 
+ATXY                REL    CONST PUB UNTYP.       CODE       1C04 
+AppU0               ABS    CONST EXT [013] UNTYP. __EXTERNS  Solved Extern 
+BACKSLASH           REL    CONST PUB UNTYP.       CODE       1B8C 
+BASE                REL    CONST PUB UNTYP.       CODE       9BC 
+BCSCTL1             ABS    CONST UNTYP.           ASEG       57 
+BCSCTL2             ABS    CONST UNTYP.           ASEG       58 
+BCSCTL3             ABS    CONST UNTYP.           ASEG       53 
+BEGIN               REL    CONST PUB UNTYP.       CODE       17CA 
+BELL                REL    CONST PUB UNTYP.       CODE       1BC0 
+BIN                 REL    CONST PUB UNTYP.       CODE       1C40 
+BLANK               REL    CONST PUB UNTYP.       CODE       AB8 
+BOOT                REL    CONST PUB UNTYP.       CODE       1E8A 
+BOOTIP              REL    CONST PUB UNTYP.       CODE       1E8C 
+BRACCHAR            REL    CONST PUB UNTYP.       CODE       15D0 
+BRACTICK            REL    CONST PUB UNTYP.       CODE       1738 
+BUILDS              REL    CONST PUB UNTYP.       CODE       1628 
+CACTL1              ABS    CONST UNTYP.           ASEG       59 
+CACTL2              ABS    CONST UNTYP.           ASEG       5A 
+CALBC1_12MHZ        ABS    CONST UNTYP.           ASEG       10FB 
+CALBC1_16MHZ        ABS    CONST UNTYP.           ASEG       10F9 
+CALBC1_1MHZ         ABS    CONST UNTYP.           ASEG       10FF 
+CALBC1_8MHZ         ABS    CONST UNTYP.           ASEG       10FD 
+CALDCO_12MHZ        ABS    CONST UNTYP.           ASEG       10FA 
+CALDCO_16MHZ        ABS    CONST UNTYP.           ASEG       10F8 
+CALDCO_1MHZ         ABS    CONST UNTYP.           ASEG       10FE 
+CALDCO_8MHZ         ABS    CONST UNTYP.           ASEG       10FC 
+CALLL               REL    CONST PUB UNTYP.       CODE       20C4 
+CAPD                ABS    CONST UNTYP.           ASEG       5B 
+CAPITALIZE          REL    CONST PUB UNTYP.       CODE       130C 
+CAPS                REL    CONST PUB UNTYP.       CODE       A38 
+CAPS1               REL    CONST UNTYP.           CODE       1322 
+CAPS2               REL    CONST UNTYP.           CODE       1330 
+CCOMMA              REL    CONST PUB UNTYP.       CODE       1112 
+CCRC                REL    CONST PUB UNTYP.       CODE       1B18 
+CELL                REL    CONST PUB UNTYP.       CODE       B0 
+CELLPLUS            REL    CONST PUB UNTYP.       CODE       BE 
+CELLS               REL    CONST PUB UNTYP.       CODE       D0 
+CEXIT               REL    CONST PUB UNTYP.       CODE       176 
+CFETCH              REL    CONST PUB UNTYP.       CODE       3D6 
+CHARPLUS            REL    CONST PUB UNTYP.       CODE       DC 
+CHARR               REL    CONST PUB UNTYP.       CODE       15BA 
+CHARS               REL    CONST PUB UNTYP.       CODE       E8 
+CMOVE               REL    CONST PUB UNTYP.       CODE       88C 
+CMOVEUP             REL    CONST PUB UNTYP.       CODE       8B0 
+CMOVE_1             REL    CONST UNTYP.           CODE       896 
+CMOVE_X             REL    CONST UNTYP.           CODE       8A0 
+CMOVU_1             REL    CONST UNTYP.           CODE       8BE 
+CMOVU_X             REL    CONST UNTYP.           CODE       8CA 
+CODEADR             REL    CONST PUB UNTYP.       CODE       20B2 
+CODEE               REL    CONST PUB UNTYP.       CODE       2094 
+COLD                REL    CONST PUB UNTYP.       CODE       1EE8 
+COLDIP              REL    CONST PUB UNTYP.       CODE       1EEA 
+COLON               REL    CONST PUB UNTYP.       CODE       1714 
+COMMA               REL    CONST PUB UNTYP.       CODE       10FC 
+COMMABRANCH         REL    CONST PUB UNTYP.       CODE       18C 
+COMMACALL           REL    CONST PUB UNTYP.       CODE       132 
+COMMACF             REL    CONST PUB UNTYP.       CODE       11A 
+COMMADEST           REL    CONST PUB UNTYP.       CODE       19A 
+COMMAJMP            REL    CONST PUB UNTYP.       CODE       146 
+COMMANONE           REL    CONST PUB UNTYP.       CODE       1C4 
+COMMAXT             REL    CONST PUB UNTYP.       CODE       102 
+CONSTANT            REL    CONST PUB UNTYP.       CODE       230 
+COR                 REL    CONST PUB UNTYP.       CODE       B00 
+CORPOWERON          ABS    CONST UNTYP.           CODE       186 
+CORREST             ABS    CONST UNTYP.           CODE       18E 
+COUNT               REL    CONST PUB UNTYP.       CODE       D54 
+CR                  REL    CONST PUB UNTYP.       CODE       D7E 
+CRC                 REL    CONST PUB UNTYP.       CODE       1B3C 
+CREATE              REL    CONST PUB UNTYP.       CODE       163E 
+CSTORE              REL    CONST PUB UNTYP.       CODE       3E4 
+CamelForthEnd       REL    CONST UNTYP.           CODE       226A 
+DABS                REL    CONST PUB UNTYP.       CODE       BB2 
+DCOCTL              ABS    CONST UNTYP.           ASEG       56 
+DDP                 REL    CONST PUB UNTYP.       CODE       9D4 
+DECIMAL             REL    CONST PUB UNTYP.       CODE       10B4 
+DEPTH               REL    CONST PUB UNTYP.       CODE       191A 
+DIGITQ              REL    CONST PUB UNTYP.       CODE       135C 
+DIV1                REL    CONST UNTYP.           CODE       83A 
+DIV2                REL    CONST UNTYP.           CODE       840 
+DIV3                REL    CONST UNTYP.           CODE       854 
+DIV4                REL    CONST UNTYP.           CODE       856 
+DIVIDE              REL    CONST UNTYP.           CODE       834 
+DNEG1               REL    CONST UNTYP.           CODE       BA8 
+DNEGATE             REL    CONST PUB UNTYP.       CODE       B80 
+DO                  REL    CONST PUB UNTYP.       CODE       1854 
+DOALIAS             REL    CONST PUB UNTYP.       CODE       270 
+DOCODE              REL    CONST UNTYP.           CODE       Not solved 
+DOCOLON             REL    CONST PUB UNTYP.       CODE       206 
+DOCON               REL    CONST PUB UNTYP.       CODE       238 
+DOCR                REL    CONST PUB UNTYP.       CODE       D68 
+DOEMIT              REL    CONST PUB UNTYP.       CODE       44 
+DOES                REL    CONST PUB UNTYP.       CODE       1672 
+DOKEY               REL    CONST PUB UNTYP.       CODE       60 
+DOROM               REL    CONST PUB UNTYP.       CODE       244 
+DOT                 REL    CONST PUB UNTYP.       CODE       1090 
+DOTBOOTVERSION      REL    CONST PUB UNTYP.       CODE       1DE4 
+DOTCOLD             REL    CONST PUB UNTYP.       CODE       1ED2 
+DOTERRN             REL    CONST PUB UNTYP.       CODE       DF2 
+DOTQUOTE            REL    CONST PUB UNTYP.       CODE       F5C 
+DOTS                REL    CONST PUB UNTYP.       CODE       1AD8 
+DOTS1               REL    CONST UNTYP.           CODE       1B08 
+DOTS2               REL    CONST UNTYP.           CODE       1B16 
+DOTSTATUS           REL    CONST PUB UNTYP.       CODE       14E8 
+DOTVER              REL    CONST PUB UNTYP.       CODE       1BA0 
+DOTWOCON            REL    CONST PUB UNTYP.       CODE       1B76 
+DOUSER              REL    CONST PUB UNTYP.       CODE       260 
+DOVAR               REL    CONST PUB UNTYP.       CODE       238 
+DROP                REL    CONST PUB UNTYP.       CODE       2B6 
+DTOI                REL    CONST PUB UNTYP.       CODE       510 
+DTOI_BYTE           REL    CONST UNTYP.           CODE       544 
+DTOI_END            REL    CONST UNTYP.           CODE       54A 
+DTOI_LOOP           REL    CONST UNTYP.           CODE       51A 
+DTOI_WORD           REL    CONST UNTYP.           CODE       532 
+DTOI_X              REL    CONST UNTYP.           CODE       55C 
+DUMP                REL    CONST PUB UNTYP.       CODE       1A6C 
+DUP                 REL    CONST PUB UNTYP.       CODE       290 
+ELSS                REL    CONST PUB UNTYP.       CODE       17AE 
+EMIT                REL    CONST PUB UNTYP.       CODE       970 
+EMITLOOPx           REL    CONST UNTYP.           CODE       46 
+ENDCODE             REL    CONST PUB UNTYP.       CODE       20F2 
+ENDLOOP             REL    CONST PUB UNTYP.       CODE       1870 
+ENVIRONMENTQ        REL    CONST PUB UNTYP.       CODE       1938 
+EQUAL               REL    CONST PUB UNTYP.       CODE       6AE 
+ESC0                REL    CONST UNTYP.           CODE       1C2B 
+ESC1                REL    CONST UNTYP.           CODE       1C2E 
+ESCPAR              REL    CONST PUB UNTYP.       CODE       1BCA 
+EVALUATE            REL    CONST PUB UNTYP.       CODE       14C6 
+EXECUTE             REL    CONST PUB UNTYP.       CODE       1D8 
+EXIT                REL    CONST PUB UNTYP.       CODE       1FE 
+FACTORY             REL    CONST PUB UNTYP.       CODE       1F10 
+FACTORYIP           REL    CONST PUB UNTYP.       CODE       1F12 
+FALSE               REL    CONST PUB UNTYP.       CODE       1C62 
+FCTL1               ABS    CONST UNTYP.           ASEG       128 
+FCTL2               ABS    CONST UNTYP.           ASEG       12A 
+FCTL3               ABS    CONST UNTYP.           ASEG       12C 
+FETCH               REL    CONST PUB UNTYP.       CODE       3B6 
+FILL                REL    CONST PUB UNTYP.       CODE       868 
+FILL_1              REL    CONST UNTYP.           CODE       872 
+FILL_X              REL    CONST UNTYP.           CODE       87C 
+FIND                REL    CONST PUB UNTYP.       CODE       12AC 
+FIND1               REL    CONST UNTYP.           CODE       12B2 
+FIND2               REL    CONST UNTYP.           CODE       12CA 
+FIND3               REL    CONST UNTYP.           CODE       12E8 
+FLALIGNED           REL    CONST PUB UNTYP.       CODE       195A 
+FLERASE             REL    CONST PUB UNTYP.       CODE       3FE 
+FLE_1               REL    CONST UNTYP.           CODE       404 
+FLE_INFO            REL    CONST UNTYP.           CODE       420 
+FLE_OK              REL    CONST UNTYP.           CODE       42C 
+FLE_VEC             REL    CONST UNTYP.           CODE       414 
+FLE_X               REL    CONST UNTYP.           CODE       464 
+FL_INFO             REL    CONST UNTYP.           CODE       45E 
+FMMOD1              REL    CONST UNTYP.           CODE       C36 
+FMSLASHMOD          REL    CONST PUB UNTYP.       CODE       C10 
+GREATER             REL    CONST PUB UNTYP.       CODE       6E4 
+HEADR               REL    CONST PUB UNTYP.       CODE       15FA 
+HERE                REL    CONST PUB UNTYP.       CODE       10DC 
+HEX                 REL    CONST PUB UNTYP.       CODE       10C8 
+HIDE                REL    CONST PUB UNTYP.       CODE       16C4 
+HOLD                REL    CONST PUB UNTYP.       CODE       FD4 
+HP                  REL    CONST PUB UNTYP.       CODE       9FC 
+IALLOT              REL    CONST PUB UNTYP.       CODE       113E 
+ICCOMMA             REL    CONST PUB UNTYP.       CODE       1164 
+ICOMMA              REL    CONST PUB UNTYP.       CODE       114C 
+ICSTORE             REL    CONST PUB UNTYP.       CODE       4C4 
+ICST_INFO           REL    CONST UNTYP.           CODE       4D8 
+ICST_OK             REL    CONST UNTYP.           CODE       4E4 
+ICST_RAM            REL    CONST UNTYP.           CODE       4F4 
+IDP                 REL    CONST PUB UNTYP.       CODE       A12 
+IE1                 ABS    CONST UNTYP.           ASEG       0 
+IE2                 ABS    CONST UNTYP.           ASEG       1 
+IFF                 REL    CONST PUB UNTYP.       CODE       1786 
+IFG1                ABS    CONST UNTYP.           ASEG       2 
+IFG2                ABS    CONST UNTYP.           ASEG       3 
+IHERE               REL    CONST PUB UNTYP.       CODE       112C 
+II                  REL    CONST PUB UNTYP.       CODE       7BA 
+IMMEDIATE           REL    CONST PUB UNTYP.       CODE       16FE 
+IMMEDQ              REL    CONST PUB UNTYP.       CODE       1294 
+INFOB               REL    CONST PUB UNTYP.       CODE       B0E 
+INFOC               REL    CONST PUB UNTYP.       CODE       B1C 
+INFOD               REL    CONST PUB UNTYP.       CODE       B2A 
+INTER1              REL    CONST UNTYP.           CODE       1460 
+INTER2              REL    CONST UNTYP.           CODE       148C 
+INTER3              REL    CONST UNTYP.           CODE       148E 
+INTER4              REL    CONST UNTYP.           CODE       1492 
+INTER5              REL    CONST UNTYP.           CODE       149E 
+INTER6              REL    CONST UNTYP.           CODE       14B2 
+INTER8              REL    CONST UNTYP.           CODE       14B2 
+INTER9              REL    CONST UNTYP.           CODE       14B6 
+INTERPRET           REL    CONST PUB UNTYP.       CODE       1454 
+INTERRUPT           REL    CONST PUB UNTYP.       CODE       2080 
+INVERT              REL    CONST PUB UNTYP.       CODE       5E2 
+IRXOFF              REL    CONST PUB UNTYP.       CODE       21CA 
+IRXON               REL    CONST PUB UNTYP.       CODE       21B0 
+ISQUOTE             REL    CONST PUB UNTYP.       CODE       F02 
+ISTORE              REL    CONST PUB UNTYP.       CODE       470 
+IST_INFO            REL    CONST UNTYP.           CODE       488 
+IST_OK              REL    CONST UNTYP.           CODE       494 
+IST_RAM             REL    CONST UNTYP.           CODE       4A4 
+IST_X               REL    CONST UNTYP.           CODE       4B6 
+IST_X2              REL    CONST UNTYP.           CODE       1F94 
+ITHERE              REL    CONST PUB UNTYP.       CODE       1DFE 
+ITOD                REL    CONST PUB UNTYP.       CODE       8D8 
+IWORD               REL    CONST PUB UNTYP.       CODE       F72 
+IWORD1              REL    CONST UNTYP.           CODE       F76 
+IWORDC              REL    CONST PUB UNTYP.       CODE       F84 
+JJ                  REL    CONST PUB UNTYP.       CODE       7D0 
+KEY                 REL    CONST PUB UNTYP.       CODE       95E 
+KEYLOOPx            REL    CONST UNTYP.           CODE       62 
+KEYQ                REL    CONST PUB UNTYP.       CODE       982 
+L$002               REL    CONST UNTYP.           CODE       80A 
+L$01                REL    CONST UNTYP.           CODE       812 
+L0                  REL    CONST PUB UNTYP.       CODE       A7E 
+LATEST              REL    CONST PUB UNTYP.       CODE       9F2 
+LDUMP1              REL    CONST UNTYP.           CODE       1A76 
+LDUMP2              REL    CONST UNTYP.           CODE       1A90 
+LDUMP3              REL    CONST UNTYP.           CODE       1AAE 
+LEAV                REL    CONST PUB UNTYP.       CODE       18B6 
+LEFTBRACKET         REL    CONST PUB UNTYP.       CODE       16A0 
+LESS                REL    CONST PUB UNTYP.       CODE       6D0 
+LESSNUM             REL    CONST PUB UNTYP.       CODE       FEC 
+LFROM               REL    CONST PUB UNTYP.       CODE       183C 
+LITER1              REL    CONST UNTYP.           CODE       1350 
+LITERAL             REL    CONST PUB UNTYP.       CODE       133E 
+LOO                 REL    CONST PUB UNTYP.       CODE       188E 
+LOOP1               REL    CONST UNTYP.           CODE       1876 
+LOOP2               REL    CONST UNTYP.           CODE       1884 
+LP                  REL    CONST PUB UNTYP.       CODE       A06 
+LPM_WAKE            REL    CONST PUB UNTYP.       CODE       21E0 
+LSHIFT              REL    CONST PUB UNTYP.       CODE       64E 
+LSH_1               REL    CONST UNTYP.           CODE       658 
+LSH_X               REL    CONST UNTYP.           CODE       65E 
+LSTACK              ABS    CONST EXT [003] UNTYP. __EXTERNS  Solved Extern 
+MACU                REL    CONST UNTYP.           CODE       806 
+MARKER              REL    CONST PUB UNTYP.       CODE       1978 
+MAX                 REL    CONST PUB UNTYP.       CODE       CA8 
+MAX1                REL    CONST UNTYP.           CODE       CB4 
+MCLK                ABS    CONST UNTYP.           CODE       8 
+MEM                 REL    CONST PUB UNTYP.       CODE       1D6E 
+MEMBOT              REL    CONST PUB UNTYP.       CODE       1D54 
+MEMTOP              REL    CONST PUB UNTYP.       CODE       1D62 
+MIN                 REL    CONST PUB UNTYP.       CODE       CC0 
+MIN1                REL    CONST UNTYP.           CODE       CCC 
+MINUS               REL    CONST PUB UNTYP.       CODE       59E 
+MODD                REL    CONST PUB UNTYP.       CODE       C74 
+MOVE                REL    CONST PUB UNTYP.       CODE       18EE 
+MOVE1               REL    CONST UNTYP.           CODE       190A 
+MOVE2               REL    CONST UNTYP.           CODE       190E 
+MPLUS               REL    CONST PUB UNTYP.       CODE       588 
+MPYU                REL    CONST UNTYP.           CODE       802 
+MS                  REL    CONST PUB UNTYP.       CODE       1CAE 
+MSTAR               REL    CONST PUB UNTYP.       CODE       BC0 
+NEGATE              REL    CONST PUB UNTYP.       CODE       5F4 
+NEQUAL              REL    CONST PUB UNTYP.       CODE       954 
+NEWEST              REL    CONST PUB UNTYP.       CODE       A20 
+NEWLINE             REL    CONST PUB UNTYP.       CODE       A68 
+NEXTCOMA            REL    CONST PUB UNTYP.       CODE       20D6 
+NFATOCFA            REL    CONST PUB UNTYP.       CODE       127A 
+NFATOLFA            REL    CONST PUB UNTYP.       CODE       1264 
+NINIT               REL    CONST PUB UNTYP.       CODE       AF4 
+NIP                 REL    CONST PUB UNTYP.       CODE       310 
+NODUP               REL    CONST UNTYP.           CODE       2AA 
+NOOP                REL    CONST PUB UNTYP.       CODE       1948 
+NOTEQUAL            REL    CONST PUB UNTYP.       CODE       6C2 
+NUM                 REL    CONST PUB UNTYP.       CODE       1020 
+NUMGREATER          REL    CONST PUB UNTYP.       CODE       104C 
+NUMS                REL    CONST PUB UNTYP.       CODE       1036 
+NUMS1               REL    CONST UNTYP.           CODE       1038 
+ONEMINUS            REL    CONST PUB UNTYP.       CODE       612 
+ONEMS               REL    CONST PUB UNTYP.       CODE       1C8C 
+ONEPLUS             REL    CONST PUB UNTYP.       CODE       604 
+ORR                 REL    CONST PUB UNTYP.       CODE       5C0 
+OVER                REL    CONST PUB UNTYP.       CODE       2DC 
+OWNONE              REL    CONST UNTYP.           CODE       2142 
+OWRECV0             REL    CONST UNTYP.           CODE       218C 
+OWRESET             REL    CONST PUB UNTYP.       CODE       2102 
+OWSEND0             REL    CONST UNTYP.           CODE       217A 
+OWSLOT              REL    CONST PUB UNTYP.       CODE       215A 
+P1                  REL    CONST PUB UNTYP.       CODE       1DCC 
+P1DIR               ABS    CONST UNTYP.           ASEG       22 
+P1IE                ABS    CONST UNTYP.           ASEG       25 
+P1IES               ABS    CONST UNTYP.           ASEG       24 
+P1IFG               ABS    CONST UNTYP.           ASEG       23 
+P1IN                ABS    CONST UNTYP.           ASEG       20 
+P1OUT               ABS    CONST UNTYP.           ASEG       21 
+P1REN               ABS    CONST UNTYP.           ASEG       27 
+P1SEL               ABS    CONST UNTYP.           ASEG       26 
+P1SEL2              ABS    CONST UNTYP.           ASEG       41 
+P2                  REL    CONST PUB UNTYP.       CODE       1DD6 
+P2DIR               ABS    CONST UNTYP.           ASEG       2A 
+P2IE                ABS    CONST UNTYP.           ASEG       2D 
+P2IES               ABS    CONST UNTYP.           ASEG       2C 
+P2IFG               ABS    CONST UNTYP.           ASEG       2B 
+P2IN                ABS    CONST UNTYP.           ASEG       28 
+P2OUT               ABS    CONST UNTYP.           ASEG       29 
+P2REN               ABS    CONST UNTYP.           ASEG       2F 
+P2SEL               ABS    CONST UNTYP.           ASEG       2E 
+P2SEL2              ABS    CONST UNTYP.           ASEG       42 
+P3                  REL    CONST PUB UNTYP.       CODE       1DE0 
+P3DIR               ABS    CONST UNTYP.           ASEG       1A 
+P3IN                ABS    CONST UNTYP.           ASEG       18 
+P3OUT               ABS    CONST UNTYP.           ASEG       19 
+P3REN               ABS    CONST UNTYP.           ASEG       10 
+P3SEL               ABS    CONST UNTYP.           ASEG       1B 
+P3SEL2              ABS    CONST UNTYP.           ASEG       43 
+PAD                 REL    CONST PUB UNTYP.       CODE       A74 
+PADAREA             ABS    CONST EXT [002] UNTYP. __EXTERNS  Solved Extern 
+PAGEE               REL    CONST PUB UNTYP.       CODE       1C24 
+PAREN               REL    CONST PUB UNTYP.       CODE       15E4 
+PARENUDOTR          REL    CONST PUB UNTYP.       CODE       1A06 
+PARENVECWIPE        REL    CONST PUB UNTYP.       CODE       1FA8 
+PARENWIPE           REL    CONST PUB UNTYP.       CODE       1F44 
+PARSE               REL    CONST PUB UNTYP.       CODE       1202 
+PARSE1              REL    CONST UNTYP.           CODE       121E 
+PLUS                REL    CONST PUB UNTYP.       CODE       568 
+PLUSLOOP            REL    CONST PUB UNTYP.       CODE       18A2 
+PLUSSTORE           REL    CONST PUB UNTYP.       CODE       576 
+PN                  REL    CONST PUB UNTYP.       CODE       1BDA 
+POST1               REL    CONST UNTYP.           CODE       177C 
+POST2               REL    CONST UNTYP.           CODE       177E 
+POSTPONE            REL    CONST PUB UNTYP.       CODE       1752 
+PROFUSE             REL    CONST UNTYP.           CODE       0 
+PROFUSEADR          REL    CONST PUB UNTYP.       CODE       1F2A 
+PROMPT              REL    CONST PUB UNTYP.       CODE       14F4 
+PROMPT1             REL    CONST UNTYP.           CODE       1526 
+PSTACK              ABS    CONST EXT [004] UNTYP. __EXTERNS  Solved Extern 
+PUSHTOS             REL    CONST UNTYP.           CODE       292 
+QABO1               REL    CONST UNTYP.           CODE       157E 
+QABORT              REL    CONST PUB UNTYP.       CODE       1572 
+QDNEGATE            REL    CONST PUB UNTYP.       CODE       B9E 
+QDUP                REL    CONST PUB UNTYP.       CODE       2A4 
+QNEG1               REL    CONST UNTYP.           CODE       B62 
+QNEGATE             REL    CONST PUB UNTYP.       CODE       B58 
+QNUM1               REL    CONST UNTYP.           CODE       1434 
+QNUM2               REL    CONST UNTYP.           CODE       1440 
+QNUM3               REL    CONST UNTYP.           CODE       1444 
+QNUMBER             REL    CONST PUB UNTYP.       CODE       1410 
+QQ                  REL    CONST PUB UNTYP.       CODE       1DBE 
+QSIGN               REL    CONST PUB UNTYP.       CODE       1398 
+QSIGN1              REL    CONST UNTYP.           CODE       13C2 
+QSTACK              REL    CONST PUB UNTYP.       CODE       117E 
+QTIB                REL    CONST PUB UNTYP.       CODE       E12 
+QTIB1               REL    CONST UNTYP.           CODE       E24 
+QUIT                REL    CONST PUB UNTYP.       CODE       1530 
+QUIT1               REL    CONST UNTYP.           CODE       1542 
+QUITIP              REL    CONST PUB UNTYP.       CODE       1532 
+RAMDICT             ABS    CONST EXT [007] UNTYP. __EXTERNS  Solved Extern 
+RECURSE             REL    CONST PUB UNTYP.       CODE       168E 
+REPEAT              REL    CONST PUB UNTYP.       CODE       1818 
+REVEAL              REL    CONST PUB UNTYP.       CODE       16E4 
+RFETCH              REL    CONST PUB UNTYP.       CODE       342 
+RFROM               REL    CONST PUB UNTYP.       CODE       32E 
+RIGHTBRACKET        REL    CONST PUB UNTYP.       CODE       16B0 
+RLAA                REL    CONST PUB UNTYP.       CODE       712 
+ROMDICT             ABS    CONST EXT [-001] UNTYP. __EXTERNS  Solved Extern 
+ROT                 REL    CONST PUB UNTYP.       CODE       2F4 
+RPFETCH             REL    CONST PUB UNTYP.       CODE       380 
+RPSTORE             REL    CONST PUB UNTYP.       CODE       396 
+RSHIFT              REL    CONST PUB UNTYP.       CODE       66E 
+RSH_1               REL    CONST UNTYP.           CODE       678 
+RSH_X               REL    CONST UNTYP.           CODE       680 
+RSTACK              ABS    CONST EXT [005] UNTYP. __EXTERNS  Solved Extern 
+RZERO               REL    CONST PUB UNTYP.       CODE       A88 
+S0                  REL    CONST PUB UNTYP.       CODE       A92 
+S2                  REL    CONST PUB UNTYP.       CODE       2252 
+SAVE                REL    CONST PUB UNTYP.       CODE       1E4C 
+SCAN                REL    CONST PUB UNTYP.       CODE       908 
+SCAN_1              REL    CONST UNTYP.           CODE       912 
+SCAN_X              REL    CONST UNTYP.           CODE       91C 
+SEMICOLON           REL    CONST PUB UNTYP.       CODE       1726 
+SEMIPN              REL    CONST PUB UNTYP.       CODE       1BEE 
+SEQUAL              REL    CONST PUB UNTYP.       CODE       92C 
+SEQU_1              REL    CONST UNTYP.           CODE       936 
+SEQU_X              REL    CONST UNTYP.           CODE       94A 
+SETIRX              REL    CONST PUB UNTYP.       CODE       2222 
+SIGN                REL    CONST PUB UNTYP.       CODE       1064 
+SIGN1               REL    CONST UNTYP.           CODE       1072 
+SKIP                REL    CONST PUB UNTYP.       CODE       8E2 
+SKIP_1              REL    CONST UNTYP.           CODE       8EC 
+SKIP_X              REL    CONST UNTYP.           CODE       8F6 
+SLASH               REL    CONST PUB UNTYP.       CODE       C64 
+SLASHMOD            REL    CONST PUB UNTYP.       CODE       C52 
+SLASHSTRING         REL    CONST PUB UNTYP.       CODE       11AC 
+SMISMATCH           REL    CONST UNTYP.           CODE       944 
+SMSLASHREM          REL    CONST PUB UNTYP.       CODE       BE2 
+SOURCE              REL    CONST PUB UNTYP.       CODE       1198 
+SPACE               REL    CONST PUB UNTYP.       CODE       D92 
+SPACES              REL    CONST PUB UNTYP.       CODE       DA4 
+SPCS1               REL    CONST UNTYP.           CODE       DA6 
+SPCS2               REL    CONST UNTYP.           CODE       DB4 
+SPFETCH             REL    CONST PUB UNTYP.       CODE       358 
+SPSTORE             REL    CONST PUB UNTYP.       CODE       36E 
+SQEST               REL    CONST PUB UNTYP.       CODE       2260 
+SQUOTE              REL    CONST PUB UNTYP.       CODE       F2A 
+SSMOD               REL    CONST PUB UNTYP.       CODE       C86 
+STAR                REL    CONST PUB UNTYP.       CODE       C42 
+STARSLASH           REL    CONST PUB UNTYP.       CODE       C98 
+STATE               REL    CONST PUB UNTYP.       CODE       9CA 
+STOD                REL    CONST PUB UNTYP.       CODE       B44 
+STORCOLON           REL    CONST PUB UNTYP.       CODE       15C 
+STORE               REL    CONST PUB UNTYP.       CODE       3C4 
+STORECF             REL    CONST PUB UNTYP.       CODE       10E 
+STOREDEST           REL    CONST PUB UNTYP.       CODE       1AE 
+SWAP                REL    CONST PUB UNTYP.       CODE       2C6 
+SWAPBYTES           REL    CONST PUB UNTYP.       CODE       620 
+TA0CCR0             ABS    CONST UNTYP.           ASEG       172 
+TA0CCR1             ABS    CONST UNTYP.           ASEG       174 
+TA0CCR2             ABS    CONST UNTYP.           ASEG       176 
+TA0CCTL0            ABS    CONST UNTYP.           ASEG       162 
+TA0CCTL1            ABS    CONST UNTYP.           ASEG       164 
+TA0CCTL2            ABS    CONST UNTYP.           ASEG       166 
+TA0CTL              ABS    CONST UNTYP.           ASEG       160 
+TA0IV               ABS    CONST UNTYP.           ASEG       12E 
+TA0R                ABS    CONST UNTYP.           ASEG       170 
+TA1CCR0             ABS    CONST UNTYP.           ASEG       192 
+TA1CCR1             ABS    CONST UNTYP.           ASEG       194 
+TA1CCR2             ABS    CONST UNTYP.           ASEG       196 
+TA1CCTL0            ABS    CONST UNTYP.           ASEG       182 
+TA1CCTL1            ABS    CONST UNTYP.           ASEG       184 
+TA1CCTL2            ABS    CONST UNTYP.           ASEG       186 
+TA1CTL              ABS    CONST UNTYP.           ASEG       180 
+TA1IV               ABS    CONST UNTYP.           ASEG       11E 
+TA1R                ABS    CONST UNTYP.           ASEG       190 
+TABLE               REL    CONST PUB UNTYP.       CODE       1C70 
+THEN                REL    CONST PUB UNTYP.       CODE       179C 
+TIB                 REL    CONST PUB UNTYP.       CODE       A9E 
+TIBAREA             ABS    CONST EXT [006] UNTYP. __EXTERNS  Solved Extern 
+TIBSIZE             REL    CONST PUB UNTYP.       CODE       AAE 
+TIB_SIZE            ABS    CONST EXT [008] UNTYP. __EXTERNS  Solved Extern 
+TICK                REL    CONST PUB UNTYP.       CODE       159E 
+TICKSOURCE          REL    CONST PUB UNTYP.       CODE       9E4 
+TID                 ABS    CONST UNTYP.           ASEG       2B00 
+TLV_ADC10_1_LEN     ABS    CONST UNTYP.           ASEG       10DB 
+TLV_ADC10_1_TAG     ABS    CONST UNTYP.           ASEG       10DA 
+TLV_CHECKSUM        ABS    CONST UNTYP.           ASEG       10C0 
+TLV_DCO_30_LEN      ABS    CONST UNTYP.           ASEG       10F7 
+TLV_DCO_30_TAG      ABS    CONST UNTYP.           ASEG       10F6 
+TOBODY              REL    CONST PUB UNTYP.       CODE       F4 
+TOCOUNTED           REL    CONST PUB UNTYP.       CODE       11C8 
+TODIGIT             REL    CONST PUB UNTYP.       CODE       1000 
+TOIN                REL    CONST PUB UNTYP.       CODE       9B0 
+TOL                 REL    CONST PUB UNTYP.       CODE       1826 
+TONUM1              REL    CONST UNTYP.           CODE       13D2 
+TONUM2              REL    CONST UNTYP.           CODE       13E8 
+TONUM3              REL    CONST UNTYP.           CODE       1402 
+TONUMBER            REL    CONST PUB UNTYP.       CODE       13D0 
+TOPSEG              REL    CONST PUB UNTYP.       CODE       1DA6 
+TOR                 REL    CONST PUB UNTYP.       CODE       31E 
+TOSFALSE            REL    CONST UNTYP.           CODE       6B6 
+TOSTRUE             REL    CONST UNTYP.           CODE       6D8 
+TRUE                REL    CONST PUB UNTYP.       CODE       1C54 
+TUCK                REL    CONST PUB UNTYP.       CODE       3A8 
+TWOCONSTANT         REL    CONST PUB UNTYP.       CODE       1B6C 
+TWODROP             REL    CONST PUB UNTYP.       CODE       D02 
+TWODUP              REL    CONST PUB UNTYP.       CODE       D12 
+TWOFETCH            REL    CONST PUB UNTYP.       CODE       CD6 
+TWOOVER             REL    CONST PUB UNTYP.       CODE       D3A 
+TWOSLASH            REL    CONST PUB UNTYP.       CODE       63C 
+TWOSTAR             REL    CONST PUB UNTYP.       CODE       62E 
+TWOSTORE            REL    CONST PUB UNTYP.       CODE       CEA 
+TWOSWAP             REL    CONST PUB UNTYP.       CODE       D24 
+TYP                 REL    CONST PUB UNTYP.       CODE       E92 
+TYP3                REL    CONST UNTYP.           CODE       EA2 
+TYP4                REL    CONST UNTYP.           CODE       EB0 
+TYP5                REL    CONST UNTYP.           CODE       EB2 
+U0                  REL    CONST PUB UNTYP.       CODE       9A4 
+UAREA               ABS    CONST EXT [001] UNTYP. __EXTERNS  Solved Extern 
+UAREA_SIZE          ABS    CONST EXT [-001] UNTYP. __EXTERNS  Solved Extern 
+UCA0ABCTL           ABS    CONST UNTYP.           ASEG       5D 
+UCA0BR0             ABS    CONST UNTYP.           ASEG       62 
+UCA0BR1             ABS    CONST UNTYP.           ASEG       63 
+UCA0CTL0            ABS    CONST UNTYP.           ASEG       60 
+UCA0CTL1            ABS    CONST UNTYP.           ASEG       61 
+UCA0IRRCTL          ABS    CONST UNTYP.           ASEG       5F 
+UCA0IRTCTL          ABS    CONST UNTYP.           ASEG       5E 
+UCA0MCTL            ABS    CONST UNTYP.           ASEG       64 
+UCA0RXBUF           ABS    CONST UNTYP.           ASEG       66 
+UCA0STAT            ABS    CONST UNTYP.           ASEG       65 
+UCA0TXBUF           ABS    CONST UNTYP.           ASEG       67 
+UCB0BR0             ABS    CONST UNTYP.           ASEG       6A 
+UCB0BR1             ABS    CONST UNTYP.           ASEG       6B 
+UCB0CTL0            ABS    CONST UNTYP.           ASEG       68 
+UCB0CTL1            ABS    CONST UNTYP.           ASEG       69 
+UCB0I2CIE           ABS    CONST UNTYP.           ASEG       6C 
+UCB0I2COA           ABS    CONST UNTYP.           ASEG       118 
+UCB0I2CSA           ABS    CONST UNTYP.           ASEG       11A 
+UCB0RXBUF           ABS    CONST UNTYP.           ASEG       6E 
+UCB0STAT            ABS    CONST UNTYP.           ASEG       6D 
+UCB0TXBUF           ABS    CONST UNTYP.           ASEG       6F 
+UDOT                REL    CONST PUB UNTYP.       CODE       107A 
+UDOTR               REL    CONST PUB UNTYP.       CODE       1A26 
+UDSLASHMOD          REL    CONST PUB UNTYP.       CODE       F98 
+UDSTAR              REL    CONST PUB UNTYP.       CODE       FB6 
+UGREATER            REL    CONST PUB UNTYP.       CODE       702 
+UINIT               REL    CONST PUB UNTYP.       CODE       AC6 
+ULESS               REL    CONST PUB UNTYP.       CODE       6F2 
+UMAX                REL    CONST PUB UNTYP.       CODE       DD8 
+UMAX1               REL    CONST UNTYP.           CODE       DE4 
+UMIN                REL    CONST PUB UNTYP.       CODE       DC0 
+UMIN1               REL    CONST UNTYP.           CODE       DCC 
+UMSLASHMOD          REL    CONST PUB UNTYP.       CODE       82E 
+UMSTAR              REL    CONST PUB UNTYP.       CODE       7FE 
+UNLOOP              REL    CONST PUB UNTYP.       CODE       7EC 
+UNTIL               REL    CONST PUB UNTYP.       CODE       17DA 
+UNUSED              REL    CONST PUB UNTYP.       CODE       1D82 
+UP                  ABS    CONST EXT [000] UNTYP. __EXTERNS  Solved Extern 
+UPC                 REL    CONST PUB UNTYP.       CODE       12EA 
+UPC1                REL    CONST UNTYP.           CODE       1304 
+USER                REL    CONST PUB UNTYP.       CODE       258 
+USEREMIT            REL    CONST PUB UNTYP.       CODE       A58 
+USERKEY             REL    CONST PUB UNTYP.       CODE       A48 
+VALIDQ              REL    CONST PUB UNTYP.       CODE       1E36 
+VARAREA             ABS    CONST EXT [009] UNTYP. __EXTERNS  Solved Extern 
+VARBOT              REL    CONST PUB UNTYP.       CODE       1D98 
+VARIABLE            REL    CONST PUB UNTYP.       CODE       21A 
+VAR_SIZE            ABS    CONST EXT [010] UNTYP. __EXTERNS  Solved Extern 
+VECBACK             REL    CONST PUB UNTYP.       CODE       203C 
+VECBOT              REL    CONST PUB UNTYP.       CODE       1DB4 
+VECRESTORE          REL    CONST PUB UNTYP.       CODE       2020 
+VECSAVE             REL    CONST PUB UNTYP.       CODE       1FFC 
+VECSTORE            REL    CONST PUB UNTYP.       CODE       1F66 
+VECWIPE             REL    CONST PUB UNTYP.       CODE       1FE2 
+WARM                REL    CONST PUB UNTYP.       CODE       1EC4 
+WDS1                REL    CONST UNTYP.           CODE       19D4 
+WDS2                REL    CONST UNTYP.           CODE       19E8 
+WDS3                REL    CONST UNTYP.           CODE       1A02 
+WDTCTL              ABS    CONST UNTYP.           ASEG       120 
+WHILE               REL    CONST PUB UNTYP.       CODE       1806 
+WIPE                REL    CONST PUB UNTYP.       CODE       1F36 
+WITHIN              REL    CONST PUB UNTYP.       CODE       18D6 
+WORDD               REL    CONST PUB UNTYP.       CODE       1230 
+WORDS               REL    CONST PUB UNTYP.       CODE       19CE 
+XDOES               REL    CONST PUB UNTYP.       CODE       165A 
+XISQUOTE            REL    CONST PUB UNTYP.       CODE       EBE 
+XORR                REL    CONST PUB UNTYP.       CODE       5D0 
+XSQUOTE             REL    CONST PUB UNTYP.       CODE       ED6 
+ZERO                REL    CONST PUB UNTYP.       CODE       99A 
+ZEROEQUAL           REL    CONST PUB UNTYP.       CODE       68C 
+ZEROLESS            REL    CONST PUB UNTYP.       CODE       69C 
+ZEROS               REL    CONST PUB UNTYP.       CODE       1A4C 
+ZEROS1              REL    CONST UNTYP.           CODE       1A4E 
+ZEROS2              REL    CONST UNTYP.           CODE       1A60 
+ZEROUDOTR           REL    CONST PUB UNTYP.       CODE       1A38 
+__MSP430G2203__     ABS    CONST UNTYP.           ASEG       Not solved 
+__lab0              REL    CONST UNTYP.           CODE       3C 
+__lab1              REL    CONST UNTYP.           CODE       44 
+__lab10             REL    CONST UNTYP.           CODE       D5 
+__lab100            REL    CONST UNTYP.           CODE       61D 
+__lab101            REL    CONST UNTYP.           CODE       620 
+__lab102            REL    CONST UNTYP.           CODE       62B 
+__lab103            REL    CONST UNTYP.           CODE       62E 
+__lab104            REL    CONST UNTYP.           CODE       639 
+__lab105            REL    CONST UNTYP.           CODE       63C 
+__lab106            REL    CONST UNTYP.           CODE       647 
+__lab107            REL    CONST UNTYP.           CODE       64E 
+__lab108            REL    CONST UNTYP.           CODE       667 
+__lab109            REL    CONST UNTYP.           CODE       66E 
+__lab11             REL    CONST UNTYP.           CODE       E1 
+__lab110            REL    CONST UNTYP.           CODE       689 
+__lab111            REL    CONST UNTYP.           CODE       68C 
+__lab112            REL    CONST UNTYP.           CODE       699 
+__lab113            REL    CONST UNTYP.           CODE       69C 
+__lab114            REL    CONST UNTYP.           CODE       6AB 
+__lab115            REL    CONST UNTYP.           CODE       6AE 
+__lab116            REL    CONST UNTYP.           CODE       6BF 
+__lab117            REL    CONST UNTYP.           CODE       6CD 
+__lab118            REL    CONST UNTYP.           CODE       6D0 
+__lab119            REL    CONST UNTYP.           CODE       6E1 
+__lab12             REL    CONST UNTYP.           CODE       ED 
+__lab120            REL    CONST UNTYP.           CODE       6EF 
+__lab121            REL    CONST UNTYP.           CODE       6F2 
+__lab122            REL    CONST UNTYP.           CODE       6FF 
+__lab123            REL    CONST UNTYP.           CODE       70D 
+__lab124            REL    CONST UNTYP.           CODE       712 
+__lab125            REL    CONST UNTYP.           CODE       727 
+__lab126            REL    CONST UNTYP.           CODE       72E 
+__lab127            REL    CONST UNTYP.           CODE       739 
+__lab128            REL    CONST UNTYP.           CODE       742 
+__lab129            REL    CONST UNTYP.           CODE       753 
+__lab13             REL    CONST UNTYP.           CODE       F9 
+__lab130            REL    CONST UNTYP.           CODE       758 
+__lab131            REL    CONST UNTYP.           CODE       777 
+__lab132            REL    CONST UNTYP.           CODE       77E 
+__lab133            REL    CONST UNTYP.           CODE       795 
+__lab134            REL    CONST UNTYP.           CODE       79E 
+__lab135            REL    CONST UNTYP.           CODE       7B7 
+__lab136            REL    CONST UNTYP.           CODE       7BA 
+__lab137            REL    CONST UNTYP.           CODE       7CD 
+__lab138            REL    CONST UNTYP.           CODE       7D0 
+__lab139            REL    CONST UNTYP.           CODE       7E5 
+__lab14             REL    CONST UNTYP.           CODE       109 
+__lab140            REL    CONST UNTYP.           CODE       7EC 
+__lab141            REL    CONST UNTYP.           CODE       7F9 
+__lab142            REL    CONST UNTYP.           CODE       7FE 
+__lab143            REL    CONST UNTYP.           CODE       827 
+__lab144            REL    CONST UNTYP.           CODE       82E 
+__lab145            REL    CONST UNTYP.           CODE       863 
+__lab146            REL    CONST UNTYP.           CODE       868 
+__lab147            REL    CONST UNTYP.           CODE       885 
+__lab148            REL    CONST UNTYP.           CODE       88C 
+__lab149            REL    CONST UNTYP.           CODE       8A9 
+__lab15             REL    CONST UNTYP.           CODE       115 
+__lab150            REL    CONST UNTYP.           CODE       8B0 
+__lab151            REL    CONST UNTYP.           CODE       8D3 
+__lab152            REL    CONST UNTYP.           CODE       8DD 
+__lab153            REL    CONST UNTYP.           CODE       8E2 
+__lab154            REL    CONST UNTYP.           CODE       903 
+__lab155            REL    CONST UNTYP.           CODE       908 
+__lab156            REL    CONST UNTYP.           CODE       929 
+__lab157            REL    CONST UNTYP.           CODE       92C 
+__lab158            REL    CONST UNTYP.           CODE       951 
+__lab159            REL    CONST UNTYP.           CODE       959 
+__lab16             REL    CONST UNTYP.           CODE       12B 
+__lab160            REL    CONST UNTYP.           CODE       96B 
+__lab161            REL    CONST UNTYP.           CODE       97D 
+__lab162            REL    CONST UNTYP.           CODE       982 
+__lab163            REL    CONST UNTYP.           CODE       995 
+__lab164            REL    CONST UNTYP.           CODE       9A1 
+__lab165            REL    CONST UNTYP.           CODE       9AB 
+__lab166            REL    CONST UNTYP.           CODE       9B7 
+__lab167            REL    CONST UNTYP.           CODE       9C3 
+__lab168            REL    CONST UNTYP.           CODE       9D1 
+__lab169            REL    CONST UNTYP.           CODE       9DB 
+__lab17             REL    CONST UNTYP.           CODE       141 
+__lab170            REL    CONST UNTYP.           CODE       9EB 
+__lab171            REL    CONST UNTYP.           CODE       9F9 
+__lab172            REL    CONST UNTYP.           CODE       A03 
+__lab173            REL    CONST UNTYP.           CODE       A0D 
+__lab174            REL    CONST UNTYP.           CODE       A19 
+__lab175            REL    CONST UNTYP.           CODE       A27 
+__lab176            REL    CONST UNTYP.           CODE       A33 
+__lab177            REL    CONST UNTYP.           CODE       A3F 
+__lab178            REL    CONST UNTYP.           CODE       A4F 
+__lab179            REL    CONST UNTYP.           CODE       A5F 
+__lab18             REL    CONST UNTYP.           CODE       155 
+__lab180            REL    CONST UNTYP.           CODE       A6F 
+__lab181            REL    CONST UNTYP.           CODE       A7B 
+__lab182            REL    CONST UNTYP.           CODE       A85 
+__lab183            REL    CONST UNTYP.           CODE       A8F 
+__lab184            REL    CONST UNTYP.           CODE       A99 
+__lab185            REL    CONST UNTYP.           CODE       AA5 
+__lab186            REL    CONST UNTYP.           CODE       AB5 
+__lab187            REL    CONST UNTYP.           CODE       ABF 
+__lab188            REL    CONST UNTYP.           CODE       AED 
+__lab189            REL    CONST UNTYP.           CODE       AFB 
+__lab19             REL    CONST UNTYP.           CODE       16F 
+__lab190            REL    CONST UNTYP.           CODE       B07 
+__lab191            REL    CONST UNTYP.           CODE       B15 
+__lab192            REL    CONST UNTYP.           CODE       B23 
+__lab193            REL    CONST UNTYP.           CODE       B31 
+__lab194            REL    CONST UNTYP.           CODE       B3F 
+__lab195            REL    CONST UNTYP.           CODE       B4F 
+__lab196            REL    CONST UNTYP.           CODE       B5E 
+__lab197            REL    CONST UNTYP.           CODE       B67 
+__lab198            REL    CONST UNTYP.           CODE       B77 
+__lab199            REL    CONST UNTYP.           CODE       B95 
+__lab2              REL    CONST UNTYP.           CODE       59 
+__lab20             REL    CONST UNTYP.           CODE       183 
+__lab200            REL    CONST UNTYP.           CODE       BA4 
+__lab201            REL    CONST UNTYP.           CODE       BAD 
+__lab202            REL    CONST UNTYP.           CODE       BBD 
+__lab203            REL    CONST UNTYP.           CODE       BDB 
+__lab204            REL    CONST UNTYP.           CODE       C09 
+__lab205            REL    CONST UNTYP.           CODE       C2A 
+__lab206            REL    CONST UNTYP.           CODE       C3F 
+__lab207            REL    CONST UNTYP.           CODE       C4D 
+__lab208            REL    CONST UNTYP.           CODE       C61 
+__lab209            REL    CONST UNTYP.           CODE       C6F 
+__lab21             REL    CONST UNTYP.           CODE       193 
+__lab210            REL    CONST UNTYP.           CODE       C7F 
+__lab211            REL    CONST UNTYP.           CODE       C95 
+__lab212            REL    CONST UNTYP.           CODE       CA3 
+__lab213            REL    CONST UNTYP.           CODE       CB0 
+__lab214            REL    CONST UNTYP.           CODE       CBB 
+__lab215            REL    CONST UNTYP.           CODE       CC8 
+__lab216            REL    CONST UNTYP.           CODE       CD3 
+__lab217            REL    CONST UNTYP.           CODE       CE7 
+__lab218            REL    CONST UNTYP.           CODE       CFB 
+__lab219            REL    CONST UNTYP.           CODE       D0D 
+__lab22             REL    CONST UNTYP.           CODE       1A7 
+__lab220            REL    CONST UNTYP.           CODE       D1D 
+__lab221            REL    CONST UNTYP.           CODE       D33 
+__lab222            REL    CONST UNTYP.           CODE       D4D 
+__lab223            REL    CONST UNTYP.           CODE       D63 
+__lab224            REL    CONST UNTYP.           CODE       D7B 
+__lab225            REL    CONST UNTYP.           CODE       D8B 
+__lab226            REL    CONST UNTYP.           CODE       D9D 
+__lab227            REL    CONST UNTYP.           CODE       DAA 
+__lab228            REL    CONST UNTYP.           CODE       DB2 
+__lab229            REL    CONST UNTYP.           CODE       DBB 
+__lab23             REL    CONST UNTYP.           CODE       1BD 
+__lab230            REL    CONST UNTYP.           CODE       DC8 
+__lab231            REL    CONST UNTYP.           CODE       DD3 
+__lab232            REL    CONST UNTYP.           CODE       DE0 
+__lab233            REL    CONST UNTYP.           CODE       DEB 
+__lab234            REL    CONST UNTYP.           CODE       E18 
+__lab235            REL    CONST UNTYP.           CODE       E29 
+__lab236            REL    CONST UNTYP.           CODE       E46 
+__lab237            REL    CONST UNTYP.           CODE       E56 
+__lab238            REL    CONST UNTYP.           CODE       E6E 
+__lab239            REL    CONST UNTYP.           CODE       E7E 
+__lab24             REL    CONST UNTYP.           CODE       1CF 
+__lab240            REL    CONST UNTYP.           CODE       E8D 
+__lab241            REL    CONST UNTYP.           CODE       E98 
+__lab242            REL    CONST UNTYP.           CODE       EAA 
+__lab243            REL    CONST UNTYP.           CODE       EAE 
+__lab244            REL    CONST UNTYP.           CODE       EB7 
+__lab245            REL    CONST UNTYP.           CODE       ED1 
+__lab246            REL    CONST UNTYP.           CODE       EFD 
+__lab247            REL    CONST UNTYP.           CODE       F27 
+__lab248            REL    CONST UNTYP.           CODE       F59 
+__lab249            REL    CONST UNTYP.           CODE       F6B 
+__lab25             REL    CONST UNTYP.           CODE       1D8 
+__lab250            REL    CONST UNTYP.           CODE       F8C 
+__lab251            REL    CONST UNTYP.           CODE       F91 
+__lab252            REL    CONST UNTYP.           CODE       FB1 
+__lab253            REL    CONST UNTYP.           CODE       FCF 
+__lab254            REL    CONST UNTYP.           CODE       FE9 
+__lab255            REL    CONST UNTYP.           CODE       FF9 
+__lab256            REL    CONST UNTYP.           CODE       101D 
+__lab257            REL    CONST UNTYP.           CODE       1033 
+__lab258            REL    CONST UNTYP.           CODE       1042 
+__lab259            REL    CONST UNTYP.           CODE       1049 
+__lab26             REL    CONST UNTYP.           CODE       1E3 
+__lab260            REL    CONST UNTYP.           CODE       105F 
+__lab261            REL    CONST UNTYP.           CODE       106A 
+__lab262            REL    CONST UNTYP.           CODE       1077 
+__lab263            REL    CONST UNTYP.           CODE       108D 
+__lab264            REL    CONST UNTYP.           CODE       10AB 
+__lab265            REL    CONST UNTYP.           CODE       10C3 
+__lab266            REL    CONST UNTYP.           CODE       10D7 
+__lab267            REL    CONST UNTYP.           CODE       10E7 
+__lab268            REL    CONST UNTYP.           CODE       10F9 
+__lab269            REL    CONST UNTYP.           CODE       110F 
+__lab27             REL    CONST UNTYP.           CODE       1E8 
+__lab270            REL    CONST UNTYP.           CODE       1125 
+__lab271            REL    CONST UNTYP.           CODE       1137 
+__lab272            REL    CONST UNTYP.           CODE       1149 
+__lab273            REL    CONST UNTYP.           CODE       115F 
+__lab274            REL    CONST UNTYP.           CODE       1177 
+__lab275            REL    CONST UNTYP.           CODE       1191 
+__lab276            REL    CONST UNTYP.           CODE       11A3 
+__lab277            REL    CONST UNTYP.           CODE       11BF 
+__lab278            REL    CONST UNTYP.           CODE       11D9 
+__lab279            REL    CONST UNTYP.           CODE       11FB 
+__lab28             REL    CONST UNTYP.           CODE       1F9 
+__lab280            REL    CONST UNTYP.           CODE       121A 
+__lab281            REL    CONST UNTYP.           CODE       122B 
+__lab282            REL    CONST UNTYP.           CODE       125B 
+__lab283            REL    CONST UNTYP.           CODE       1271 
+__lab284            REL    CONST UNTYP.           CODE       128D 
+__lab285            REL    CONST UNTYP.           CODE       12A7 
+__lab286            REL    CONST UNTYP.           CODE       12C0 
+__lab287            REL    CONST UNTYP.           CODE       12CE 
+__lab288            REL    CONST UNTYP.           CODE       12D4 
+__lab289            REL    CONST UNTYP.           CODE       1300 
+__lab29             REL    CONST UNTYP.           CODE       1FE 
+__lab290            REL    CONST UNTYP.           CODE       1314 
+__lab291            REL    CONST UNTYP.           CODE       132E 
+__lab292            REL    CONST UNTYP.           CODE       1335 
+__lab293            REL    CONST UNTYP.           CODE       1346 
+__lab294            REL    CONST UNTYP.           CODE       1355 
+__lab295            REL    CONST UNTYP.           CODE       1391 
+__lab296            REL    CONST UNTYP.           CODE       13B4 
+__lab297            REL    CONST UNTYP.           CODE       13C7 
+__lab298            REL    CONST UNTYP.           CODE       13D6 
+__lab299            REL    CONST UNTYP.           CODE       13E2 
+__lab3              REL    CONST UNTYP.           CODE       60 
+__lab30             REL    CONST UNTYP.           CODE       211 
+__lab300            REL    CONST UNTYP.           CODE       1400 
+__lab301            REL    CONST UNTYP.           CODE       1407 
+__lab302            REL    CONST UNTYP.           CODE       1424 
+__lab303            REL    CONST UNTYP.           CODE       1432 
+__lab304            REL    CONST UNTYP.           CODE       143C 
+__lab305            REL    CONST UNTYP.           CODE       1449 
+__lab306            REL    CONST UNTYP.           CODE       146C 
+__lab307            REL    CONST UNTYP.           CODE       1476 
+__lab308            REL    CONST UNTYP.           CODE       1484 
+__lab309            REL    CONST UNTYP.           CODE       148A 
+__lab31             REL    CONST UNTYP.           CODE       227 
+__lab310            REL    CONST UNTYP.           CODE       1490 
+__lab311            REL    CONST UNTYP.           CODE       1496 
+__lab312            REL    CONST UNTYP.           CODE       149C 
+__lab313            REL    CONST UNTYP.           CODE       14B4 
+__lab314            REL    CONST UNTYP.           CODE       14BD 
+__lab315            REL    CONST UNTYP.           CODE       14FE 
+__lab316            REL    CONST UNTYP.           CODE       152B 
+__lab317            REL    CONST UNTYP.           CODE       1554 
+__lab318            REL    CONST UNTYP.           CODE       1559 
+__lab319            REL    CONST UNTYP.           CODE       156B 
+__lab32             REL    CONST UNTYP.           CODE       253 
+__lab320            REL    CONST UNTYP.           CODE       1578 
+__lab321            REL    CONST UNTYP.           CODE       1585 
+__lab322            REL    CONST UNTYP.           CODE       159B 
+__lab323            REL    CONST UNTYP.           CODE       15B5 
+__lab324            REL    CONST UNTYP.           CODE       15C9 
+__lab325            REL    CONST UNTYP.           CODE       15E1 
+__lab326            REL    CONST UNTYP.           CODE       15F3 
+__lab327            REL    CONST UNTYP.           CODE       161F 
+__lab328            REL    CONST UNTYP.           CODE       1637 
+__lab329            REL    CONST UNTYP.           CODE       1651 
+__lab33             REL    CONST UNTYP.           CODE       28B 
+__lab330            REL    CONST UNTYP.           CODE       166B 
+__lab331            REL    CONST UNTYP.           CODE       1685 
+__lab332            REL    CONST UNTYP.           CODE       169D 
+__lab333            REL    CONST UNTYP.           CODE       16AD 
+__lab334            REL    CONST UNTYP.           CODE       16BF 
+__lab335            REL    CONST UNTYP.           CODE       16DD 
+__lab336            REL    CONST UNTYP.           CODE       16F3 
+__lab337            REL    CONST UNTYP.           CODE       1711 
+__lab338            REL    CONST UNTYP.           CODE       1723 
+__lab339            REL    CONST UNTYP.           CODE       1733 
+__lab34             REL    CONST UNTYP.           CODE       290 
+__lab340            REL    CONST UNTYP.           CODE       1749 
+__lab341            REL    CONST UNTYP.           CODE       1768 
+__lab342            REL    CONST UNTYP.           CODE       177A 
+__lab343            REL    CONST UNTYP.           CODE       1783 
+__lab344            REL    CONST UNTYP.           CODE       1797 
+__lab345            REL    CONST UNTYP.           CODE       17A9 
+__lab346            REL    CONST UNTYP.           CODE       17C3 
+__lab347            REL    CONST UNTYP.           CODE       17D3 
+__lab348            REL    CONST UNTYP.           CODE       17E9 
+__lab349            REL    CONST UNTYP.           CODE       17FF 
+__lab35             REL    CONST UNTYP.           CODE       29F 
+__lab350            REL    CONST UNTYP.           CODE       1811 
+__lab351            REL    CONST UNTYP.           CODE       1823 
+__lab352            REL    CONST UNTYP.           CODE       1839 
+__lab353            REL    CONST UNTYP.           CODE       1851 
+__lab354            REL    CONST UNTYP.           CODE       1867 
+__lab355            REL    CONST UNTYP.           CODE       187C 
+__lab356            REL    CONST UNTYP.           CODE       1882 
+__lab357            REL    CONST UNTYP.           CODE       1889 
+__lab358            REL    CONST UNTYP.           CODE       189B 
+__lab359            REL    CONST UNTYP.           CODE       18AF 
+__lab36             REL    CONST UNTYP.           CODE       2A4 
+__lab360            REL    CONST UNTYP.           CODE       18CF 
+__lab361            REL    CONST UNTYP.           CODE       18E9 
+__lab362            REL    CONST UNTYP.           CODE       1900 
+__lab363            REL    CONST UNTYP.           CODE       1908 
+__lab364            REL    CONST UNTYP.           CODE       1913 
+__lab365            REL    CONST UNTYP.           CODE       192B 
+__lab366            REL    CONST UNTYP.           CODE       1943 
+__lab367            REL    CONST UNTYP.           CODE       194F 
+__lab368            REL    CONST UNTYP.           CODE       1971 
+__lab369            REL    CONST UNTYP.           CODE       19C7 
+__lab37             REL    CONST UNTYP.           CODE       2B1 
+__lab370            REL    CONST UNTYP.           CODE       19D8 
+__lab371            REL    CONST UNTYP.           CODE       19E6 
+__lab372            REL    CONST UNTYP.           CODE       1A00 
+__lab373            REL    CONST UNTYP.           CODE       1A21 
+__lab374            REL    CONST UNTYP.           CODE       1A33 
+__lab375            REL    CONST UNTYP.           CODE       1A45 
+__lab376            REL    CONST UNTYP.           CODE       1A52 
+__lab377            REL    CONST UNTYP.           CODE       1A5E 
+__lab378            REL    CONST UNTYP.           CODE       1A67 
+__lab379            REL    CONST UNTYP.           CODE       1A9C 
+__lab38             REL    CONST UNTYP.           CODE       2B6 
+__lab380            REL    CONST UNTYP.           CODE       1AC6 
+__lab381            REL    CONST UNTYP.           CODE       1ACE 
+__lab382            REL    CONST UNTYP.           CODE       1AD5 
+__lab383            REL    CONST UNTYP.           CODE       1AFA 
+__lab384            REL    CONST UNTYP.           CODE       1B14 
+__lab385            REL    CONST UNTYP.           CODE       1B18 
+__lab386            REL    CONST UNTYP.           CODE       1B37 
+__lab387            REL    CONST UNTYP.           CODE       1B42 
+__lab388            REL    CONST UNTYP.           CODE       1B54 
+__lab389            REL    CONST UNTYP.           CODE       1B58 
+__lab39             REL    CONST UNTYP.           CODE       2C1 
+__lab390            REL    CONST UNTYP.           CODE       1B61 
+__lab391            REL    CONST UNTYP.           CODE       1B89 
+__lab392            REL    CONST UNTYP.           CODE       1B9B 
+__lab393            REL    CONST UNTYP.           CODE       1BBB 
+__lab394            REL    CONST UNTYP.           CODE       1BFD 
+__lab395            REL    CONST UNTYP.           CODE       1C1F 
+__lab396            REL    CONST UNTYP.           CODE       1C3B 
+__lab397            REL    CONST UNTYP.           CODE       1C4F 
+__lab398            REL    CONST UNTYP.           CODE       1C5B 
+__lab399            REL    CONST UNTYP.           CODE       1C69 
+__lab4              REL    CONST UNTYP.           CODE       79 
+__lab40             REL    CONST UNTYP.           CODE       2C6 
+__lab400            REL    CONST UNTYP.           CODE       1C87 
+__lab401            REL    CONST UNTYP.           CODE       1CA0 
+__lab402            REL    CONST UNTYP.           CODE       1CA4 
+__lab403            REL    CONST UNTYP.           CODE       1CAB 
+__lab404            REL    CONST UNTYP.           CODE       1CB8 
+__lab405            REL    CONST UNTYP.           CODE       1CBF 
+__lab406            REL    CONST UNTYP.           CODE       1CC4 
+__lab407            REL    CONST UNTYP.           CODE       1CD5 
+__lab408            REL    CONST UNTYP.           CODE       1CDA 
+__lab409            REL    CONST UNTYP.           CODE       1CEB 
+__lab41             REL    CONST UNTYP.           CODE       2D7 
+__lab410            REL    CONST UNTYP.           CODE       1CF0 
+__lab411            REL    CONST UNTYP.           CODE       1D01 
+__lab412            REL    CONST UNTYP.           CODE       1D06 
+__lab413            REL    CONST UNTYP.           CODE       1D17 
+__lab414            REL    CONST UNTYP.           CODE       1D20 
+__lab415            REL    CONST UNTYP.           CODE       1D31 
+__lab416            REL    CONST UNTYP.           CODE       1D36 
+__lab417            REL    CONST UNTYP.           CODE       1D4D 
+__lab418            REL    CONST UNTYP.           CODE       1D5B 
+__lab419            REL    CONST UNTYP.           CODE       1D69 
+__lab42             REL    CONST UNTYP.           CODE       2DC 
+__lab420            REL    CONST UNTYP.           CODE       1D7B 
+__lab421            REL    CONST UNTYP.           CODE       1D91 
+__lab422            REL    CONST UNTYP.           CODE       1D9F 
+__lab423            REL    CONST UNTYP.           CODE       1DAD 
+__lab424            REL    CONST UNTYP.           CODE       1DBB 
+__lab425            REL    CONST UNTYP.           CODE       1DC9 
+__lab426            REL    CONST UNTYP.           CODE       1DD3 
+__lab427            REL    CONST UNTYP.           CODE       1DDD 
+__lab428            REL    CONST UNTYP.           CODE       1DF7 
+__lab429            REL    CONST UNTYP.           CODE       1E18 
+__lab43             REL    CONST UNTYP.           CODE       2EF 
+__lab430            REL    CONST UNTYP.           CODE       1E47 
+__lab431            REL    CONST UNTYP.           CODE       1E85 
+__lab432            REL    CONST UNTYP.           CODE       1E92 
+__lab433            REL    CONST UNTYP.           CODE       1E98 
+__lab434            REL    CONST UNTYP.           CODE       1EA8 
+__lab435            REL    CONST UNTYP.           CODE       1EB6 
+__lab436            REL    CONST UNTYP.           CODE       1EBF 
+__lab437            REL    CONST UNTYP.           CODE       1EE3 
+__lab438            REL    CONST UNTYP.           CODE       1F07 
+__lab439            REL    CONST UNTYP.           CODE       1F31 
+__lab44             REL    CONST UNTYP.           CODE       2F4 
+__lab440            REL    CONST UNTYP.           CODE       1F3E 
+__lab441            REL    CONST UNTYP.           CODE       1F61 
+__lab442            REL    CONST UNTYP.           CODE       1F66 
+__lab443            REL    CONST UNTYP.           CODE       1F9D 
+__lab444            REL    CONST UNTYP.           CODE       1FA8 
+__lab445            REL    CONST UNTYP.           CODE       1FD9 
+__lab446            REL    CONST UNTYP.           CODE       1FF3 
+__lab447            REL    CONST UNTYP.           CODE       2015 
+__lab448            REL    CONST UNTYP.           CODE       2033 
+__lab449            REL    CONST UNTYP.           CODE       2056 
+__lab45             REL    CONST UNTYP.           CODE       30B 
+__lab450            REL    CONST UNTYP.           CODE       206E 
+__lab451            REL    CONST UNTYP.           CODE       2075 
+__lab452            REL    CONST UNTYP.           CODE       208F 
+__lab453            REL    CONST UNTYP.           CODE       20A9 
+__lab454            REL    CONST UNTYP.           CODE       20BF 
+__lab455            REL    CONST UNTYP.           CODE       20C4 
+__lab456            REL    CONST UNTYP.           CODE       20CF 
+__lab457            REL    CONST UNTYP.           CODE       20E9 
+__lab458            REL    CONST UNTYP.           CODE       20F9 
+__lab459            REL    CONST UNTYP.           CODE       2102 
+__lab46             REL    CONST UNTYP.           CODE       310 
+__lab460            REL    CONST UNTYP.           CODE       2153 
+__lab461            REL    CONST UNTYP.           CODE       215A 
+__lab462            REL    CONST UNTYP.           CODE       21A9 
+__lab463            REL    CONST UNTYP.           CODE       21B0 
+__lab464            REL    CONST UNTYP.           CODE       21C3 
+__lab465            REL    CONST UNTYP.           CODE       21CA 
+__lab466            REL    CONST UNTYP.           CODE       21D7 
+__lab467            REL    CONST UNTYP.           CODE       21EF 
+__lab468            REL    CONST UNTYP.           CODE       21F4 
+__lab469            REL    CONST UNTYP.           CODE       2205 
+__lab47             REL    CONST UNTYP.           CODE       31B 
+__lab470            REL    CONST UNTYP.           CODE       220A 
+__lab471            REL    CONST UNTYP.           CODE       221B 
+__lab472            REL    CONST UNTYP.           CODE       2231 
+__lab473            REL    CONST UNTYP.           CODE       223F 
+__lab474            REL    CONST UNTYP.           CODE       224F 
+__lab475            REL    CONST UNTYP.           CODE       225B 
+__lab48             REL    CONST UNTYP.           CODE       31E 
+__lab49             REL    CONST UNTYP.           CODE       32B 
+__lab5              REL    CONST UNTYP.           CODE       91 
+__lab50             REL    CONST UNTYP.           CODE       32E 
+__lab51             REL    CONST UNTYP.           CODE       33F 
+__lab52             REL    CONST UNTYP.           CODE       342 
+__lab53             REL    CONST UNTYP.           CODE       353 
+__lab54             REL    CONST UNTYP.           CODE       358 
+__lab55             REL    CONST UNTYP.           CODE       369 
+__lab56             REL    CONST UNTYP.           CODE       36E 
+__lab57             REL    CONST UNTYP.           CODE       37B 
+__lab58             REL    CONST UNTYP.           CODE       380 
+__lab59             REL    CONST UNTYP.           CODE       391 
+__lab6              REL    CONST UNTYP.           CODE       AB 
+__lab60             REL    CONST UNTYP.           CODE       396 
+__lab61             REL    CONST UNTYP.           CODE       3A3 
+__lab62             REL    CONST UNTYP.           CODE       3B3 
+__lab63             REL    CONST UNTYP.           CODE       3B6 
+__lab64             REL    CONST UNTYP.           CODE       3C1 
+__lab65             REL    CONST UNTYP.           CODE       3C4 
+__lab66             REL    CONST UNTYP.           CODE       3D3 
+__lab67             REL    CONST UNTYP.           CODE       3D6 
+__lab68             REL    CONST UNTYP.           CODE       3E1 
+__lab69             REL    CONST UNTYP.           CODE       3E4 
+__lab7              REL    CONST UNTYP.           CODE       B7 
+__lab70             REL    CONST UNTYP.           CODE       3F5 
+__lab71             REL    CONST UNTYP.           CODE       3FE 
+__lab72             REL    CONST UNTYP.           CODE       46D 
+__lab73             REL    CONST UNTYP.           CODE       470 
+__lab74             REL    CONST UNTYP.           CODE       4BF 
+__lab75             REL    CONST UNTYP.           CODE       4C4 
+__lab76             REL    CONST UNTYP.           CODE       50B 
+__lab77             REL    CONST UNTYP.           CODE       510 
+__lab78             REL    CONST UNTYP.           CODE       565 
+__lab79             REL    CONST UNTYP.           CODE       568 
+__lab8              REL    CONST UNTYP.           CODE       BE 
+__lab80             REL    CONST UNTYP.           CODE       573 
+__lab81             REL    CONST UNTYP.           CODE       576 
+__lab82             REL    CONST UNTYP.           CODE       585 
+__lab83             REL    CONST UNTYP.           CODE       588 
+__lab84             REL    CONST UNTYP.           CODE       59B 
+__lab85             REL    CONST UNTYP.           CODE       59E 
+__lab86             REL    CONST UNTYP.           CODE       5AD 
+__lab87             REL    CONST UNTYP.           CODE       5B2 
+__lab88             REL    CONST UNTYP.           CODE       5BD 
+__lab89             REL    CONST UNTYP.           CODE       5C0 
+__lab9              REL    CONST UNTYP.           CODE       C9 
+__lab90             REL    CONST UNTYP.           CODE       5CB 
+__lab91             REL    CONST UNTYP.           CODE       5D0 
+__lab92             REL    CONST UNTYP.           CODE       5DB 
+__lab93             REL    CONST UNTYP.           CODE       5E2 
+__lab94             REL    CONST UNTYP.           CODE       5ED 
+__lab95             REL    CONST UNTYP.           CODE       5F4 
+__lab96             REL    CONST UNTYP.           CODE       601 
+__lab97             REL    CONST UNTYP.           CODE       604 
+__lab98             REL    CONST UNTYP.           CODE       60F 
+__lab99             REL    CONST UNTYP.           CODE       612 
+abort1              REL    CONST UNTYP.           CODE       1562 
+boot1               REL    CONST UNTYP.           CODE       1EBA 
+bran                REL    CONST PUB UNTYP.       CODE       72E 
+cclr                REL    CONST PUB UNTYP.       CODE       1D06 
+ccrc1               REL    CONST UNTYP.           CODE       1B24 
+ccrc2               REL    CONST UNTYP.           CODE       1B2C 
+cget                REL    CONST PUB UNTYP.       CODE       1D36 
+cget1               REL    CONST UNTYP.           CODE       1D42 
+cget2               REL    CONST UNTYP.           CODE       1D44 
+cor                 ABS    CONST EXT [011] UNTYP. __EXTERNS  Solved Extern 
+crcval              ABS    CONST EXT [018] UNTYP. __EXTERNS  Solved Extern 
+cset                REL    CONST PUB UNTYP.       CODE       1CDA 
+ctoggle             REL    CONST PUB UNTYP.       CODE       1D20 
+doboot0             REL    CONST UNTYP.           CODE       1DE9 
+doboot1             REL    CONST UNTYP.           CODE       1DF0 
+dobran              REL    CONST UNTYP.           CODE       730 
+docreate            REL    CONST PUB UNTYP.       CODE       238 
+dodoes              REL    CONST PUB UNTYP.       CODE       274 
+donext              REL    CONST UNTYP.           CODE       72 
+donoop              REL    CONST UNTYP.           CODE       72 
+dotcold0            REL    CONST UNTYP.           CODE       1ED7 
+dotcold1            REL    CONST UNTYP.           CODE       1EDC 
+green               REL    CONST PUB UNTYP.       CODE       2246 
+ih1                 REL    CONST UNTYP.           CODE       1E02 
+infoB               ABS    CONST EXT [012] UNTYP. __EXTERNS  Solved Extern 
+infoC               ABS    CONST EXT [014] UNTYP. __EXTERNS  Solved Extern 
+infoD               ABS    CONST EXT [015] UNTYP. __EXTERNS  Solved Extern 
+intseg              ABS    CONST EXT [016] UNTYP. __EXTERNS  Solved Extern 
+intvecs             ABS    CONST EXT [017] UNTYP. __EXTERNS  Solved Extern 
+invalid             REL    CONST UNTYP.           CODE       1E9C 
+lastword            REL    CONST PUB UNTYP.       CODE       225B 
+link                REL    VAR UNTYP.             CODE       225B 
+lit                 REL    CONST PUB UNTYP.       CODE       1E8 
+lpm_wake            REL    CONST PUB UNTYP.       CODE       21E4 
+ms1                 REL    CONST UNTYP.           CODE       1CB4 
+nullirq             ABS    CONST EXT [-001] UNTYP. __EXTERNS  Solved Extern 
+onems1              REL    CONST UNTYP.           CODE       1C96 
+onems2              REL    CONST UNTYP.           CODE       1C9E 
+pcrc1               REL    CONST UNTYP.           CODE       1B4C 
+pcrc2               REL    CONST UNTYP.           CODE       1B5A 
+pcrc3               REL    CONST UNTYP.           CODE       1B5C 
+qbran               REL    CONST PUB UNTYP.       CODE       742 
+red                 REL    CONST PUB UNTYP.       CODE       2236 
+reset               ABS    CONST EXT [020] UNTYP. __EXTERNS  Solved Extern 
+reset1              REL    CONST UNTYP.           CODE       1EAA 
+resetvec            ABS    CONST EXT [019] UNTYP. __EXTERNS  Solved Extern 
+setlpm0             REL    CONST PUB UNTYP.       CODE       220A 
+setlpm4             REL    CONST PUB UNTYP.       CODE       21F4 
+stamp               REL    CONST UNTYP.           CODE       22 
+stamp0              REL    CONST UNTYP.           CODE       23 
+stampend            REL    CONST UNTYP.           CODE       39 
+uareasize           ABS    CONST UNTYP.           CODE       22 
+uinitend            REL    CONST UNTYP.           CODE       AEA 
+uinitstart          REL    CONST UNTYP.           CODE       AC8 
+valid               REL    CONST UNTYP.           CODE       1E9A 
+vback1              REL    CONST UNTYP.           CODE       2046 
+vback2              REL    CONST UNTYP.           CODE       2068 
+ver0                REL    CONST UNTYP.           CODE       3 
+verend              REL    CONST UNTYP.           CODE       22 
+version             REL    CONST UNTYP.           CODE       2 
+warm0               REL    CONST UNTYP.           CODE       1EC9 
+warm1               REL    CONST UNTYP.           CODE       1ECE 
+wclr                REL    CONST PUB UNTYP.       CODE       1CF0 
+wipe1               REL    CONST UNTYP.           CODE       1F42 
+wipmsg0             REL    CONST UNTYP.           CODE       1F53 
+wipmsg1             REL    CONST UNTYP.           CODE       1F5A 
+wset                REL    CONST PUB UNTYP.       CODE       1CC4 
+xdo                 REL    CONST PUB UNTYP.       CODE       758 
+xloop               REL    CONST PUB UNTYP.       CODE       77E 
+xplusloop           REL    CONST PUB UNTYP.       CODE       79E 
+
+
+##############################
+#          CRC:19C2          #
+#        Errors:   0         #
+#        Warnings: 0         #
+#        Bytes: 8810         #
+##############################
+
+
+
+

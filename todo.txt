@@ -1,0 +1,29 @@
+to do im 4e4th debug
+
+
+
+---
+ist IE flag im status register? --> ja!
+also ist 
+        EINT                    ; Enable interrupts
+        POP sr
+quatsch.
+Aus code entfernen.
+---
+
+erledigt: 13.04.2013, update 20.05.2013
+statt verschiedener versionen (debug, debug-pro):
+production fuse
+WIPE testet was an der profuseadr steht.
+falls 0 --> COLD
+sonst WIPE
+
+mit (WIPE) kann dennoch gelöscht werden.
+
+4E4THPRO brennt die fuse
+: 4E4THPRO ( -- )  save   zero profuseadr vec! ;
+
+save muss vorher sein, sonst hängt forth!  
+seit dem es vec! gibt ist es moeglich in den kernel zu schreiben - handle with care!!
+
+mk

@@ -1,0 +1,144 @@
+###############################################################################
+#                                                                             #
+#     IAR Assembler V5.30.1.50284/W32  for MSP430 28/Apr/2012  03:06:23       #
+#     Copyright 1996-2011 IAR Systems AB.                                     #
+#                                                                             #
+#           Target option =  MSP430                                           #
+#           Source file   =  C:\Dokumente und Einstellungen\All Users\Dokumente\4e4th\4e-vecs430G2553.s43#
+#           List file     =  C:\Dokumente und Einstellungen\All Users\Dokumente\4e4th\Release0.34\List\4e-vecs430G2553.lst#
+#           Object file   =  C:\Dokumente und Einstellungen\All Users\Dokumente\4e4th\Release0.34\Obj\4e-vecs430G2553.r43#
+#           Command line  =  C:\Dokumente und Einstellungen\All Users\Dokumente\4e4th\4e-vecs430G2553.s43 #
+#                            -OC:\Dokumente und Einstellungen\All Users\Dokumente\4e4th\Release0.34\Obj\ #
+#                            -s+ -M<> -w+                                     #
+#                            -LC:\Dokumente und Einstellungen\All Users\Dokumente\4e4th\Release0.34\List\ #
+#                            -i -t8 -xD -r -D__MSP430G2553__                  #
+#                            -IC:\Programme\IAR Systems\Embedded Workbench 6.0 Kickstart\430\INC\ #
+#                                                                             #
+###############################################################################
+
+      1    000000              ; ----------------------------------------------
+                               ------------------------
+      2    000000              ; 4e4th is a Forth based on CamelForth
+                                
+      3    000000              ; for the Texas Instruments MSP430 
+      4    000000              ; 
+      5    000000              ; This program is free software; you can
+                                redistribute it and/or modify
+      6    000000              ; it under the terms of the GNU General Public
+                                License as published by
+      7    000000              ; the Free Software Foundation; either version 3
+                                of the License, or
+      8    000000              ; (at your option) any later version.
+      9    000000              ; 
+     10    000000              ; This program is distributed in the hope that
+                                it will be useful,
+     11    000000              ; but WITHOUT ANY WARRANTY; without even the
+                                implied warranty of
+     12    000000              ; MERCHANTABILITY or FITNESS FOR A PARTICULAR
+                                PURPOSE.  See the
+     13    000000              ; GNU General Public License for more details.
+     14    000000              ;
+     15    000000              ; You should have received a copy of the GNU
+                                General Public License
+     16    000000              ; along with this program.  If not, see
+                                <http://www.gnu.org/licenses/>.
+     17    000000              ; 
+     18    000000              ; See LICENSE TERMS in Brads file readme.txt as
+                                well.
+     19    000000              
+     20    000000              ; ----------------------------------------------
+                               ------------------------
+     21    000000              ; 4e-vecs430G2553.s43: Interrupt Vectors -
+                                MSP430G2553 
+     22    000000              ; ----------------------------------------------
+                               ------------------------
+     23    000000              
+     24    000000              ; Interrupt vectors are located in the range
+                                FFC0-FFFFh. mk laut slau144i
+     25    000000              ; $fffe $ffc0 - . 62  ok  31 vectoren mk
+     26    000000              
+     27    000000                      RSEG    INTVEC
+     28    000000                      EXTERN nullirq
+     29    000000              
+     30    000000              ; intvecs
+     31    000000              intvecs:             ; priorität ; Bedeutung
+     32    000000              /*
+     33    000000                      DC16 nullirq ; 0         ;
+     34    000000                      DC16 nullirq ; 1         ;
+     35    000000                      DC16 nullirq ; 2         ;
+     36    000000                      DC16 nullirq ; 3         ;
+     37    000000                      DC16 nullirq ; 4         ;
+     38    000000                      DC16 nullirq ; 5         ;
+     39    000000                      DC16 nullirq ; 6         ;
+     40    000000                      DC16 nullirq ; 7         ;
+     41    000000                      DC16 nullirq ; 8         ;
+     42    000000                      DC16 nullirq ; 9         ;
+     43    000000                      DC16 nullirq ; 10         ;
+     44    000000                      DC16 nullirq ; 11         ;
+     45    000000                      DC16 nullirq ; 12         ;
+     46    000000                      DC16 nullirq ; 13         ;
+     47    000000                      DC16 nullirq ; 14         ;
+     48    000000                      DC16 nullirq ; 15         ;
+     49    000000 ....         */        DC16 nullirq ; 16         ; FFE0-FFFF
+     50    000002 ....                 DC16 nullirq ; 17         ;
+     51    000004 ....                 DC16 nullirq ; 18         ;
+     52    000006 ....                 DC16 nullirq ; 19         ;
+     53    000008 ....                 DC16 nullirq ; 20         ;
+     54    00000A ....                 DC16 nullirq ; 21         ;
+     55    00000C ....                 DC16 nullirq ; 22         ;
+     56    00000E ....                 DC16 nullirq ; 23         ;
+     57    000010 ....                 DC16 nullirq ; 24         ;
+     58    000012 ....                 DC16 nullirq ; 25         ;
+     59    000014 ....                 DC16 nullirq ; 26         ;
+     60    000016 ....                 DC16 nullirq ; 27         ;
+     61    000018 ....                 DC16 nullirq ; 28         ;
+     62    00001A ....                 DC16 nullirq ; 29         ;
+     63    00001C ....                 DC16 nullirq ; 30         ;
+     64    00001E              
+     65    000000                      RSEG    RESET
+     66    000000                      EXTERN reset
+     67    000000              
+     68    000000 ....                 DC16 reset   ; 31         ; power up
+                                                     ...
+     69    000002              
+     70    000002                      END
+
+
+__430X_CORE__        #define, value: 1, line:         0  
+__430_CORE__         #define, value: 0, line:         0  
+__A430__             #define, value: 1, line:         0  
+__BUILD_NUMBER__     #define,            line:         0  
+__CORE__             #define, value: 0, line:         0  
+__DATE__             #define,            line:         0  
+__FILE__             #define,            line:         0  
+__IAR_SYSTEMS_ASM    #define,            line:         0  
+__IAR_SYSTEMS_ASM__  #define,            line:         0  
+__LINE__             #define,            line:         0  
+__MSP430G2553__      #define, value: 1, line:         0  
+__SUBVERSION__       #define,            line:         0  
+__TID__              #define,            line:         0  
+__TIME__             #define,            line:         0  
+__VER__              #define,            line:         0  
+
+Segment             Type 	Mode
+----------------------------------------
+INTVEC              UNTYPED  	REL 
+RESET               UNTYPED  	REL 
+
+Label               Mode   Type                   Segment    Value/Offset
+------------------------------------------------------------------------------
+intvecs             REL    CONST UNTYP.           INTVEC     0 
+nullirq             ABS    CONST EXT [000] UNTYP. __EXTERNS  Solved Extern 
+reset               ABS    CONST EXT [001] UNTYP. __EXTERNS  Solved Extern 
+
+
+##############################
+#          CRC:F38A          #
+#        Errors:   0         #
+#        Warnings: 0         #
+#         Bytes: 32          #
+##############################
+
+
+
+

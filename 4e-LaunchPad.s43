@@ -1,0 +1,70 @@
+; ----------------------------------------------------------------------
+; 4e-LaunchPad.s43 - LaunchPad Suporting Words - MSP430G2553 
+; ----------------------------------------------------------------------
+
+
+;U PORTS ---------------------------------------------------------------
+
+; TI document SLAU144I - December 2004 - Revised January 2012 
+; The digital I/O registers are listed in Table 8-2. 
+
+;U \ P1in = $20
+;U \ P1out = $21
+;U \ P1dir = $22
+
+;U \ P2in = $28
+;U \ P2out = $29
+;U \ P2dir = $2A
+
+;U \ LED - portpinX->---resistor---LED---GND
+;U \ P1.0 - red LED
+;U \ P1.6 - green LED
+
+;U RED      -- mask port         red LED mask and port address
+    HEADER red,3,'RED',DOTWOCON
+	  DW P1OUT
+	  DW 00000001b
+
+;U GREEN     -- mask port        green LED mask and port address
+    HEADER green,5,'GREEN',DOTWOCON
+      DW P1OUT
+      DW 01000000b
+
+;U \ Switch S2
+;U portpin P1.3 --->0_0----GND
+;U S2        -- mask port        second button mask and port address
+    HEADER S2,2,'S2',DOTWOCON
+      DW P1IN
+      DW 00001000b
+
+;U S2?     -- f    test button S2, true is pressed 
+    HEADER SQEST,3,'S2?',DOCOLON
+        DW S2, cget, ZEROEQUAL, EXIT
+
+/* ----------------------------------------------------------------------
+; µs counter / square wave at P1.0
+
+;Z TA+     --    (TA0 cont. ISR)
+    HEADER TAPLUS,3,'SW+',DOCODE
+      mov.w   #CCIE,&CCTL0            ; CCR0 interrupt enabled
+      mov.w   #1000,&CCR0            ;
+      mov.w   #TASSEL_2+ID_3+MC_2,&TACTL   ; SMCLK/8, contmode
+      EINT
+      NEXT
+
+;Z TA-     --    stop TA0 cont. ISR
+    HEADER TAMINUS,3,'TA-',DOCODE
+      bic.w   #CCIE,&CCTL0            ; CCR0 interrupt enabled
+      mov.w   #0,&TACTL               ; stop timer
+      NEXT
+
+      EXTERN time0,time1
+isr_TA0:    ; Toggle P1.0
+      add.w   #1000,&CCR0            ; Add Offset to CCR0
+      xor.b   #001h,&P1OUT            ; Toggle P1.0
+      inc time0
+      jnz ta00
+      inc time1
+ta00: reti 
+      PUBLIC isr_TA0 
+*/ ; ----------------------------------------------------------------------

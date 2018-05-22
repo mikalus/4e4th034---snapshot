@@ -1,0 +1,465 @@
+###############################################################################
+#                                                                             #
+#     IAR Assembler V6.30.1.934/W32  for MSP430 22/May/2018  23:30:01         #
+#     Copyright 1996-2015 IAR Systems AB.                                     #
+#                                                                             #
+#           Target option =  MSP430                                           #
+#           Source file   =  C:\Users\mka\Documents\GitHub\4e4th034\4e-vecs430G2553.s43#
+#           List file     =  C:\Users\mka\Documents\GitHub\4e4th034\Debug\List\4e-vecs430G2553.lst#
+#           Object file   =  C:\Users\mka\Documents\GitHub\4e4th034\Debug\Obj\4e-vecs430G2553.r43#
+#           Command line  =  C:\Users\mka\Documents\GitHub\4e4th034\4e-vecs430G2553.s43 #
+#                            -OC:\Users\mka\Documents\GitHub\4e4th034\Debug\Obj\ #
+#                            -s+ -M<> -w+                                     #
+#                            -LC:\Users\mka\Documents\GitHub\4e4th034\Debug\List\ #
+#                            -t8 -xDI -r -D__MSP430G2553__                    #
+#                            -IC:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2\430\INC\ #
+#                                                                             #
+###############################################################################
+
+      1    000000              ; ----------------------------------------------
+                               ------------------------
+      2    000000              ; 4e4th is a Forth based on CamelForth
+                                
+      3    000000              ; for the Texas Instruments MSP430 
+      4    000000              ; 
+      5    000000              ; This program is free software; you can
+                                redistribute it and/or modify
+      6    000000              ; it under the terms of the GNU General Public
+                                License as published by
+      7    000000              ; the Free Software Foundation; either version 3
+                                of the License, or
+      8    000000              ; (at your option) any later version.
+      9    000000              ; 
+     10    000000              ; This program is distributed in the hope that
+                                it will be useful,
+     11    000000              ; but WITHOUT ANY WARRANTY; without even the
+                                implied warranty of
+     12    000000              ; MERCHANTABILITY or FITNESS FOR A PARTICULAR
+                                PURPOSE.  See the
+     13    000000              ; GNU General Public License for more details.
+     14    000000              ;
+     15    000000              ; You should have received a copy of the GNU
+                                General Public License
+     16    000000              ; along with this program.  If not, see
+                                <http://www.gnu.org/licenses/>.
+     17    000000              ; 
+     18    000000              ; See LICENSE TERMS in Brads file readme.txt as
+                                well.
+     19    000000              
+     20    000000              ; ----------------------------------------------
+                               ------------------------
+     21    000000              ; 4e-vecs430G2553.s43: Interrupt Vectors -
+                                MSP430G2553 
+     22    000000              ; ----------------------------------------------
+                               ------------------------
+     23    000000              PUBLIC intseg,intvecs
+     24    000000              
+     25    000000                      RSEG    INTSEG
+     26    000000              intseg:      ; DW 0x1122 ; test Kennung, kann
+                                weg. mk
+     27    000000              
+     28    000000              ; Interrupt vectors are located in the range
+                                FFC0-FFFFh. mk laut slau144i
+     29    000000              ; $fffe $ffc0 - . 62  ok  31 vectoren mk
+     30    000000              
+     31    000000                      RSEG    INTVEC
+     32    000000                      EXTERN isr_null,lpm_wake,isr_TA0
+     33    000000              
+     34    000000              intvecs:             ; priorität ; Bedeutung
+     35    000000              /*      DC16 isr_null ; 0         ;  not
+                                implemented in device
+     36    000000                      DC16 isr_null ; 1         ;
+     37    000000                      DC16 isr_null ; 2         ;
+     38    000000                      DC16 isr_null ; 3         ;
+     39    000000                      DC16 isr_null ; 4         ;
+     40    000000                      DC16 isr_null ; 5         ;
+     41    000000                      DC16 isr_null ; 6         ;
+     42    000000                      DC16 isr_null ; 7         ;
+     43    000000                      DC16 isr_null ; 8         ;
+     44    000000                      DC16 isr_null ; 9         ;
+     45    000000                      DC16 isr_null ; 10         ;
+     46    000000                      DC16 isr_null ; 11         ;
+     47    000000                      DC16 isr_null ; 12         ;
+     48    000000                      DC16 isr_null ; 13         ;
+     49    000000                      DC16 isr_null ; 14         ;
+     50    000000                      DC16 isr_null ; 15         ; */
+     51    000000                      
+     52    000000                      ; Range FFE0-FFFF          ; 
+     53    000000 ....                 DC16 isr_null ; 16         ;   
+                                                      nc
+     54    000002 ....                 DC16 isr_null ; 17         ;   
+                                                      nc
+     55    000004 ....                 DC16 isr_null ; 18         ;   
+                                                      P1IFG.0..7
+     56    000006 ....                 DC16 isr_null ; 19         ;   
+                                                      P2IFG.0..7
+     57    000008 ....                 DC16 isr_null ; 20         ;   
+                                                      nc
+     58    00000A ....                 DC16 isr_null ; 21         ;   
+                                                      ADC10IFG
+     59    00000C ....                 DC16 isr_null ; 22         ;   
+                                                      UCA0TXIFG, UCB0TXIFG
+     60    00000E                      
+     61    00000E ....                 DC16 lpm_wake ; 23         ;   
+                                                      UCA0RXIFG, UCB0RXIFG
+     62    000010                      
+     63    000010 ....                 DC16 isr_null ; 24         ;    TA0CCR2
+                                                      TAOCCR1 CCIFG, TAIFG
+     64    000012              
+     65    000012              ;        DC16 isr_TA0 ; 25         ;    TA0CCR0
+                                CCIFG
+     66    000012 ....                 DC16 isr_null ; 25         ;    TA0CCR0
+                                                      CCIFG
+     67    000014              
+     68    000014 ....                 DC16 isr_null ; 26         ;   
+                                                      WDTIFG
+     69    000016 ....                 DC16 isr_null ; 27         ;   
+                                                      CAIFG
+     70    000018 ....                 DC16 isr_null ; 28         ;    TA1CCR2
+                                                      TA1CCR1 CCIFG, TAIFG
+     71    00001A ....                 DC16 isr_null ; 29         ;    TA1CCR0
+                                                      CCIFG
+     72    00001C ....                 DC16 isr_null ; 30         ;    NMIIFG,
+                                                      OFIFG, ACCVIIFG
+                                                      (non-maskable)
+     73    00001E              ; tabelle stimmt - mk 21050514
+     74    000000                      RSEG    RESET
+     75    000000                      PUBLIC resetvec
+     76    000000                      EXTERN reset
+     77    000000              
+     78    000000 ....         resetvec:        DC16 reset   ; 31         ;
+                                                              power up ...
+                                                              (non-maskable)
+     79    000002              
+     80    000002                      END
+
+
+EOF                  DELIMITER 
+\n                   DELIMITER 
+                     DELIMITER 
+!                    OPERATOR 
+!=                   OPERATOR 
+%                    OPERATOR 
+&                    OPERATOR 
+&&                   OPERATOR 
+(                    OPERATOR 
+(                    DELIMITER 
+)                    OPERATOR 
+)                    DELIMITER 
+*                    OPERATOR 
++                    OPERATOR 
+,                    DELIMITER 
+-                    OPERATOR 
+.                    Target symbol: 24 
+.                    DELIMITER 
+.CFI                 DIRECTIVE 
+.DOUBLE              DIRECTIVE 
+.FLOAT               DIRECTIVE 
+.REQUIRE             DIRECTIVE 
+/                    OPERATOR 
+:                    DELIMITER 
+;                    DELIMITER 
+;                    Target symbol: 23 
+<                    OPERATOR 
+<<                   OPERATOR 
+<=                   OPERATOR 
+<>                   OPERATOR 
+<>                   DELIMITER 
+=                    OPERATOR 
+=                    DELIMITER 
+=                    DIRECTIVE 
+==                   OPERATOR 
+>                    OPERATOR 
+>=                   OPERATOR 
+>>                   OPERATOR 
+ADC                  MNEMONIC 
+ADD                  MNEMONIC 
+ADDC                 MNEMONIC 
+ALIAS                DIRECTIVE 
+ALIGN                DIRECTIVE 
+ALIGNRAM             DIRECTIVE 
+AND                  OPERATOR 
+AND                  MNEMONIC 
+ASEG                 DIRECTIVE 
+ASEGN                DIRECTIVE 
+ASSIGN               DIRECTIVE 
+B                    SUFFIX 
+BIC                  MNEMONIC 
+BIS                  MNEMONIC 
+BIT                  SEGMENT TYPE 
+BIT                  MNEMONIC 
+BITAND               OPERATOR 
+BITNOT               OPERATOR 
+BITOR                OPERATOR 
+BITXOR               OPERATOR 
+BLOCK                DIRECTIVE 
+BR                   MNEMONIC 
+BRANCH               MNEMONIC 
+BYTE                 Target symbol: 524288 
+CALL                 MNEMONIC 
+CALL_GRAPH_ROOT      DIRECTIVE 
+CASEOFF              DIRECTIVE 
+CASEON               DIRECTIVE 
+CFI                  DIRECTIVE 
+CG1                  REGISTER 
+CG2                  REGISTER 
+CLR                  MNEMONIC 
+CLRC                 MNEMONIC 
+CLRN                 MNEMONIC 
+CLRZ                 MNEMONIC 
+CMP                  MNEMONIC 
+CODE                 SEGMENT TYPE 
+COL                  DIRECTIVE 
+COMMON               DIRECTIVE 
+CONST                SEGMENT TYPE 
+CONST                DIRECTIVE 
+DADC                 MNEMONIC 
+DADD                 MNEMONIC 
+DATA                 SEGMENT TYPE 
+DATE                 OPERATOR 
+DB                   DIRECTIVE 
+DC16                 DIRECTIVE 
+DC24                 DIRECTIVE 
+DC32                 DIRECTIVE 
+DC8                  DIRECTIVE 
+DEC                  MNEMONIC 
+DECD                 MNEMONIC 
+DEFINE               DIRECTIVE 
+DF                   DIRECTIVE 
+DF32                 DIRECTIVE 
+DF64                 DIRECTIVE 
+DFTI32               DIRECTIVE 
+DFTI40               DIRECTIVE 
+DINT                 MNEMONIC 
+DL                   DIRECTIVE 
+DS                   DIRECTIVE 
+DS16                 DIRECTIVE 
+DS24                 DIRECTIVE 
+DS32                 DIRECTIVE 
+DS8                  DIRECTIVE 
+DW                   DIRECTIVE 
+EINT                 MNEMONIC 
+ELIF                 DIRECTIVE 
+ELSE                 DIRECTIVE 
+END                  DIRECTIVE 
+ENDIF                DIRECTIVE 
+ENDM                 DIRECTIVE 
+ENDMOD               DIRECTIVE 
+ENDR                 DIRECTIVE 
+EQ                   OPERATOR 
+EQU                  DIRECTIVE 
+EVEN                 DIRECTIVE 
+EXITM                DIRECTIVE 
+EXPORT               DIRECTIVE 
+EXTERN               DIRECTIVE 
+FAR                  SEGMENT TYPE 
+FARCODE              SEGMENT TYPE 
+FARCONST             SEGMENT TYPE 
+FARDATA              SEGMENT TYPE 
+FUNCTION             DIRECTIVE 
+GE                   OPERATOR 
+GT                   OPERATOR 
+HIGH                 OPERATOR 
+HUGE                 SEGMENT TYPE 
+HUGECODE             SEGMENT TYPE 
+HUGECONST            SEGMENT TYPE 
+HUGEDATA             SEGMENT TYPE 
+HWRD                 OPERATOR 
+IDATA                SEGMENT TYPE 
+IF                   DIRECTIVE 
+IMPORT               DIRECTIVE 
+INC                  MNEMONIC 
+INCD                 MNEMONIC 
+INV                  MNEMONIC 
+JC                   MNEMONIC 
+JEQ                  MNEMONIC 
+JGE                  MNEMONIC 
+JHS                  MNEMONIC 
+JL                   MNEMONIC 
+JLO                  MNEMONIC 
+JMP                  MNEMONIC 
+JN                   MNEMONIC 
+JNC                  MNEMONIC 
+JNE                  MNEMONIC 
+JNZ                  MNEMONIC 
+JZ                   MNEMONIC 
+LE                   OPERATOR 
+LIBRARY              DIRECTIVE 
+LIMIT                DIRECTIVE 
+LOCAL                DIRECTIVE 
+LOW                  OPERATOR 
+LSTCND               DIRECTIVE 
+LSTCOD               DIRECTIVE 
+LSTEXP               DIRECTIVE 
+LSTMAC               DIRECTIVE 
+LSTOUT               DIRECTIVE 
+LSTPAG               DIRECTIVE 
+LSTREP               DIRECTIVE 
+LSTSAS               DIRECTIVE 
+LSTXRF               DIRECTIVE 
+LT                   OPERATOR 
+LWRD                 OPERATOR 
+MACRO                DIRECTIVE 
+MOD                  OPERATOR 
+MODULE               DIRECTIVE 
+MOV                  MNEMONIC 
+NAME                 DIRECTIVE 
+NE                   OPERATOR 
+NEAR                 SEGMENT TYPE 
+NEARCODE             SEGMENT TYPE 
+NEARCONST            SEGMENT TYPE 
+NEARDATA             SEGMENT TYPE 
+NOALLOC              SEGMENT TYPE 
+NOP                  MNEMONIC 
+NOROOT               SEGMENT TYPE 
+NOT                  OPERATOR 
+NPAGE                SEGMENT TYPE 
+ODD                  DIRECTIVE 
+OR                   OPERATOR 
+ORG                  DIRECTIVE 
+PAGE                 DIRECTIVE 
+PAGSIZ               DIRECTIVE 
+PC                   REGISTER 
+POP                  MNEMONIC 
+PROGRAM              DIRECTIVE 
+PUBLIC               DIRECTIVE 
+PUBWEAK              DIRECTIVE 
+PUSH                 MNEMONIC 
+R0                   REGISTER 
+R1                   REGISTER 
+R10                  REGISTER 
+R11                  REGISTER 
+R12                  REGISTER 
+R13                  REGISTER 
+R14                  REGISTER 
+R15                  REGISTER 
+R2                   REGISTER 
+R3                   REGISTER 
+R4                   REGISTER 
+R5                   REGISTER 
+R6                   REGISTER 
+R7                   REGISTER 
+R8                   REGISTER 
+R9                   REGISTER 
+RADIX                DIRECTIVE 
+READ                 Target symbol: 2048 
+REGISTER             SEGMENT TYPE 
+REORDER              SEGMENT TYPE 
+REPT                 DIRECTIVE 
+REPTC                DIRECTIVE 
+REPTI                DIRECTIVE 
+REQUIRE              DIRECTIVE 
+RET                  MNEMONIC 
+RETI                 MNEMONIC 
+RLA                  MNEMONIC 
+RLC                  MNEMONIC 
+ROOT                 SEGMENT TYPE 
+RRA                  MNEMONIC 
+RRC                  MNEMONIC 
+RSEG                 DIRECTIVE 
+RTMODEL              DIRECTIVE 
+SBC                  MNEMONIC 
+SET                  DIRECTIVE 
+SETC                 MNEMONIC 
+SETN                 MNEMONIC 
+SETZ                 MNEMONIC 
+SFB                  OPERATOR 
+SFE                  OPERATOR 
+SFRB                 DIRECTIVE 
+SFRTYPE              DIRECTIVE 
+SFRW                 DIRECTIVE 
+SHL                  OPERATOR 
+SHR                  OPERATOR 
+SIZEOF               OPERATOR 
+SORT                 SEGMENT TYPE 
+SP                   REGISTER 
+SR                   REGISTER 
+STACK                DIRECTIVE 
+SUB                  MNEMONIC 
+SUBC                 MNEMONIC 
+SUPPRESS_CPU40_WARNING DIRECTIVE 
+SUPPRESS_NOP_AFTER_DINT_WARNING DIRECTIVE 
+SUPPRESS_NOP_AFTER_LPM_WARNING DIRECTIVE 
+SUPPRESS_NOP_BEFORE_EINT_WARNING
+                     DIRECTIVE 
+SUPPRESS_THIS_GIE_NOP_WARNING DIRECTIVE 
+SWPB                 MNEMONIC 
+SXT                  MNEMONIC 
+SYMBOL               DIRECTIVE 
+TST                  MNEMONIC 
+UGT                  OPERATOR 
+ULT                  OPERATOR 
+UNTYPED              SEGMENT TYPE 
+VAR                  DIRECTIVE 
+W                    SUFFIX 
+WORD                 Target symbol: 1048576 
+WRITE                Target symbol: 4096 
+XDATA                SEGMENT TYPE 
+XOR                  OPERATOR 
+XOR                  MNEMONIC 
+ZPAGE                SEGMENT TYPE 
+^                    OPERATOR 
+__430X_CORE__        #define, value: 1, line:         0  
+__430X__             #define, value: 1, line:         0  
+__430_CORE__         #define, value: 0, line:         0  
+__430__              #define, value: 0, line:         0  
+__A430__             #define, value: 1, line:         0  
+__BUILD_NUMBER__     #define,            line:         0  
+__CORE__             #define, value: 0, line:         0  
+__DATE__             #define,            line:         0  
+__FILE__             #define,            line:         0  
+__IAR_SYSTEMS_ASM    #define,            line:         0  
+__IAR_SYSTEMS_ASM__  #define,            line:         0  
+__LINE__             #define,            line:         0  
+__MSP430G2553__      #define, value: 1, line:         0  
+__SUBVERSION__       #define,            line:         0  
+__TID__              #define,            line:         0  
+__TIME__             #define,            line:         0  
+__VER__              #define,            line:         0  
+define               PREPROCESSOR DIRECTIVE 
+defined              Target symbol: 0 
+elif                 PREPROCESSOR DIRECTIVE 
+else                 PREPROCESSOR DIRECTIVE 
+endif                PREPROCESSOR DIRECTIVE 
+error                PREPROCESSOR DIRECTIVE 
+if                   PREPROCESSOR DIRECTIVE 
+ifdef                PREPROCESSOR DIRECTIVE 
+ifndef               PREPROCESSOR DIRECTIVE 
+include              PREPROCESSOR DIRECTIVE 
+line                 PREPROCESSOR DIRECTIVE 
+message              PREPROCESSOR DIRECTIVE 
+pragma               PREPROCESSOR DIRECTIVE 
+undef                PREPROCESSOR DIRECTIVE 
+|                    OPERATOR 
+||                   OPERATOR 
+~                    OPERATOR 
+
+Segment             Type 	Mode
+----------------------------------------
+INTSEG              UNTYPED  	REL 
+INTVEC              UNTYPED  	REL 
+RESET               UNTYPED  	REL 
+__EXTERNS           CODE  	ABS Org:0 
+
+Label               Mode   Type                   Segment    Value/Offset
+------------------------------------------------------------------------------
+TID                 ABS    CONST UNTYP.           ASEG       2B00 
+intseg              REL    CONST PUB UNTYP.       INTSEG     0 
+intvecs             REL    CONST PUB UNTYP.       INTVEC     0 
+isr_TA0             ABS    CONST EXT [-001] UNTYP. __EXTERNS  Solved Extern 
+isr_null            ABS    CONST EXT [000] UNTYP. __EXTERNS  Solved Extern 
+lpm_wake            ABS    CONST EXT [001] UNTYP. __EXTERNS  Solved Extern 
+reset               ABS    CONST EXT [002] UNTYP. __EXTERNS  Solved Extern 
+resetvec            REL    CONST PUB UNTYP.       RESET      0 
+
+
+##############################
+#          CRC:A376          #
+#        Errors:   0         #
+#        Warnings: 0         #
+#         Bytes: 32          #
+##############################
+
+
+
+

@@ -1,0 +1,1329 @@
+###############################################################################
+#                                                                             #
+#     IAR Assembler V6.30.1.934/W32  for MSP430 22/May/2018  23:30:01         #
+#     Copyright 1996-2015 IAR Systems AB.                                     #
+#                                                                             #
+#           Target option =  MSP430                                           #
+#           Source file   =  C:\Users\mka\Documents\GitHub\4e4th034\4e-infoC.s43#
+#           List file     =  C:\Users\mka\Documents\GitHub\4e4th034\Debug\List\4e-infoC.lst#
+#           Object file   =  C:\Users\mka\Documents\GitHub\4e4th034\Debug\Obj\4e-infoC.r43#
+#           Command line  =  C:\Users\mka\Documents\GitHub\4e4th034\4e-infoC.s43 #
+#                            -OC:\Users\mka\Documents\GitHub\4e4th034\Debug\Obj\ #
+#                            -s+ -M<> -w+                                     #
+#                            -LC:\Users\mka\Documents\GitHub\4e4th034\Debug\List\ #
+#                            -t8 -xDI -r -D__MSP430G2553__                    #
+#                            -IC:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2\430\INC\ #
+#                                                                             #
+###############################################################################
+
+      1    000000              ; ----------------------------------------------
+                               --------------------------------
+      2    000000              ; 4e4th is a Forth based on CamelForth
+                                
+      3    000000              ; for the Texas Instruments MSP430 
+      4    000000              ; 
+      5    000000              ; This program is free software; you can
+                                redistribute it and/or modify
+      6    000000              ; it under the terms of the GNU General Public
+                                License as published by
+      7    000000              ; the Free Software Foundation; either version 3
+                                of the License, or
+      8    000000              ; (at your option) any later version.
+      9    000000              ; 
+     10    000000              ; This program is distributed in the hope that
+                                it will be useful,
+     11    000000              ; but WITHOUT ANY WARRANTY; without even the
+                                implied warranty of
+     12    000000              ; MERCHANTABILITY or FITNESS FOR A PARTICULAR
+                                PURPOSE.  See the
+     13    000000              ; GNU General Public License for more details.
+     14    000000              ;
+     15    000000              ; You should have received a copy of the GNU
+                                General Public License
+     16    000000              ; along with this program.  If not, see
+                                <http://www.gnu.org/licenses/>.
+     17    000000              ; 
+     18    000000              ; See LICENSE TERMS in Brads file readme.txt as
+                                well.
+     19    000000              
+     20    000000              ; ----------------------------------------------
+                               --------------------------------
+     21    000000              ; 4e-infoCG2553.s43 - SAVE variables to infoC -
+                                MSP430G2553
+     22    000000              ; ----------------------------------------------
+                               --------------------------------
+     23    000000              
+     24    000000              #include "msp430.h"                     ;
+                                #define controlled include file
+     25    000000              #include "4e-CF430G2553forth.h"             ;
+                                header macros and register defs
+     26    000000              
+     27    000000              PUBLIC infoC
+     28    000000              
+     29    000000              RSEG INFOC
+     30    000000              
+     31    000000              ; VAR_AREA in infoC   -   saved variables,
+                                default value = 0
+     32    000000              
+     33    000000              infoC:
+     34    000000 0000                DW 0
+     35    000002 0000                DW 0
+     36    000004 0000                DW 0
+     37    000006 0000                DW 0
+     38    000008 0000                DW 0
+     39    00000A 0000                DW 0
+     40    00000C 0000                DW 0
+     41    00000E 0000                DW 0
+     42    000010              
+     43    000010 0000                DW 0
+     44    000012 0000                DW 0
+     45    000014 0000                DW 0
+     46    000016 0000                DW 0
+     47    000018 0000                DW 0
+     48    00001A 0000                DW 0
+     49    00001C 0000                DW 0
+     50    00001E 0000                DW 0
+     51    000020              
+     52    000020              END
+
+
+EOF                  DELIMITER 
+\n                   DELIMITER 
+                     DELIMITER 
+!                    OPERATOR 
+!=                   OPERATOR 
+%                    OPERATOR 
+&                    OPERATOR 
+&&                   OPERATOR 
+(                    OPERATOR 
+(                    DELIMITER 
+)                    OPERATOR 
+)                    DELIMITER 
+*                    OPERATOR 
++                    OPERATOR 
+,                    DELIMITER 
+-                    OPERATOR 
+.                    Target symbol: 24 
+.                    DELIMITER 
+.CFI                 DIRECTIVE 
+.DOUBLE              DIRECTIVE 
+.FLOAT               DIRECTIVE 
+.REQUIRE             DIRECTIVE 
+/                    OPERATOR 
+:                    DELIMITER 
+;                    DELIMITER 
+;                    Target symbol: 23 
+<                    OPERATOR 
+<<                   OPERATOR 
+<=                   OPERATOR 
+<>                   OPERATOR 
+<>                   DELIMITER 
+=                    OPERATOR 
+=                    DELIMITER 
+=                    DIRECTIVE 
+==                   OPERATOR 
+>                    OPERATOR 
+>=                   OPERATOR 
+>>                   OPERATOR 
+ACCVIE               #define, value: (0x20), line:     137:2  
+ACCVIFG              #define, value: (0x0004u), line:     453:2  
+ADC                  MNEMONIC 
+ADC10AE0_            #define, value: (0x004Au), line:     172:2      173:2
+ADC10B1              #define, value: (0x002), line:     276:2  
+ADC10BUSY            #define, value: (0x0001u), line:     216:2  
+ADC10CT              #define, value: (0x004), line:     277:2  
+ADC10CTL0_           #define, value: (0x01B0u), line:     175:2      176:2
+ADC10CTL1_           #define, value: (0x01B2u), line:     177:2      178:2
+ADC10DF              #define, value: (0x0200u), line:     225:2  
+ADC10DISABLE         #define, value: (0x000), line:     279:2  
+ADC10DIV0            #define, value: (0x0020u), line:     221:2  
+ADC10DIV1            #define, value: (0x0040u), line:     222:2  
+ADC10DIV2            #define, value: (0x0080u), line:     223:2  
+ADC10DIV_0           #define, value: (0*0x20u), line:     243:2  
+ADC10DIV_1           #define, value: (1*0x20u), line:     244:2  
+ADC10DIV_2           #define, value: (2*0x20u), line:     245:2  
+ADC10DIV_3           #define, value: (3*0x20u), line:     246:2  
+ADC10DIV_4           #define, value: (4*0x20u), line:     247:2  
+ADC10DIV_5           #define, value: (5*0x20u), line:     248:2  
+ADC10DIV_6           #define, value: (6*0x20u), line:     249:2  
+ADC10DIV_7           #define, value: (7*0x20u), line:     250:2  
+ADC10DTC0_           #define, value: (0x0048u), line:     168:2      169:2
+ADC10DTC1_           #define, value: (0x0049u), line:     170:2      171:2
+ADC10FETCH           #define, value: (0x001), line:     275:2  
+ADC10IE              #define, value: (0x008), line:     188:2  
+ADC10IFG             #define, value: (0x004), line:     187:2  
+ADC10MEM_            #define, value: (0x01B4u), line:     179:2      180:2
+ADC10ON              #define, value: (0x010), line:     189:2  
+ADC10SA_             #define, value: (0x01BCu), line:     181:2      182:2
+ADC10SC              #define, value: (0x001), line:     185:2  
+ADC10SHT0            #define, value: (0x800), line:     196:2  
+ADC10SHT1            #define, value: (0x1000u), line:     197:2  
+ADC10SHT_0           #define, value: (0*0x800u), line:     201:2  
+ADC10SHT_1           #define, value: (1*0x800u), line:     202:2  
+ADC10SHT_2           #define, value: (2*0x800u), line:     203:2  
+ADC10SHT_3           #define, value: (3*0x800u), line:     204:2  
+ADC10SR              #define, value: (0x400), line:     195:2  
+ADC10SSEL0           #define, value: (0x0008u), line:     219:2  
+ADC10SSEL1           #define, value: (0x0010u), line:     220:2  
+ADC10SSEL_0          #define, value: (0*8u), line:     238:2  
+ADC10SSEL_1          #define, value: (1*8u), line:     239:2  
+ADC10SSEL_2          #define, value: (2*8u), line:     240:2  
+ADC10SSEL_3          #define, value: (3*8u), line:     241:2  
+ADC10TB              #define, value: (0x008), line:     278:2  
+ADC10_VECTOR         #define, value: (5 * 2u), line:    1014:2  
+ADD                  MNEMONIC 
+ADDC                 MNEMONIC 
+ALIAS                DIRECTIVE 
+ALIGN                DIRECTIVE 
+ALIGNRAM             DIRECTIVE 
+AND                  OPERATOR 
+AND                  MNEMONIC 
+ASEG                 DIRECTIVE 
+ASEGN                DIRECTIVE 
+ASSIGN               DIRECTIVE 
+B                    SUFFIX 
+BCSCTL1_             #define, value: (0x0057u), line:     288:2      289:2
+BCSCTL2_             #define, value: (0x0058u), line:     290:2      291:2
+BCSCTL3_             #define, value: (0x0053u), line:     292:2      293:2
+BIC                  MNEMONIC 
+BIS                  MNEMONIC 
+BIT                  SEGMENT TYPE 
+BIT                  MNEMONIC 
+BIT0                 #define, value: (0x0001u), line:      62:2  
+BIT1                 #define, value: (0x0002u), line:      63:2  
+BIT2                 #define, value: (0x0004u), line:      64:2  
+BIT3                 #define, value: (0x0008u), line:      65:2  
+BIT4                 #define, value: (0x0010u), line:      66:2  
+BIT5                 #define, value: (0x0020u), line:      67:2  
+BIT6                 #define, value: (0x0040u), line:      68:2  
+BIT7                 #define, value: (0x0080u), line:      69:2  
+BIT8                 #define, value: (0x0100u), line:      70:2  
+BIT9                 #define, value: (0x0200u), line:      71:2  
+BITA                 #define, value: (0x0400u), line:      72:2  
+BITAND               OPERATOR 
+BITB                 #define, value: (0x0800u), line:      73:2  
+BITC                 #define, value: (0x1000u), line:      74:2  
+BITD                 #define, value: (0x2000u), line:      75:2  
+BITE                 #define, value: (0x4000u), line:      76:2  
+BITF                 #define, value: (0x8000u), line:      77:2  
+BITNOT               OPERATOR 
+BITOR                OPERATOR 
+BITXOR               OPERATOR 
+BLKWRT               #define, value: (0x0080u), line:     428:2  
+BLOCK                DIRECTIVE 
+BR                   MNEMONIC 
+BRANCH               MNEMONIC 
+BUSY                 #define, value: (0x0001u), line:     451:2  
+BYTE                 Target symbol: 524288 
+C                    #define, value: (0x0001u), line:      83:2  
+CACTL1_              #define, value: (0x0059u), line:     370:2      371:2
+CACTL2_              #define, value: (0x005Au), line:     372:2      373:2
+CAEX                 #define, value: (0x80), line:     384:2  
+CAF                  #define, value: (0x02), line:     392:2  
+CAIE                 #define, value: (0x02), line:     378:2  
+CAIES                #define, value: (0x04), line:     379:2  
+CAIFG                #define, value: (0x01), line:     377:2  
+CALBC1_12MHZ_        #define, value: (0x10FBu), line:     953:2      954:2
+CALBC1_16MHZ_        #define, value: (0x10F9u), line:     949:2      950:2
+CALBC1_1MHZ_         #define, value: (0x10FFu), line:     961:2      962:2
+CALBC1_8MHZ_         #define, value: (0x10FDu), line:     957:2      958:2
+CALDCO_12MHZ_        #define, value: (0x10FAu), line:     951:2      952:2
+CALDCO_16MHZ_        #define, value: (0x10F8u), line:     947:2      948:2
+CALDCO_1MHZ_         #define, value: (0x10FEu), line:     959:2      960:2
+CALDCO_8MHZ_         #define, value: (0x10FCu), line:     955:2      956:2
+CALL                 MNEMONIC 
+CALL_GRAPH_ROOT      DIRECTIVE 
+CAL_ADC_15T30        #define, value: (0x0003u), line:     992:2  
+CAL_ADC_15T85        #define, value: (0x0004u), line:     991:2  
+CAL_ADC_15VREF_FACTOR #define, value: (0x0002u), line:     993:2  
+CAL_ADC_25T30        #define, value: (0x0006u), line:     989:2  
+CAL_ADC_25T85        #define, value: (0x0007u), line:     988:2  
+CAL_ADC_25VREF_FACTOR #define, value: (0x0005u), line:     990:2  
+CAL_ADC_GAIN_FACTOR  #define, value: (0x0000u), line:     995:2  
+CAL_ADC_OFFSET       #define, value: (0x0001u), line:     994:2  
+CAL_BC1_12MHZ        #define, value: (0x0003u), line:    1000:2  
+CAL_BC1_16MHZ        #define, value: (0x0001u), line:     998:2  
+CAL_BC1_1MHZ         #define, value: (0x0007u), line:    1004:2  
+CAL_BC1_8MHZ         #define, value: (0x0005u), line:    1002:2  
+CAL_DCO_12MHZ        #define, value: (0x0002u), line:     999:2  
+CAL_DCO_16MHZ        #define, value: (0x0000u), line:     997:2  
+CAL_DCO_1MHZ         #define, value: (0x0006u), line:    1003:2  
+CAL_DCO_8MHZ         #define, value: (0x0004u), line:    1001:2  
+CAON                 #define, value: (0x08), line:     380:2  
+CAOUT                #define, value: (0x01), line:     391:2  
+CAP                  #define, value: (0x0100u), line:     609:2  
+CAPD0                #define, value: (0x01), line:     400:2  
+CAPD1                #define, value: (0x02), line:     401:2  
+CAPD2                #define, value: (0x04), line:     402:2  
+CAPD3                #define, value: (0x08), line:     403:2  
+CAPD4                #define, value: (0x10), line:     404:2  
+CAPD5                #define, value: (0x20), line:     405:2  
+CAPD6                #define, value: (0x40), line:     406:2  
+CAPD7                #define, value: (0x80), line:     407:2  
+CAPD_                #define, value: (0x005Bu), line:     374:2      375:2
+CAREF0               #define, value: (0x10), line:     381:2  
+CAREF1               #define, value: (0x20), line:     382:2  
+CAREF_0              #define, value: (0x00), line:     386:2  
+CAREF_1              #define, value: (0x10), line:     387:2  
+CAREF_2              #define, value: (0x20), line:     388:2  
+CAREF_3              #define, value: (0x30), line:     389:2  
+CARSEL               #define, value: (0x40), line:     383:2  
+CASEOFF              DIRECTIVE 
+CASEON               DIRECTIVE 
+CASHORT              #define, value: (0x80), line:     398:2  
+CCI                  #define, value: (0x0008u), line:     614:2  
+CCIE                 #define, value: (0x0010u), line:     613:2  
+CCIFG                #define, value: (0x0001u), line:     617:2  
+CCIS0                #define, value: (0x1000u), line:     606:2  
+CCIS1                #define, value: (0x2000u), line:     605:2  
+CCIS_0               #define, value: (0*0x1000u), line:     627:2  
+CCIS_1               #define, value: (1*0x1000u), line:     628:2  
+CCIS_2               #define, value: (2*0x1000u), line:     629:2  
+CCIS_3               #define, value: (3*0x1000u), line:     630:2  
+CCR0                 #define, value: TACCR0, line:     570:2  
+CCR0_                #define, value: TACCR0_, line:     576:2  
+CCR1                 #define, value: TACCR1, line:     571:2  
+CCR1_                #define, value: TACCR1_, line:     577:2  
+CCR2                 #define, value: TACCR2, line:     572:2  
+CCR2_                #define, value: TACCR2_, line:     578:2  
+CCTL0                #define, value: TACCTL0, line:     567:2  
+CCTL0_               #define, value: TACCTL0_, line:     573:2  
+CCTL1                #define, value: TACCTL1, line:     568:2  
+CCTL1_               #define, value: TACCTL1_, line:     574:2  
+CCTL2                #define, value: TACCTL2, line:     569:2  
+CCTL2_               #define, value: TACCTL2_, line:     575:2  
+CFI                  DIRECTIVE 
+CG1                  REGISTER 
+CG2                  REGISTER 
+CLR                  MNEMONIC 
+CLRC                 MNEMONIC 
+CLRN                 MNEMONIC 
+CLRZ                 MNEMONIC 
+CM0                  #define, value: (0x4000u), line:     604:2  
+CM1                  #define, value: (0x8000u), line:     603:2  
+CMP                  MNEMONIC 
+CM_0                 #define, value: (0*0x4000u), line:     631:2  
+CM_1                 #define, value: (1*0x4000u), line:     632:2  
+CM_2                 #define, value: (2*0x4000u), line:     633:2  
+CM_3                 #define, value: (3*0x4000u), line:     634:2  
+CODE                 SEGMENT TYPE 
+COL                  DIRECTIVE 
+COMMON               DIRECTIVE 
+COMPARATORA_VECTOR   #define, value: (11 * 2u), line:    1020:2  
+CONSEQ0              #define, value: (0x0002u), line:     217:2  
+CONSEQ1              #define, value: (0x0004u), line:     218:2  
+CONSEQ_0             #define, value: (0*2u), line:     233:2  
+CONSEQ_1             #define, value: (1*2u), line:     234:2  
+CONSEQ_2             #define, value: (2*2u), line:     235:2  
+CONSEQ_3             #define, value: (3*2u), line:     236:2  
+CONST                SEGMENT TYPE 
+CONST                DIRECTIVE 
+COV                  #define, value: (0x0002u), line:     616:2  
+CPUOFF               #define, value: (0x0010u), line:      88:2  
+DADC                 MNEMONIC 
+DADD                 MNEMONIC 
+DATA                 SEGMENT TYPE 
+DATE                 OPERATOR 
+DB                   DIRECTIVE 
+DC16                 DIRECTIVE 
+DC24                 DIRECTIVE 
+DC32                 DIRECTIVE 
+DC8                  DIRECTIVE 
+DCO0                 #define, value: (0x20), line:     300:2  
+DCO1                 #define, value: (0x40), line:     301:2  
+DCO2                 #define, value: (0x80), line:     302:2  
+DCOCTL_              #define, value: (0x0056u), line:     286:2      287:2
+DEC                  MNEMONIC 
+DECD                 MNEMONIC 
+DEFC                 #define,            line:      47:2      133:2    140:2    148:2    156:2
+                                                                    169:2    171:2    173:2    287:2
+                                                                    289:2    291:2    293:2    371:2
+                                                                    373:2    375:2    467:2    469:2
+                                                                    471:2    473:2    475:2    477:2
+                                                                    479:2    481:2    483:2    486:2
+                                                                    488:2    490:2    492:2    494:2
+                                                                    496:2    498:2    500:2    502:2
+                                                                    510:2    512:2    514:2    516:2
+                                                                    518:2    520:2    684:2    686:2
+                                                                    688:2    690:2    692:2    694:2
+                                                                    696:2    698:2    700:2    702:2
+                                                                    704:2    709:2    711:2    713:2
+                                                                    715:2    717:2    719:2    721:2
+                                                                    723:2    948:2    950:2    952:2
+                                                                    954:2    956:2    958:2    960:2
+                                                                    962:2    979:2    981:2    983:2
+                                                                    985:2
+DEFINE               DIRECTIVE 
+DEFW                 #define,            line:      48:2      176:2    178:2    180:2    182:2
+                                                                    415:2    417:2    419:2    528:2
+                                                                    530:2    532:2    534:2    536:2
+                                                                    538:2    540:2    542:2    544:2
+                                                                    650:2    652:2    654:2    656:2
+                                                                    658:2    660:2    662:2    664:2
+                                                                    666:2    725:2    727:2    900:2
+                                                                    977:2
+DEST                 MACRO 
+DF                   DIRECTIVE 
+DF32                 DIRECTIVE 
+DF64                 DIRECTIVE 
+DFTI32               DIRECTIVE 
+DFTI40               DIRECTIVE 
+DINT                 MNEMONIC 
+DIVA0                #define, value: (0x10), line:     308:2  
+DIVA1                #define, value: (0x20), line:     309:2  
+DIVA_0               #define, value: (0x00), line:     313:2  
+DIVA_1               #define, value: (0x10), line:     314:2  
+DIVA_2               #define, value: (0x20), line:     315:2  
+DIVA_3               #define, value: (0x30), line:     316:2  
+DIVM0                #define, value: (0x10), line:     321:2  
+DIVM1                #define, value: (0x20), line:     322:2  
+DIVM_0               #define, value: (0x00), line:     331:2  
+DIVM_1               #define, value: (0x10), line:     332:2  
+DIVM_2               #define, value: (0x20), line:     333:2  
+DIVM_3               #define, value: (0x30), line:     334:2  
+DIVS0                #define, value: (0x02), line:     318:2  
+DIVS1                #define, value: (0x04), line:     319:2  
+DIVS_0               #define, value: (0x00), line:     326:2  
+DIVS_1               #define, value: (0x02), line:     327:2  
+DIVS_2               #define, value: (0x04), line:     328:2  
+DIVS_3               #define, value: (0x06), line:     329:2  
+DL                   DIRECTIVE 
+DS                   DIRECTIVE 
+DS16                 DIRECTIVE 
+DS24                 DIRECTIVE 
+DS32                 DIRECTIVE 
+DS8                  DIRECTIVE 
+DW                   DIRECTIVE 
+EINT                 MNEMONIC 
+ELIF                 DIRECTIVE 
+ELSE                 DIRECTIVE 
+EMEX                 #define, value: (0x0020u), line:     456:2  
+ENC                  #define, value: (0x002), line:     186:2  
+END                  DIRECTIVE 
+ENDIF                DIRECTIVE 
+ENDM                 DIRECTIVE 
+ENDMOD               DIRECTIVE 
+ENDR                 DIRECTIVE 
+EQ                   OPERATOR 
+EQU                  DIRECTIVE 
+ERASE                #define, value: (0x0002u), line:     425:2  
+EVEN                 DIRECTIVE 
+EXITM                DIRECTIVE 
+EXPORT               DIRECTIVE 
+EXTERN               DIRECTIVE 
+FAIL                 #define, value: (0x0080u), line:     458:2  
+FAR                  SEGMENT TYPE 
+FARCODE              SEGMENT TYPE 
+FARCONST             SEGMENT TYPE 
+FARDATA              SEGMENT TYPE 
+FCTL1_               #define, value: (0x0128u), line:     414:2      415:2
+FCTL2_               #define, value: (0x012Au), line:     416:2      417:2
+FCTL3_               #define, value: (0x012Cu), line:     418:2      419:2
+FN0                  #define, value: (0x0001u), line:     431:2  
+FN1                  #define, value: (0x0002u), line:     432:2  
+FN2                  #define, value: (0x0004u), line:     434:2  
+FN3                  #define, value: (0x0008u), line:     437:2  
+FN4                  #define, value: (0x0010u), line:     440:2  
+FN5                  #define, value: (0x0020u), line:     442:2  
+FRKEY                #define, value: (0x9600u), line:     421:2  
+FSSEL0               #define, value: (0x0040u), line:     443:2  
+FSSEL1               #define, value: (0x0080u), line:     444:2  
+FSSEL_0              #define, value: (0x0000u), line:     446:2  
+FSSEL_1              #define, value: (0x0040u), line:     447:2  
+FSSEL_2              #define, value: (0x0080u), line:     448:2  
+FSSEL_3              #define, value: (0x00C0u), line:     449:2  
+FUNCTION             DIRECTIVE 
+FWKEY                #define, value: (0xA500u), line:     422:2  
+FXKEY                #define, value: (0x3300u), line:     423:2  
+GE                   OPERATOR 
+GIE                  #define, value: (0x0008u), line:      87:2  
+GT                   OPERATOR 
+HEADER               MACRO 
+HEADERLESS           MACRO 
+HEADLESS             MACRO 
+HIGH                 OPERATOR 
+HUGE                 SEGMENT TYPE 
+HUGECODE             SEGMENT TYPE 
+HUGECONST            SEGMENT TYPE 
+HUGEDATA             SEGMENT TYPE 
+HWRD                 OPERATOR 
+ID0                  #define, value: (0x0040u), line:     583:2  
+ID1                  #define, value: (0x0080u), line:     582:2  
+IDATA                SEGMENT TYPE 
+ID_0                 #define, value: (0*0x40u), line:     594:2  
+ID_1                 #define, value: (1*0x40u), line:     595:2  
+ID_2                 #define, value: (2*0x40u), line:     596:2  
+ID_3                 #define, value: (3*0x40u), line:     597:2  
+IE1_                 #define, value: (0x0000u), line:     132:2      133:2
+IE2_                 #define, value: (0x0001u), line:     147:2      148:2
+IF                   DIRECTIVE 
+IFG1_                #define, value: (0x0002u), line:     139:2      140:2
+IFG2_                #define, value: (0x0003u), line:     155:2      156:2
+IMMED                MACRO 
+IMPORT               DIRECTIVE 
+INC                  MNEMONIC 
+INCD                 MNEMONIC 
+INCH0                #define, value: (0x1000u), line:     228:2  
+INCH1                #define, value: (0x2000u), line:     229:2  
+INCH2                #define, value: (0x4000u), line:     230:2  
+INCH3                #define, value: (0x8000u), line:     231:2  
+INCH_0               #define, value: (0*0x1000u), line:     257:2  
+INCH_1               #define, value: (1*0x1000u), line:     258:2  
+INCH_10              #define, value: (10*0x1000u), line:     267:2  
+INCH_11              #define, value: (11*0x1000u), line:     268:2  
+INCH_12              #define, value: (12*0x1000u), line:     269:2  
+INCH_13              #define, value: (13*0x1000u), line:     270:2  
+INCH_14              #define, value: (14*0x1000u), line:     271:2  
+INCH_15              #define, value: (15*0x1000u), line:     272:2  
+INCH_2               #define, value: (2*0x1000u), line:     259:2  
+INCH_3               #define, value: (3*0x1000u), line:     260:2  
+INCH_4               #define, value: (4*0x1000u), line:     261:2  
+INCH_5               #define, value: (5*0x1000u), line:     262:2  
+INCH_6               #define, value: (6*0x1000u), line:     263:2  
+INCH_7               #define, value: (7*0x1000u), line:     264:2  
+INCH_8               #define, value: (8*0x1000u), line:     265:2  
+INCH_9               #define, value: (9*0x1000u), line:     266:2  
+INDEX                #define, value: R8, line:      51:3  
+INFOEND              #define, value: (0x10FF), line:      28:3  
+INFOSEG              #define, value: (128), line:      36:3  
+INFOSTART            #define, value: (0x1000), line:      27:3  
+INV                  MNEMONIC 
+IP                   #define, value: R5, line:      46:3  
+IRACL                #define, value: R12, line:      67:3  
+IRACM                #define, value: R13, line:      68:3  
+IRBT                 #define, value: W, line:      69:3  
+IROP1                #define, value: TOS, line:      64:3  
+IROP2L               #define, value: R10, line:      65:3  
+IROP2M               #define, value: R11, line:      66:3  
+ISREND               #define, value: (0xFFDF), line:      34:3  
+ISRSTART             #define, value: (0xFE00), line:      33:3  
+ISSH                 #define, value: (0x0100u), line:     224:2  
+JC                   MNEMONIC 
+JEQ                  MNEMONIC 
+JGE                  MNEMONIC 
+JHS                  MNEMONIC 
+JL                   MNEMONIC 
+JLO                  MNEMONIC 
+JMP                  MNEMONIC 
+JN                   MNEMONIC 
+JNC                  MNEMONIC 
+JNE                  MNEMONIC 
+JNZ                  MNEMONIC 
+JZ                   MNEMONIC 
+KEYV                 #define, value: (0x0002u), line:     452:2  
+LE                   OPERATOR 
+LFXT1OF              #define, value: (0x01), line:     341:2  
+LFXT1S0              #define, value: (0x10), line:     345:2  
+LFXT1S1              #define, value: (0x20), line:     346:2  
+LFXT1S_0             #define, value: (0x00), line:     355:2  
+LFXT1S_1             #define, value: (0x10), line:     356:2  
+LFXT1S_2             #define, value: (0x20), line:     357:2  
+LFXT1S_3             #define, value: (0x30), line:     358:2  
+LIBRARY              DIRECTIVE 
+LIMIT                #define, value: R9, line:      52:3  
+LOCAL                DIRECTIVE 
+LOCK                 #define, value: (0x0010u), line:     455:2  
+LOCKA                #define, value: (0x0040u), line:     457:2  
+LOW                  OPERATOR 
+LPM0                 #define, value: (CPUOFF), line:      96:2  
+LPM1                 #define, value: (SCG0+CPUOFF), line:      97:2  
+LPM2                 #define, value: (SCG1+CPUOFF), line:      98:2  
+LPM3                 #define, value: (SCG1+SCG0+CPUOFF), line:      99:2  
+LPM4                 #define, value: (SCG1+SCG0+OSCOFF+CPUOFF), line:     100:2  
+LSTCND               DIRECTIVE 
+LSTCOD               DIRECTIVE 
+LSTEXP               DIRECTIVE 
+LSTMAC               DIRECTIVE 
+LSTOUT               DIRECTIVE 
+LSTPAG               DIRECTIVE 
+LSTREP               DIRECTIVE 
+LSTSAS               DIRECTIVE 
+LSTXRF               DIRECTIVE 
+LT                   OPERATOR 
+LWRD                 OPERATOR 
+MACRO                DIRECTIVE 
+MAINSEG              #define, value: (512), line:      35:3  
+MC0                  #define, value: (0x0010u), line:     585:2  
+MC1                  #define, value: (0x0020u), line:     584:2  
+MC_0                 #define, value: (0*0x10u), line:     590:2  
+MC_1                 #define, value: (1*0x10u), line:     591:2  
+MC_2                 #define, value: (2*0x10u), line:     592:2  
+MC_3                 #define, value: (3*0x10u), line:     593:2  
+MERAS                #define, value: (0x0004u), line:     426:2  
+MOD                  OPERATOR 
+MOD0                 #define, value: (0x01), line:     295:2  
+MOD1                 #define, value: (0x02), line:     296:2  
+MOD2                 #define, value: (0x04), line:     297:2  
+MOD3                 #define, value: (0x08), line:     298:2  
+MOD4                 #define, value: (0x10), line:     299:2  
+MODULE               DIRECTIVE 
+MOV                  MNEMONIC 
+MSC                  #define, value: (0x080), line:     192:2  
+N                    #define, value: (0x0004u), line:      85:2  
+NAME                 DIRECTIVE 
+NE                   OPERATOR 
+NEAR                 SEGMENT TYPE 
+NEARCODE             SEGMENT TYPE 
+NEARCONST            SEGMENT TYPE 
+NEARDATA             SEGMENT TYPE 
+NEXT                 MACRO 
+NMIIE                #define, value: (0x10), line:     136:2  
+NMIIFG               #define, value: (0x10), line:     145:2  
+NMI_VECTOR           #define, value: (14 * 2u), line:    1023:2  
+NOALLOC              SEGMENT TYPE 
+NOP                  MNEMONIC 
+NOROOT               SEGMENT TYPE 
+NOT                  OPERATOR 
+NPAGE                SEGMENT TYPE 
+ODD                  DIRECTIVE 
+OFIE                 #define, value: (0x02), line:     135:2  
+OFIFG                #define, value: (0x02), line:     142:2  
+OR                   OPERATOR 
+ORG                  DIRECTIVE 
+OSCOFF               #define, value: (0x0020u), line:      89:2  
+OUT                  #define, value: (0x0004u), line:     615:2  
+OUTMOD0              #define, value: (0x0020u), line:     612:2  
+OUTMOD1              #define, value: (0x0040u), line:     611:2  
+OUTMOD2              #define, value: (0x0080u), line:     610:2  
+OUTMOD_0             #define, value: (0*0x20u), line:     619:2  
+OUTMOD_1             #define, value: (1*0x20u), line:     620:2  
+OUTMOD_2             #define, value: (2*0x20u), line:     621:2  
+OUTMOD_3             #define, value: (3*0x20u), line:     622:2  
+OUTMOD_4             #define, value: (4*0x20u), line:     623:2  
+OUTMOD_5             #define, value: (5*0x20u), line:     624:2  
+OUTMOD_6             #define, value: (6*0x20u), line:     625:2  
+OUTMOD_7             #define, value: (7*0x20u), line:     626:2  
+P1DIR_               #define, value: (0x0022u), line:     470:2      471:2
+P1IES_               #define, value: (0x0024u), line:     474:2      475:2
+P1IE_                #define, value: (0x0025u), line:     476:2      477:2
+P1IFG_               #define, value: (0x0023u), line:     472:2      473:2
+P1IN_                #define, value: (0x0020u), line:     466:2      467:2
+P1OUT_               #define, value: (0x0021u), line:     468:2      469:2
+P1REN_               #define, value: (0x0027u), line:     482:2      483:2
+P1SEL2_              #define, value: (0x0041u), line:     480:2      481:2
+P1SEL_               #define, value: (0x0026u), line:     478:2      479:2
+P2CA0                #define, value: (0x04), line:     393:2  
+P2CA1                #define, value: (0x08), line:     394:2  
+P2CA2                #define, value: (0x10), line:     395:2  
+P2CA3                #define, value: (0x20), line:     396:2  
+P2CA4                #define, value: (0x40), line:     397:2  
+P2DIR_               #define, value: (0x002Au), line:     489:2      490:2
+P2IES_               #define, value: (0x002Cu), line:     493:2      494:2
+P2IE_                #define, value: (0x002Du), line:     495:2      496:2
+P2IFG_               #define, value: (0x002Bu), line:     491:2      492:2
+P2IN_                #define, value: (0x0028u), line:     485:2      486:2
+P2OUT_               #define, value: (0x0029u), line:     487:2      488:2
+P2REN_               #define, value: (0x002Fu), line:     501:2      502:2
+P2SEL2_              #define, value: (0x0042u), line:     499:2      500:2
+P2SEL_               #define, value: (0x002Eu), line:     497:2      498:2
+P3DIR_               #define, value: (0x001Au), line:     513:2      514:2
+P3IN_                #define, value: (0x0018u), line:     509:2      510:2
+P3OUT_               #define, value: (0x0019u), line:     511:2      512:2
+P3REN_               #define, value: (0x0010u), line:     519:2      520:2
+P3SEL2_              #define, value: (0x0043u), line:     517:2      518:2
+P3SEL_               #define, value: (0x001Bu), line:     515:2      516:2
+PAGE                 DIRECTIVE 
+PAGSIZ               DIRECTIVE 
+PC                   REGISTER 
+POP                  MNEMONIC 
+PORIFG               #define, value: (0x04), line:     143:2  
+PORT1_VECTOR         #define, value: (2 * 2u), line:    1012:2  
+PORT2_VECTOR         #define, value: (3 * 2u), line:    1013:2  
+PROGRAM              DIRECTIVE 
+PSP                  #define, value: R4, line:      45:3  
+PUBLIC               DIRECTIVE 
+PUBWEAK              DIRECTIVE 
+PUSH                 MNEMONIC 
+Q                    #define, value: R12, line:      57:3  
+R0                   REGISTER 
+R1                   REGISTER 
+R10                  REGISTER 
+R11                  REGISTER 
+R12                  REGISTER 
+R13                  REGISTER 
+R14                  REGISTER 
+R15                  REGISTER 
+R2                   REGISTER 
+R3                   REGISTER 
+R4                   REGISTER 
+R5                   REGISTER 
+R6                   REGISTER 
+R7                   REGISTER 
+R8                   REGISTER 
+R9                   REGISTER 
+RADIX                DIRECTIVE 
+RAMEND               #define, value: (0x0400), line:      30:3  
+RAMSTART             #define, value: (0x0200), line:      29:3  
+READ                 Target symbol: 2048 
+READ_ONLY            #define, value: const, line:      55:2      467:2    486:2    510:2    528:2
+                                                                    650:2    696:2    721:2    948:2
+                                                                    950:2    952:2    954:2    956:2
+                                                                    958:2    960:2    962:2    977:2
+                                                                    979:2    981:2    983:2    985:2
+REF2_5V              #define, value: (0x040), line:     191:2  
+REFBURST             #define, value: (0x100), line:     193:2  
+REFON                #define, value: (0x020), line:     190:2  
+REFOUT               #define, value: (0x200), line:     194:2  
+REGISTER             SEGMENT TYPE 
+REORDER              SEGMENT TYPE 
+REPT                 DIRECTIVE 
+REPTC                DIRECTIVE 
+REPTI                DIRECTIVE 
+REQUIRE              DIRECTIVE 
+RESET_VECTOR         #define, value: (15 * 2u), line:    1024:2  
+RET                  MNEMONIC 
+RETI                 MNEMONIC 
+RLA                  MNEMONIC 
+RLC                  MNEMONIC 
+ROOT                 SEGMENT TYPE 
+RRA                  MNEMONIC 
+RRC                  MNEMONIC 
+RSEG                 DIRECTIVE 
+RSEL0                #define, value: (0x01), line:     304:2  
+RSEL1                #define, value: (0x02), line:     305:2  
+RSEL2                #define, value: (0x04), line:     306:2  
+RSEL3                #define, value: (0x08), line:     307:2  
+RSP                  #define, value: SP, line:      42:3  
+RSTIFG               #define, value: (0x08), line:     144:2  
+RTMODEL              DIRECTIVE 
+SBC                  MNEMONIC 
+SCCI                 #define, value: (0x0400u), line:     608:2  
+SCG0                 #define, value: (0x0040u), line:      90:2  
+SCG1                 #define, value: (0x0080u), line:      91:2  
+SCS                  #define, value: (0x0800u), line:     607:2  
+SEGWRT               #define, value: (0x0080u), line:     429:2  
+SELM0                #define, value: (0x40), line:     323:2  
+SELM1                #define, value: (0x80), line:     324:2  
+SELM_0               #define, value: (0x00), line:     336:2  
+SELM_1               #define, value: (0x40), line:     337:2  
+SELM_2               #define, value: (0x80), line:     338:2  
+SELM_3               #define, value: (0xC0), line:     339:2  
+SELS                 #define, value: (0x08), line:     320:2  
+SET                  DIRECTIVE 
+SETC                 MNEMONIC 
+SETN                 MNEMONIC 
+SETZ                 MNEMONIC 
+SFB                  OPERATOR 
+SFE                  OPERATOR 
+SFRB                 DIRECTIVE 
+SFRTYPE              DIRECTIVE 
+SFRW                 DIRECTIVE 
+SHL                  OPERATOR 
+SHR                  OPERATOR 
+SHS0                 #define, value: (0x0400u), line:     226:2  
+SHS1                 #define, value: (0x0800u), line:     227:2  
+SHS_0                #define, value: (0*0x400u), line:     252:2  
+SHS_1                #define, value: (1*0x400u), line:     253:2  
+SHS_2                #define, value: (2*0x400u), line:     254:2  
+SHS_3                #define, value: (3*0x400u), line:     255:2  
+SIZEOF               OPERATOR 
+SORT                 SEGMENT TYPE 
+SP                   REGISTER 
+SR                   REGISTER 
+SREF0                #define, value: (0x2000u), line:     198:2  
+SREF1                #define, value: (0x4000u), line:     199:2  
+SREF2                #define, value: (0x8000u), line:     200:2  
+SREF_0               #define, value: (0*0x2000u), line:     206:2  
+SREF_1               #define, value: (1*0x2000u), line:     207:2  
+SREF_2               #define, value: (2*0x2000u), line:     208:2  
+SREF_3               #define, value: (3*0x2000u), line:     209:2  
+SREF_4               #define, value: (4*0x2000u), line:     210:2  
+SREF_5               #define, value: (5*0x2000u), line:     211:2  
+SREF_6               #define, value: (6*0x2000u), line:     212:2  
+SREF_7               #define, value: (7*0x2000u), line:     213:2  
+STACK                DIRECTIVE 
+SUB                  MNEMONIC 
+SUBC                 MNEMONIC 
+SUPPRESS_CPU40_WARNING DIRECTIVE 
+SUPPRESS_NOP_AFTER_DINT_WARNING DIRECTIVE 
+SUPPRESS_NOP_AFTER_LPM_WARNING DIRECTIVE 
+SUPPRESS_NOP_BEFORE_EINT_WARNING
+                     DIRECTIVE 
+SUPPRESS_THIS_GIE_NOP_WARNING DIRECTIVE 
+SWPB                 MNEMONIC 
+SXT                  MNEMONIC 
+SYMBOL               DIRECTIVE 
+T                    #define, value: R13, line:      58:3  
+TA0CCR0_             #define, value: (0x0172u), line:     539:2      540:2
+TA0CCR1_             #define, value: (0x0174u), line:     541:2      542:2
+TA0CCR2_             #define, value: (0x0176u), line:     543:2      544:2
+TA0CCTL0_            #define, value: (0x0162u), line:     531:2      532:2
+TA0CCTL1_            #define, value: (0x0164u), line:     533:2      534:2
+TA0CCTL2_            #define, value: (0x0166u), line:     535:2      536:2
+TA0CTL_              #define, value: (0x0160u), line:     529:2      530:2
+TA0IV_               #define, value: (0x012Eu), line:     527:2      528:2
+TA0IV_6              #define, value: (0x0006u), line:     640:2  
+TA0IV_8              #define, value: (0x0008u), line:     641:2  
+TA0IV_NONE           #define, value: (0x0000u), line:     637:2  
+TA0IV_TACCR1         #define, value: (0x0002u), line:     638:2  
+TA0IV_TACCR2         #define, value: (0x0004u), line:     639:2  
+TA0IV_TAIFG          #define, value: (0x000Au), line:     642:2  
+TA0R_                #define, value: (0x0170u), line:     537:2      538:2
+TA1CCR0_             #define, value: (0x0192u), line:     661:2      662:2
+TA1CCR1_             #define, value: (0x0194u), line:     663:2      664:2
+TA1CCR2_             #define, value: (0x0196u), line:     665:2      666:2
+TA1CCTL0_            #define, value: (0x0182u), line:     653:2      654:2
+TA1CCTL1_            #define, value: (0x0184u), line:     655:2      656:2
+TA1CCTL2_            #define, value: (0x0186u), line:     657:2      658:2
+TA1CTL_              #define, value: (0x0180u), line:     651:2      652:2
+TA1IV_               #define, value: (0x011Eu), line:     649:2      650:2
+TA1IV_6              #define, value: (0x0006u), line:     674:2  
+TA1IV_8              #define, value: (0x0008u), line:     675:2  
+TA1IV_NONE           #define, value: (0x0000u), line:     671:2  
+TA1IV_TACCR1         #define, value: (0x0002u), line:     672:2  
+TA1IV_TACCR2         #define, value: (0x0004u), line:     673:2  
+TA1IV_TAIFG          #define, value: (0x000Au), line:     676:2  
+TA1R_                #define, value: (0x0190u), line:     659:2      660:2
+TACCR0               #define, value: TA0CCR0, line:     553:2  
+TACCR0_              #define, value: TA0CCR0_, line:     562:2  
+TACCR1               #define, value: TA0CCR1, line:     554:2  
+TACCR1_              #define, value: TA0CCR1_, line:     563:2  
+TACCR2               #define, value: TA0CCR2, line:     555:2  
+TACCR2_              #define, value: TA0CCR2_, line:     564:2  
+TACCTL0              #define, value: TA0CCTL0, line:     549:2  
+TACCTL0_             #define, value: TA0CCTL0_, line:     558:2  
+TACCTL1              #define, value: TA0CCTL1, line:     550:2  
+TACCTL1_             #define, value: TA0CCTL1_, line:     559:2  
+TACCTL2              #define, value: TA0CCTL2, line:     551:2  
+TACCTL2_             #define, value: TA0CCTL2_, line:     560:2  
+TACLR                #define, value: (0x0004u), line:     586:2  
+TACTL                #define, value: TA0CTL, line:     548:2  
+TACTL_               #define, value: TA0CTL_, line:     557:2  
+TAG_ADC10_1          #define, value: (0x08), line:     972:2  
+TAG_DCO_30           #define, value: (0x01), line:     971:2  
+TAG_EMPTY            #define, value: (0xFE), line:     973:2  
+TAIE                 #define, value: (0x0002u), line:     587:2  
+TAIFG                #define, value: (0x0001u), line:     588:2  
+TAIV                 #define, value: TA0IV, line:     547:2  
+TAIV_                #define, value: TA0IV_, line:     556:2  
+TAR                  #define, value: TA0R, line:     552:2  
+TAR_                 #define, value: TA0R_, line:     561:2  
+TASSEL0              #define, value: (0x0100u), line:     581:2  
+TASSEL1              #define, value: (0x0200u), line:     580:2  
+TASSEL_0             #define, value: (0*0x100u), line:     598:2  
+TASSEL_1             #define, value: (1*0x100u), line:     599:2  
+TASSEL_2             #define, value: (2*0x100u), line:     600:2  
+TASSEL_3             #define, value: (3*0x100u), line:     601:2  
+TIMER0_A0_VECTOR     #define, value: (9 * 2u), line:    1018:2  
+TIMER0_A1_VECTOR     #define, value: (8 * 2u), line:    1017:2  
+TIMER1_A0_VECTOR     #define, value: (13 * 2u), line:    1022:2  
+TIMER1_A1_VECTOR     #define, value: (12 * 2u), line:    1021:2  
+TLV_ADC10_1_LEN_     #define, value: (0x10DBu), line:     984:2      985:2
+TLV_ADC10_1_TAG_     #define, value: (0x10DAu), line:     982:2      983:2
+TLV_CHECKSUM_        #define, value: (0x10C0u), line:     976:2      977:2
+TLV_DCO_30_LEN_      #define, value: (0x10F7u), line:     980:2      981:2
+TLV_DCO_30_TAG_      #define, value: (0x10F6u), line:     978:2      979:2
+TOS                  #define, value: R7, line:      48:3  
+TRAPINT_VECTOR       #define, value: (0 * 2u), line:    1011:2  
+TST                  MNEMONIC 
+UC0IE                #define, value: IE2, line:     149:2  
+UC0IFG               #define, value: IFG2, line:     157:2  
+UC7BIT               #define, value: (0x10), line:     733:2  
+UCA0ABCTL_           #define, value: (0x005Du), line:     699:2      700:2
+UCA0BR0_             #define, value: (0x0062u), line:     687:2      688:2
+UCA0BR1_             #define, value: (0x0063u), line:     689:2      690:2
+UCA0CTL0_            #define, value: (0x0060u), line:     683:2      684:2
+UCA0CTL1_            #define, value: (0x0061u), line:     685:2      686:2
+UCA0IRRCTL_          #define, value: (0x005Fu), line:     703:2      704:2
+UCA0IRTCTL_          #define, value: (0x005Eu), line:     701:2      702:2
+UCA0MCTL_            #define, value: (0x0064u), line:     691:2      692:2
+UCA0RXBUF_           #define, value: (0x0066u), line:     695:2      696:2
+UCA0RXIE             #define, value: (0x01), line:     150:2  
+UCA0RXIFG            #define, value: (0x01), line:     158:2  
+UCA0STAT_            #define, value: (0x0065u), line:     693:2      694:2
+UCA0TXBUF_           #define, value: (0x0067u), line:     697:2      698:2
+UCA0TXIE             #define, value: (0x02), line:     151:2  
+UCA0TXIFG            #define, value: (0x02), line:     159:2  
+UCA10                #define, value: (0x80), line:     745:2  
+UCABDEN              #define, value: (0x01), line:     869:2  
+UCADDR               #define, value: (0x02), line:     823:2  
+UCALIE               #define, value: (0x01), line:     834:2  
+UCALIFG              #define, value: (0x01), line:     842:2  
+UCB0BR0_             #define, value: (0x006Au), line:     712:2      713:2
+UCB0BR1_             #define, value: (0x006Bu), line:     714:2      715:2
+UCB0CTL0_            #define, value: (0x0068u), line:     708:2      709:2
+UCB0CTL1_            #define, value: (0x0069u), line:     710:2      711:2
+UCB0I2CIE_           #define, value: (0x006Cu), line:     716:2      717:2
+UCB0I2COA_           #define, value: (0x0118u), line:     724:2      725:2
+UCB0I2CSA_           #define, value: (0x011Au), line:     726:2      727:2
+UCB0RXBUF_           #define, value: (0x006Eu), line:     720:2      721:2
+UCB0RXIE             #define, value: (0x04), line:     152:2  
+UCB0RXIFG            #define, value: (0x04), line:     160:2  
+UCB0STAT_            #define, value: (0x006Du), line:     718:2      719:2
+UCB0TXBUF_           #define, value: (0x006Fu), line:     722:2      723:2
+UCB0TXIE             #define, value: (0x08), line:     153:2  
+UCB0TXIFG            #define, value: (0x08), line:     161:2  
+UCBBUSY              #define, value: (0x10), line:     838:2  
+UCBRF0               #define, value: (0x10), line:     785:2  
+UCBRF1               #define, value: (0x20), line:     784:2  
+UCBRF2               #define, value: (0x40), line:     783:2  
+UCBRF3               #define, value: (0x80), line:     782:2  
+UCBRF_0              #define, value: (0x00), line:     791:2  
+UCBRF_1              #define, value: (0x10), line:     792:2  
+UCBRF_10             #define, value: (0xA0), line:     801:2  
+UCBRF_11             #define, value: (0xB0), line:     802:2  
+UCBRF_12             #define, value: (0xC0), line:     803:2  
+UCBRF_13             #define, value: (0xD0), line:     804:2  
+UCBRF_14             #define, value: (0xE0), line:     805:2  
+UCBRF_15             #define, value: (0xF0), line:     806:2  
+UCBRF_2              #define, value: (0x20), line:     793:2  
+UCBRF_3              #define, value: (0x30), line:     794:2  
+UCBRF_4              #define, value: (0x40), line:     795:2  
+UCBRF_5              #define, value: (0x50), line:     796:2  
+UCBRF_6              #define, value: (0x60), line:     797:2  
+UCBRF_7              #define, value: (0x70), line:     798:2  
+UCBRF_8              #define, value: (0x80), line:     799:2  
+UCBRF_9              #define, value: (0x90), line:     800:2  
+UCBRK                #define, value: (0x08), line:     821:2  
+UCBRKIE              #define, value: (0x10), line:     758:2  
+UCBRS0               #define, value: (0x02), line:     788:2  
+UCBRS1               #define, value: (0x04), line:     787:2  
+UCBRS2               #define, value: (0x08), line:     786:2  
+UCBRS_0              #define, value: (0x00), line:     808:2  
+UCBRS_1              #define, value: (0x02), line:     809:2  
+UCBRS_2              #define, value: (0x04), line:     810:2  
+UCBRS_3              #define, value: (0x06), line:     811:2  
+UCBRS_4              #define, value: (0x08), line:     812:2  
+UCBRS_5              #define, value: (0x0A), line:     813:2  
+UCBRS_6              #define, value: (0x0C), line:     814:2  
+UCBRS_7              #define, value: (0x0E), line:     815:2  
+UCBTOE               #define, value: (0x04), line:     867:2  
+UCBUSY               #define, value: (0x01), line:     824:2  
+UCCKPH               #define, value: (0x80), line:     740:2  
+UCCKPL               #define, value: (0x40), line:     741:2  
+UCDELIM0             #define, value: (0x10), line:     865:2  
+UCDELIM1             #define, value: (0x20), line:     864:2  
+UCDORM               #define, value: (0x08), line:     759:2  
+UCFE                 #define, value: (0x40), line:     818:2  
+UCGC                 #define, value: (0x20), line:     837:2  
+UCGCEN               #define, value: (0x8000u), line:     871:2  
+UCIDLE               #define, value: (0x02), line:     825:2  
+UCIREN               #define, value: (0x01), line:     851:2  
+UCIRRXFE             #define, value: (0x01), line:     860:2  
+UCIRRXFL0            #define, value: (0x04), line:     858:2  
+UCIRRXFL1            #define, value: (0x08), line:     857:2  
+UCIRRXFL2            #define, value: (0x10), line:     856:2  
+UCIRRXFL3            #define, value: (0x20), line:     855:2  
+UCIRRXFL4            #define, value: (0x40), line:     854:2  
+UCIRRXFL5            #define, value: (0x80), line:     853:2  
+UCIRRXPL             #define, value: (0x02), line:     859:2  
+UCIRTXCLK            #define, value: (0x02), line:     850:2  
+UCIRTXPL0            #define, value: (0x04), line:     849:2  
+UCIRTXPL1            #define, value: (0x08), line:     848:2  
+UCIRTXPL2            #define, value: (0x10), line:     847:2  
+UCIRTXPL3            #define, value: (0x20), line:     846:2  
+UCIRTXPL4            #define, value: (0x40), line:     845:2  
+UCIRTXPL5            #define, value: (0x80), line:     844:2  
+UCLISTEN             #define, value: (0x80), line:     817:2  
+UCMM                 #define, value: (0x20), line:     747:2  
+UCMODE0              #define, value: (0x02), line:     736:2  
+UCMODE1              #define, value: (0x04), line:     735:2  
+UCMODE_0             #define, value: (0x00), line:     749:2  
+UCMODE_1             #define, value: (0x02), line:     750:2  
+UCMODE_2             #define, value: (0x04), line:     751:2  
+UCMODE_3             #define, value: (0x06), line:     752:2  
+UCMSB                #define, value: (0x20), line:     732:2  
+UCMST                #define, value: (0x08), line:     742:2  
+UCNACKIE             #define, value: (0x08), line:     831:2  
+UCNACKIFG            #define, value: (0x08), line:     839:2  
+UCOA0                #define, value: (0x0001u), line:     881:2  
+UCOA1                #define, value: (0x0002u), line:     880:2  
+UCOA2                #define, value: (0x0004u), line:     879:2  
+UCOA3                #define, value: (0x0008u), line:     878:2  
+UCOA4                #define, value: (0x0010u), line:     877:2  
+UCOA5                #define, value: (0x0020u), line:     876:2  
+UCOA6                #define, value: (0x0040u), line:     875:2  
+UCOA7                #define, value: (0x0080u), line:     874:2  
+UCOA8                #define, value: (0x0100u), line:     873:2  
+UCOA9                #define, value: (0x0200u), line:     872:2  
+UCOE                 #define, value: (0x20), line:     819:2  
+UCOS16               #define, value: (0x01), line:     789:2  
+UCPAR                #define, value: (0x40), line:     731:2  
+UCPE                 #define, value: (0x10), line:     820:2  
+UCPEN                #define, value: (0x80), line:     730:2  
+UCRXEIE              #define, value: (0x20), line:     757:2  
+UCRXERR              #define, value: (0x04), line:     822:2  
+UCSA0                #define, value: (0x0001u), line:     892:2  
+UCSA1                #define, value: (0x0002u), line:     891:2  
+UCSA2                #define, value: (0x0004u), line:     890:2  
+UCSA3                #define, value: (0x0008u), line:     889:2  
+UCSA4                #define, value: (0x0010u), line:     888:2  
+UCSA5                #define, value: (0x0020u), line:     887:2  
+UCSA6                #define, value: (0x0040u), line:     886:2  
+UCSA7                #define, value: (0x0080u), line:     885:2  
+UCSA8                #define, value: (0x0100u), line:     884:2  
+UCSA9                #define, value: (0x0200u), line:     883:2  
+UCSCLLOW             #define, value: (0x40), line:     836:2  
+UCSLA10              #define, value: (0x40), line:     746:2  
+UCSPB                #define, value: (0x08), line:     734:2  
+UCSSEL0              #define, value: (0x40), line:     756:2  
+UCSSEL1              #define, value: (0x80), line:     755:2  
+UCSSEL_0             #define, value: (0x00), line:     777:2  
+UCSSEL_1             #define, value: (0x40), line:     778:2  
+UCSSEL_2             #define, value: (0x80), line:     779:2  
+UCSSEL_3             #define, value: (0xC0), line:     780:2  
+UCSTOE               #define, value: (0x08), line:     866:2  
+UCSTPIE              #define, value: (0x04), line:     832:2  
+UCSTPIFG             #define, value: (0x04), line:     840:2  
+UCSTTIE              #define, value: (0x02), line:     833:2  
+UCSTTIFG             #define, value: (0x02), line:     841:2  
+UCSWRST              #define, value: (0x01), line:     762:2  
+UCSYNC               #define, value: (0x01), line:     737:2  
+UCTR                 #define, value: (0x10), line:     773:2  
+UCTXADDR             #define, value: (0x04), line:     760:2  
+UCTXBRK              #define, value: (0x02), line:     761:2  
+UCTXNACK             #define, value: (0x08), line:     774:2  
+UCTXSTP              #define, value: (0x04), line:     775:2  
+UCTXSTT              #define, value: (0x02), line:     776:2  
+UGT                  OPERATOR 
+ULT                  OPERATOR 
+UNTYPED              SEGMENT TYPE 
+USCIAB0RX_VECTOR     #define, value: (7 * 2u), line:    1016:2  
+USCIAB0TX_VECTOR     #define, value: (6 * 2u), line:    1015:2  
+USERFLASHEND         #define, value: (0xD1FF), line:      32:3  
+USERFLASHSTART       #define, value: (0xC000), line:      31:3  
+V                    #define, value: (0x0100u), line:      86:2  
+VAR                  DIRECTIVE 
+W                    #define, value: R6, line:      47:3  
+WAIT                 #define, value: (0x0008u), line:     454:2  
+WDTCNTCL             #define, value: (0x0008u), line:     905:2  
+WDTCTL_              #define, value: (0x0120u), line:     899:2      900:2
+WDTHOLD              #define, value: (0x0080u), line:     909:2  
+WDTIE                #define, value: (0x01), line:     134:2  
+WDTIFG               #define, value: (0x01), line:     141:2  
+WDTIS0               #define, value: (0x0001u), line:     902:2  
+WDTIS1               #define, value: (0x0002u), line:     903:2  
+WDTNMI               #define, value: (0x0020u), line:     907:2  
+WDTNMIES             #define, value: (0x0040u), line:     908:2  
+WDTPW                #define, value: (0x5A00u), line:     911:2  
+WDTSSEL              #define, value: (0x0004u), line:     904:2  
+WDTTMSEL             #define, value: (0x0010u), line:     906:2  
+WDT_ADLY_1000        #define, value: (WDTPW+WDTTMSEL+WDTCNTCL+WDTSSEL), line:     920:2  
+WDT_ADLY_16          #define, value: (WDTPW+WDTTMSEL+WDTCNTCL+WDTSSEL+WDTIS1), line:     922:2  
+WDT_ADLY_1_9         #define, value: (WDTPW+WDTTMSEL+WDTCNTCL+WDTSSEL+WDTIS1+WDTIS0), line:     923:2  
+WDT_ADLY_250         #define, value: (WDTPW+WDTTMSEL+WDTCNTCL+WDTSSEL+WDTIS0), line:     921:2  
+WDT_ARST_1000        #define, value: (WDTPW+WDTCNTCL+WDTSSEL), line:     931:2  
+WDT_ARST_16          #define, value: (WDTPW+WDTCNTCL+WDTSSEL+WDTIS1), line:     933:2  
+WDT_ARST_1_9         #define, value: (WDTPW+WDTCNTCL+WDTSSEL+WDTIS1+WDTIS0), line:     934:2  
+WDT_ARST_250         #define, value: (WDTPW+WDTCNTCL+WDTSSEL+WDTIS0), line:     932:2  
+WDT_MDLY_0_064       #define, value: (WDTPW+WDTTMSEL+WDTCNTCL+WDTIS1+WDTIS0), line:     918:2  
+WDT_MDLY_0_5         #define, value: (WDTPW+WDTTMSEL+WDTCNTCL+WDTIS1), line:     917:2  
+WDT_MDLY_32          #define, value: (WDTPW+WDTTMSEL+WDTCNTCL), line:     915:2  
+WDT_MDLY_8           #define, value: (WDTPW+WDTTMSEL+WDTCNTCL+WDTIS0), line:     916:2  
+WDT_MRST_0_064       #define, value: (WDTPW+WDTCNTCL+WDTIS1+WDTIS0), line:     929:2  
+WDT_MRST_0_5         #define, value: (WDTPW+WDTCNTCL+WDTIS1), line:     928:2  
+WDT_MRST_32          #define, value: (WDTPW+WDTCNTCL), line:     926:2  
+WDT_MRST_8           #define, value: (WDTPW+WDTCNTCL+WDTIS0), line:     927:2  
+WDT_VECTOR           #define, value: (10 * 2u), line:    1019:2  
+WORD                 Target symbol: 1048576 
+WRITE                Target symbol: 4096 
+WRT                  #define, value: (0x0040u), line:     427:2  
+X                    #define, value: R10, line:      55:3  
+XCAP0                #define, value: (0x04), line:     343:2  
+XCAP1                #define, value: (0x08), line:     344:2  
+XCAP_0               #define, value: (0x00), line:     350:2  
+XCAP_1               #define, value: (0x04), line:     351:2  
+XCAP_2               #define, value: (0x08), line:     352:2  
+XCAP_3               #define, value: (0x0C), line:     353:2  
+XDATA                SEGMENT TYPE 
+XOR                  OPERATOR 
+XOR                  MNEMONIC 
+XT2OF                #define, value: (0x02), line:     342:2  
+XT2OFF               #define, value: (0x80), line:     311:2  
+XT2S0                #define, value: (0x40), line:     347:2  
+XT2S1                #define, value: (0x80), line:     348:2  
+XT2S_0               #define, value: (0x00), line:     360:2  
+XT2S_1               #define, value: (0x40), line:     361:2  
+XT2S_2               #define, value: (0x80), line:     362:2  
+XT2S_3               #define, value: (0xC0), line:     363:2  
+XTS                  #define, value: (0x40), line:     310:2  
+Y                    #define, value: R11, line:      56:3  
+Z                    #define, value: (0x0002u), line:      84:2  
+ZPAGE                SEGMENT TYPE 
+^                    OPERATOR 
+__430X_CORE__        #define, value: 1, line:         0  
+__430X__             #define, value: 1, line:         0  
+__430_CORE__         #define, value: 0, line:         0  
+__430__              #define, value: 0, line:         0  
+__A430__             #define, value: 1, line:         0  
+__BUILD_NUMBER__     #define,            line:         0  
+__CORE__             #define, value: 0, line:         0  
+__DATE__             #define,            line:         0  
+__FILE__             #define,            line:         0  
+__IAR_SYSTEMS_ASM    #define,            line:         0  
+__IAR_SYSTEMS_ASM__  #define,            line:         0  
+__LINE__             #define,            line:         0  
+__MSP430BT5190__     Target symbol: 0 
+__MSP430F5252__      Target symbol: 0 
+__MSP430F5253__      Target symbol: 0 
+__MSP430F5254__      Target symbol: 0 
+__MSP430F5255__      Target symbol: 0 
+__MSP430F5256__      Target symbol: 0 
+__MSP430F5257__      Target symbol: 0 
+__MSP430F5258__      Target symbol: 0 
+__MSP430F5259__      Target symbol: 0 
+__MSP430FR2032__     Target symbol: 0 
+__MSP430FR2033__     Target symbol: 0 
+__MSP430FR4131__     Target symbol: 0 
+__MSP430FR4132__     Target symbol: 0 
+__MSP430FR4133__     Target symbol: 0 
+__MSP430FR58471__    Target symbol: 0 
+__MSP430FR5847__     Target symbol: 0 
+__MSP430FR5848__     Target symbol: 0 
+__MSP430FR5849__     Target symbol: 0 
+__MSP430FR5857__     Target symbol: 0 
+__MSP430FR5858__     Target symbol: 0 
+__MSP430FR5859__     Target symbol: 0 
+__MSP430FR58671__    Target symbol: 0 
+__MSP430FR5867__     Target symbol: 0 
+__MSP430FR5868__     Target symbol: 0 
+__MSP430FR5869__     Target symbol: 0 
+__MSP430FR5870__     Target symbol: 0 
+__MSP430FR58721__    Target symbol: 0 
+__MSP430FR5872__     Target symbol: 0 
+__MSP430FR5887__     Target symbol: 0 
+__MSP430FR5888__     Target symbol: 0 
+__MSP430FR58891__    Target symbol: 0 
+__MSP430FR5889__     Target symbol: 0 
+__MSP430FR59471__    Target symbol: 0 
+__MSP430FR5947__     Target symbol: 0 
+__MSP430FR5948__     Target symbol: 0 
+__MSP430FR5949__     Target symbol: 0 
+__MSP430FR5957__     Target symbol: 0 
+__MSP430FR5958__     Target symbol: 0 
+__MSP430FR5959__     Target symbol: 0 
+__MSP430FR5967__     Target symbol: 0 
+__MSP430FR5968__     Target symbol: 0 
+__MSP430FR59691__    Target symbol: 0 
+__MSP430FR5969__     Target symbol: 0 
+__MSP430FR5970__     Target symbol: 0 
+__MSP430FR59721__    Target symbol: 0 
+__MSP430FR5972__     Target symbol: 0 
+__MSP430FR5986__     Target symbol: 0 
+__MSP430FR5987__     Target symbol: 0 
+__MSP430FR5988__     Target symbol: 0 
+__MSP430FR59891__    Target symbol: 0 
+__MSP430FR5989__     Target symbol: 0 
+__MSP430FR6820__     Target symbol: 0 
+__MSP430FR68221__    Target symbol: 0 
+__MSP430FR6822__     Target symbol: 0 
+__MSP430FR6870__     Target symbol: 0 
+__MSP430FR68721__    Target symbol: 0 
+__MSP430FR6872__     Target symbol: 0 
+__MSP430FR6877__     Target symbol: 0 
+__MSP430FR68791__    Target symbol: 0 
+__MSP430FR6879__     Target symbol: 0 
+__MSP430FR6887__     Target symbol: 0 
+__MSP430FR6888__     Target symbol: 0 
+__MSP430FR68891__    Target symbol: 0 
+__MSP430FR6889__     Target symbol: 0 
+__MSP430FR6920__     Target symbol: 0 
+__MSP430FR69221__    Target symbol: 0 
+__MSP430FR6922__     Target symbol: 0 
+__MSP430FR69271__    Target symbol: 0 
+__MSP430FR6927__     Target symbol: 0 
+__MSP430FR6928__     Target symbol: 0 
+__MSP430FR6970__     Target symbol: 0 
+__MSP430FR69721__    Target symbol: 0 
+__MSP430FR6972__     Target symbol: 0 
+__MSP430FR6977__     Target symbol: 0 
+__MSP430FR69791__    Target symbol: 0 
+__MSP430FR6979__     Target symbol: 0 
+__MSP430FR6987__     Target symbol: 0 
+__MSP430FR6988__     Target symbol: 0 
+__MSP430FR69891__    Target symbol: 0 
+__MSP430FR6989__     Target symbol: 0 
+__MSP430G2210__      Target symbol: 0 
+__MSP430G2230__      Target symbol: 0 
+__MSP430G2233__      Target symbol: 0 
+__MSP430G2303__      Target symbol: 0 
+__MSP430G2333__      Target symbol: 0 
+__MSP430G2403__      Target symbol: 0 
+__MSP430G2433__      Target symbol: 0 
+__MSP430G2444__      Target symbol: 0 
+__MSP430G2533__      Target symbol: 0 
+__MSP430G2544__      Target symbol: 0 
+__MSP430G2553        #define, value: , line:      18:2  
+__MSP430G2553__      #define, value: 1, line:         0  
+__MSP430G2744__      Target symbol: 0 
+__MSP430G2755__      Target symbol: 0 
+__MSP430G2855__      Target symbol: 0 
+__MSP430G2955__      Target symbol: 0 
+__MSP430GENERIC__    Target symbol: 0 
+__MSP430SL5438A__    Target symbol: 0 
+__MSP430TCH5E__      Target symbol: 0 
+__MSP430V541__       Target symbol: 0 
+__MSP430XGENERIC__   Target symbol: 0 
+__MSP430_HAS_ADC10__ #define, value: , line:     166:2  
+__MSP430_HAS_BC2__   #define, value: , line:     284:2  
+__MSP430_HAS_CAPLUS__ #define, value: , line:     368:2  
+__MSP430_HAS_FLASH2__ #define, value: , line:     412:2  
+__MSP430_HAS_PORT1_R__ #define, value: , line:     463:2  
+__MSP430_HAS_PORT2_R__ #define, value: , line:     464:2  
+__MSP430_HAS_PORT3_R__ #define, value: , line:     507:2  
+__MSP430_HAS_T1A3__  #define, value: , line:     647:2  
+__MSP430_HAS_TA3__   #define, value: , line:     525:2  
+__MSP430_HAS_USCI__  #define, value: , line:     681:2  
+__MSP430_HAS_WDT__   #define, value: , line:     897:2  
+__MSP430_HEADER_VERSION__ #define, value: 1157, line:      20:2  
+__MSP430i2020__      Target symbol: 0 
+__MSP430i2021__      Target symbol: 0 
+__MSP430i2030__      Target symbol: 0 
+__MSP430i2031__      Target symbol: 0 
+__MSP430i2040__      Target symbol: 0 
+__MSP430i2041__      Target symbol: 0 
+__RF430FRL152H_ROM__ Target symbol: 0 
+__RF430FRL152H__     Target symbol: 0 
+__RF430FRL153H_ROM__ Target symbol: 0 
+__RF430FRL153H__     Target symbol: 0 
+__RF430FRL154H_ROM__ Target symbol: 0 
+__RF430FRL154H__     Target symbol: 0 
+__SUBVERSION__       #define,            line:         0  
+__TID__              #define,            line:         0       28:2
+__TIME__             #define,            line:         0  
+__VER__              #define,            line:         0  
+__msp430             #define, value: , line:       9:1  
+action               Target symbol: 0 
+address              Target symbol: 0 
+asmname              Target symbol: 0 
+define               PREPROCESSOR DIRECTIVE 
+defined              Target symbol: 0 
+elif                 PREPROCESSOR DIRECTIVE 
+else                 PREPROCESSOR DIRECTIVE 
+endif                PREPROCESSOR DIRECTIVE 
+error                PREPROCESSOR DIRECTIVE 
+if                   PREPROCESSOR DIRECTIVE 
+ifdef                PREPROCESSOR DIRECTIVE 
+ifndef               PREPROCESSOR DIRECTIVE 
+include              PREPROCESSOR DIRECTIVE 
+label                Target symbol: 0 
+length               Target symbol: 0 
+line                 PREPROCESSOR DIRECTIVE 
+litname              Target symbol: 0 
+message              PREPROCESSOR DIRECTIVE 
+pragma               PREPROCESSOR DIRECTIVE 
+undef                PREPROCESSOR DIRECTIVE 
+|                    OPERATOR 
+||                   OPERATOR 
+~                    OPERATOR 
+
+Segment             Type 	Mode
+----------------------------------------
+INFOC               UNTYPED  	REL 
+__EXTERNS           CODE  	ABS Org:0 
+
+Label               Mode   Type                   Segment    Value/Offset
+------------------------------------------------------------------------------
+ADC10AE0            ABS    CONST UNTYP.           ASEG       4A 
+ADC10CTL0           ABS    CONST UNTYP.           ASEG       1B0 
+ADC10CTL1           ABS    CONST UNTYP.           ASEG       1B2 
+ADC10DTC0           ABS    CONST UNTYP.           ASEG       48 
+ADC10DTC1           ABS    CONST UNTYP.           ASEG       49 
+ADC10MEM            ABS    CONST UNTYP.           ASEG       1B4 
+ADC10SA             ABS    CONST UNTYP.           ASEG       1BC 
+BCSCTL1             ABS    CONST UNTYP.           ASEG       57 
+BCSCTL2             ABS    CONST UNTYP.           ASEG       58 
+BCSCTL3             ABS    CONST UNTYP.           ASEG       53 
+CACTL1              ABS    CONST UNTYP.           ASEG       59 
+CACTL2              ABS    CONST UNTYP.           ASEG       5A 
+CALBC1_12MHZ        ABS    CONST UNTYP.           ASEG       10FB 
+CALBC1_16MHZ        ABS    CONST UNTYP.           ASEG       10F9 
+CALBC1_1MHZ         ABS    CONST UNTYP.           ASEG       10FF 
+CALBC1_8MHZ         ABS    CONST UNTYP.           ASEG       10FD 
+CALDCO_12MHZ        ABS    CONST UNTYP.           ASEG       10FA 
+CALDCO_16MHZ        ABS    CONST UNTYP.           ASEG       10F8 
+CALDCO_1MHZ         ABS    CONST UNTYP.           ASEG       10FE 
+CALDCO_8MHZ         ABS    CONST UNTYP.           ASEG       10FC 
+CAPD                ABS    CONST UNTYP.           ASEG       5B 
+DCOCTL              ABS    CONST UNTYP.           ASEG       56 
+FCTL1               ABS    CONST UNTYP.           ASEG       128 
+FCTL2               ABS    CONST UNTYP.           ASEG       12A 
+FCTL3               ABS    CONST UNTYP.           ASEG       12C 
+IE1                 ABS    CONST UNTYP.           ASEG       0 
+IE2                 ABS    CONST UNTYP.           ASEG       1 
+IFG1                ABS    CONST UNTYP.           ASEG       2 
+IFG2                ABS    CONST UNTYP.           ASEG       3 
+P1DIR               ABS    CONST UNTYP.           ASEG       22 
+P1IE                ABS    CONST UNTYP.           ASEG       25 
+P1IES               ABS    CONST UNTYP.           ASEG       24 
+P1IFG               ABS    CONST UNTYP.           ASEG       23 
+P1IN                ABS    CONST UNTYP.           ASEG       20 
+P1OUT               ABS    CONST UNTYP.           ASEG       21 
+P1REN               ABS    CONST UNTYP.           ASEG       27 
+P1SEL               ABS    CONST UNTYP.           ASEG       26 
+P1SEL2              ABS    CONST UNTYP.           ASEG       41 
+P2DIR               ABS    CONST UNTYP.           ASEG       2A 
+P2IE                ABS    CONST UNTYP.           ASEG       2D 
+P2IES               ABS    CONST UNTYP.           ASEG       2C 
+P2IFG               ABS    CONST UNTYP.           ASEG       2B 
+P2IN                ABS    CONST UNTYP.           ASEG       28 
+P2OUT               ABS    CONST UNTYP.           ASEG       29 
+P2REN               ABS    CONST UNTYP.           ASEG       2F 
+P2SEL               ABS    CONST UNTYP.           ASEG       2E 
+P2SEL2              ABS    CONST UNTYP.           ASEG       42 
+P3DIR               ABS    CONST UNTYP.           ASEG       1A 
+P3IN                ABS    CONST UNTYP.           ASEG       18 
+P3OUT               ABS    CONST UNTYP.           ASEG       19 
+P3REN               ABS    CONST UNTYP.           ASEG       10 
+P3SEL               ABS    CONST UNTYP.           ASEG       1B 
+P3SEL2              ABS    CONST UNTYP.           ASEG       43 
+TA0CCR0             ABS    CONST UNTYP.           ASEG       172 
+TA0CCR1             ABS    CONST UNTYP.           ASEG       174 
+TA0CCR2             ABS    CONST UNTYP.           ASEG       176 
+TA0CCTL0            ABS    CONST UNTYP.           ASEG       162 
+TA0CCTL1            ABS    CONST UNTYP.           ASEG       164 
+TA0CCTL2            ABS    CONST UNTYP.           ASEG       166 
+TA0CTL              ABS    CONST UNTYP.           ASEG       160 
+TA0IV               ABS    CONST UNTYP.           ASEG       12E 
+TA0R                ABS    CONST UNTYP.           ASEG       170 
+TA1CCR0             ABS    CONST UNTYP.           ASEG       192 
+TA1CCR1             ABS    CONST UNTYP.           ASEG       194 
+TA1CCR2             ABS    CONST UNTYP.           ASEG       196 
+TA1CCTL0            ABS    CONST UNTYP.           ASEG       182 
+TA1CCTL1            ABS    CONST UNTYP.           ASEG       184 
+TA1CCTL2            ABS    CONST UNTYP.           ASEG       186 
+TA1CTL              ABS    CONST UNTYP.           ASEG       180 
+TA1IV               ABS    CONST UNTYP.           ASEG       11E 
+TA1R                ABS    CONST UNTYP.           ASEG       190 
+TID                 ABS    CONST UNTYP.           ASEG       2B00 
+TLV_ADC10_1_LEN     ABS    CONST UNTYP.           ASEG       10DB 
+TLV_ADC10_1_TAG     ABS    CONST UNTYP.           ASEG       10DA 
+TLV_CHECKSUM        ABS    CONST UNTYP.           ASEG       10C0 
+TLV_DCO_30_LEN      ABS    CONST UNTYP.           ASEG       10F7 
+TLV_DCO_30_TAG      ABS    CONST UNTYP.           ASEG       10F6 
+UCA0ABCTL           ABS    CONST UNTYP.           ASEG       5D 
+UCA0BR0             ABS    CONST UNTYP.           ASEG       62 
+UCA0BR1             ABS    CONST UNTYP.           ASEG       63 
+UCA0CTL0            ABS    CONST UNTYP.           ASEG       60 
+UCA0CTL1            ABS    CONST UNTYP.           ASEG       61 
+UCA0IRRCTL          ABS    CONST UNTYP.           ASEG       5F 
+UCA0IRTCTL          ABS    CONST UNTYP.           ASEG       5E 
+UCA0MCTL            ABS    CONST UNTYP.           ASEG       64 
+UCA0RXBUF           ABS    CONST UNTYP.           ASEG       66 
+UCA0STAT            ABS    CONST UNTYP.           ASEG       65 
+UCA0TXBUF           ABS    CONST UNTYP.           ASEG       67 
+UCB0BR0             ABS    CONST UNTYP.           ASEG       6A 
+UCB0BR1             ABS    CONST UNTYP.           ASEG       6B 
+UCB0CTL0            ABS    CONST UNTYP.           ASEG       68 
+UCB0CTL1            ABS    CONST UNTYP.           ASEG       69 
+UCB0I2CIE           ABS    CONST UNTYP.           ASEG       6C 
+UCB0I2COA           ABS    CONST UNTYP.           ASEG       118 
+UCB0I2CSA           ABS    CONST UNTYP.           ASEG       11A 
+UCB0RXBUF           ABS    CONST UNTYP.           ASEG       6E 
+UCB0STAT            ABS    CONST UNTYP.           ASEG       6D 
+UCB0TXBUF           ABS    CONST UNTYP.           ASEG       6F 
+WDTCTL              ABS    CONST UNTYP.           ASEG       120 
+__MSP430G2203__     ABS    CONST UNTYP.           ASEG       Not solved 
+infoC               REL    CONST PUB UNTYP.       INFOC      0 
+
+
+##############################
+#          CRC:4E60          #
+#        Errors:   0         #
+#        Warnings: 0         #
+#         Bytes: 32          #
+##############################
+
+
+
+

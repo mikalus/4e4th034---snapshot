@@ -1,0 +1,1584 @@
+###############################################################################
+#                                                                             #
+#     IAR Assembler V6.30.1.934/W32  for MSP430 22/May/2018  23:30:01         #
+#     Copyright 1996-2015 IAR Systems AB.                                     #
+#                                                                             #
+#           Target option =  MSP430                                           #
+#           Source file   =  C:\Users\mka\Documents\GitHub\4e4th034\4e-init430G2553.s43#
+#           List file     =  C:\Users\mka\Documents\GitHub\4e4th034\Debug\List\4e-init430G2553.lst#
+#           Object file   =  C:\Users\mka\Documents\GitHub\4e4th034\Debug\Obj\4e-init430G2553.r43#
+#           Command line  =  C:\Users\mka\Documents\GitHub\4e4th034\4e-init430G2553.s43 #
+#                            -OC:\Users\mka\Documents\GitHub\4e4th034\Debug\Obj\ #
+#                            -s+ -M<> -w+                                     #
+#                            -LC:\Users\mka\Documents\GitHub\4e4th034\Debug\List\ #
+#                            -t8 -xDI -r -D__MSP430G2553__                    #
+#                            -IC:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2\430\INC\ #
+#                                                                             #
+###############################################################################
+
+      1    000000              ; ----------------------------------------------
+                               ------------------------
+      2    000000              ; 4e4th is a Forth based on CamelForth
+                                
+      3    000000              ; for the Texas Instruments MSP430 
+      4    000000              ; 
+      5    000000              ; This program is free software; you can
+                                redistribute it and/or modify
+      6    000000              ; it under the terms of the GNU General Public
+                                License as published by
+      7    000000              ; the Free Software Foundation; either version 3
+                                of the License, or
+      8    000000              ; (at your option) any later version.
+      9    000000              ; 
+     10    000000              ; This program is distributed in the hope that
+                                it will be useful,
+     11    000000              ; but WITHOUT ANY WARRANTY; without even the
+                                implied warranty of
+     12    000000              ; MERCHANTABILITY or FITNESS FOR A PARTICULAR
+                                PURPOSE.  See the
+     13    000000              ; GNU General Public License for more details.
+     14    000000              ;
+     15    000000              ; You should have received a copy of the GNU
+                                General Public License
+     16    000000              ; along with this program.  If not, see
+                                <http://www.gnu.org/licenses/>.
+     17    000000              ; 
+     18    000000              ; See LICENSE TERMS in Brads file readme.txt as
+                                well.
+     19    000000              
+     20    000000              ; ----------------------------------------------
+                               ------------------------
+     21    000000              ; 4e-init430G2553.s43 - reset interupt service
+                                routine - MSP430G2553
+     22    000000              ; ----------------------------------------------
+                               ------------------------
+     23    000000              
+     24    000000              ; 4e4th RAM memory map:
+     25    000000              ;   UP          User Pointer, 2 bytes
+     26    000000              ;   UAREA       User area, 36 bytes 
+     27    000000              ;   UAREA+20h   HOLD area, 40 bytes, grows down
+                                from end
+     28    000000              ;   UAREA+48h   PAD buffer, 88 bytes, must
+                                follow HOLD area
+     29    000000              ;   UAREA+A0h   Parameter stack, 128 B, grows
+                                down from end
+     30    000000              ;   UAREA+120h  Return stack, 128 B, grows down
+                                from end
+     31    000000              ;   UAREA+1A0h  TIB Terminal Input Buffer, 88
+                                bytes
+     32    000000              
+     33    000000              ; Note all must be word-aligned.
+     34    000000              ; See also the definitions of U0, S0, and R0 in
+                                the "system variables &
+     35    000000              ; constants" area.  A task w/o terminal input
+                                requires 200h bytes.
+     36    000000              ; Double all except TIB and PAD for 32-bit
+                                CPUs.
+     37    000000              
+     38    000000              
+     39    000000              
+     40    000000              ; RAM map
+     41    000000              ; name     celles  comment
+     42    000000                                 ; -----
+     43    000000              ; UAREA_SIZE  = 16   ; UAREA 
+     44    000012              UAREA_SIZE  = 18   ; UAREA 
+     45    000000                                 ; -----
+     46    000000                                 ; | LSTACK: leave stack
+                                
+     47    000000                                 ; | grows up 
+     48    000000                                 ; | 
+     49    000000                                 ; V
+     50    000000                                 ;   
+     51    000000                                 ; ^
+     52    000000                                 ; |
+     53    000000                                 ; | grows down
+     54    000036              PSTACK_SIZE = 54   ; | PSTACK: top of parameter
+                                stack area. 
+     55    000000                                 ; -----
+     56    000000                                 ;   
+     57    000000                                 ; ^
+     58    000000                                 ; |
+     59    000000                                 ; | grows down
+     60    000036              RSTACK_SIZE = 54   ; | RSTACK: top of return
+                                stack area. 
+     61    000000              
+     62    000000              ;          aligned buffers only required for
+                                terminal tasks.
+     63    000000              ; names    bytes  
+     64    000000                                 ; ^
+     65    000000                                 ; |
+     66    000000                                 ; | grows down
+     67    000022              HOLD_SIZE   = 34   ; | HOLDAREA: 
+     68    000000                                 ; -----
+     69    000054              PAD_SIZE    = 84   ; scratch pad
+     70    000000                                 ; -----
+     71    000054              TIB_SIZE    = 84   ; terminal input buffer
+     72    000000                                 ; -----
+     73    000000                                 ; <-- HERE
+     74    000010              VAR_SIZE    = 16   ; variable area SAVEed in
+                                INFO-C
+     75    000000                                 ; -----
+     76    000000                                 
+     77    000000              
+     78    000000              ;        PUBLIC  UP,UAREA,PADAREA,LSTACK,PSTACK,
+                               RSTACK
+     79    000000                      PUBLIC  PADAREA,LSTACK,PSTACK,RSTACK
+     80    000000                      PUBLIC  TIBAREA,TIB_SIZE,UAREA_SIZE,VARA
+ REA,VAR_SIZE
+     81    000000                      PUBLIC  reset,main
+     82    000000                      PUBLIC  UAREA,UP,cor
+     83    000000                      PUBLIC  ROMDICT,RAMDICT
+     84    000000              
+     85    000000                      EXTERN  lastword,fenceadr,NOOP
+     86    000000              ;        EXTERN  runmagic,runsmal
+     87    000000                      EXTERN  lastword
+     88    000000                      EXTERN  COLDIP,BOOTIP
+     89    000000              ;        EXTERN  DEBUGIP
+     90    000000                      
+     91    000000                      RSEG    DATA16_Z  ; uninitialized RAM
+  segment
+     92    000000              
+     93    000000              ; RAM user area    -   system label, holds
+                                active user area 
+     94    000000              ; initialiesed by BOOT
+     95    000000              ; see hilvl UINIT
+     96    000000              
+     97    000000              UP:       DS16 1
+     98    000002              UAREA:    DS16 UAREA_SIZE
+     99    000026              
+    100    000026              ; cor    -     cause of reset variable, copy of
+                                IFG1
+    101    000026              cor:      DS16 1
+    102    000028              
+    103    000028              ; ***********************  more Variables
+    104    000028              ;    PUBLIC xx,yy,zz
+    105    000028              ; xx:     DS16 1
+    106    000028              ; yy:     DS16 1
+    107    000028              ; zz:     DS16 1
+    108    000028              
+    109    000028              time0:    DS16 1
+    110    00002A              time1:    DS16 1
+    111    000000                   PUBLIC time0,time1
+    112    00002C              
+    113    00002C              
+    114    00002C              
+    115    00002C              ; LSTACK   -   start leave stack
+    116    00002C              LSTACK:
+    117    00002C                        DS16  PSTACK_SIZE ; allocate parameter
+                                                            stack
+    118    000098              ; PSTACK   -   top of parameter stack         
+                                
+    119    000098              PSTACK:                     
+    120    000098                        DS16  RSTACK_SIZE ; allocate return
+                                                            stack
+    121    000104              ; RSTACK   -   top of return stack 
+    122    000104              RSTACK:                     
+    123    000104                        DS8   HOLD_SIZE   ; allocate hold
+                                                            area
+    124    000126              ; HOLDAREA   -   top of hold adrea
+    125    000126              HOLDAREA:
+    126    000126              
+    127    000126              ; PADAREA    -   start scratch pad; must follow
+                                HOLDAREA
+    128    000126              PADAREA:  DS8   PAD_SIZE
+    129    00017A              
+    130    00017A              ; TIBAREA    -   start Terminal Input Buffer
+    131    00017A              TIBAREA:  DS8   TIB_SIZE
+    132    0001CE              
+    133    0001CE              /*
+    134    0001CE              ; WASAREA    -    4 variables for Assembler
+                                WAS
+    135    0001CE              WASAREA:
+    136    0001CE              PUBLIC X1ADR,X2ADR,OPCADR,EXTADR
+    137    0001CE              X1ADR:  DS16 1
+    138    0001CE              X2ADR:  DS16 1
+    139    0001CE              OPCADR: DS16 1
+    140    0001CE              EXTADR: DS16 1
+    141    0001CE              */
+    142    0001CE              
+    143    0001CE              ; RAMDICT    -   end of system areas, start of
+                                free RAM
+    144    0001CE              RAMDICT:
+    145    0001CE              
+    146    0001CE              ; Variable Area is free RAM. 
+    147    0001CE              ; But it is saved to INFO-C when you SAVE an
+                                app.
+    148    0001CE              ; So your app will start with your variables
+                                set.
+    149    0001CE              ; VARAREA    -   start Variable Area
+    150    0001CE              VARAREA:  DS16   VAR_SIZE
+    151    0001EE              
+    152    0001EE              ; ----------------------------------------------
+                               ------------------------
+    153    0001EE              ; POWER ON RESET AND INITIALIZATION
+    154    0001EE              
+    155    0001EE              #include "msp430G2553.h"            ; #define
+                                controlled include file
+    156    0001EE              #include "4e-CF430G2553forth.h"     ; header
+                                macros and register defs
+    157    0001EE              
+    158    000000                      RSEG CODE          ; place init in
+  'CODE' segment
+    159    000000              
+    160    000000              ; ----------------------------------------------
+                               ------------------------
+    161    000000              ; MSP430G2553 Initialize system 
+    162    000000              ; (original: FR_EXP.lst and some of mecrisp
+                                (Koch)
+    163    000000              ; for LaunchPad 
+    164    000000              
+    165    000000              
+    166    000000              
+    167    000000              ;Z   main   ( -- )   main entry point for reset
+                                is not a forth word.
+    168    000000              main:             ; Debugger requires the 'main'
+                                symbol. 
+    169    000000              reset:            ; forth requires the reset
+                                symbol.
+    170    000000              start_init:       ; I require the start_init
+                                symbol. ;-)
+    171    000000              
+    172    000000 B240805A2001     MOV.W   #WDTPW+WDTHOLD,&WDTCTL  ; Stop
+                                                                    watchdog
+                                                                    timer
+    173    000006              
+    174    000006 D2420200....     MOV.B   &IFG1,&cor      ; save IFG1 to cor
+                                                            low byte
+    175    00000C C243....         MOV.B   #0,&(cor+1) ; clr hi byte
+    176    000010              
+    177    000010              
+    178    000010              /*
+    179    000010              ; 1MHz
+    180    000010                  mov.b   &CALBC1_1MHZ, &BCSCTL1   ; Set
+                                DCO
+    181    000010                  mov.b   &CALDCO_1MHZ, &DCOCTL    ; to 1
+                                MHz.
+    182    000010                
+    183    000010                  mov.b   #006h, &P1SEL            ; Use
+                                P1.1/P1.2 for USCI_A0
+    184    000010                  mov.b   #006h, &P1SEL2           ; Use
+                                P1.1/P1.2 for USCI_A0
+    185    000010              
+    186    000010              ; Configure UART 
+    187    000010                  bis.b   #UCSSEL_2,&UCA0CTL1     ;db2
+                                SMCLK
+    188    000010                  mov.b   #0x68,&UCA0BR0          ;db3 1MHz
+                                9600 Insgesamt &104 = $068
+    189    000010                  mov.b   #0x0,&UCA0BR1           ;db4 1MHz
+                                9600
+    190    000010                  mov.b   #UCBRS_1,&UCA0MCTL      ;db5
+                                Modulation UCBRSx = 1
+    191    000010                  bic.b   #UCSWRST,&UCA0CTL1      ;db6
+                                **Initialize USCI state machine**
+    192    000010              */
+    193    000010              
+    194    000010              
+    195    000010              ; /*
+    196    000010              ; 8MHz
+    197    000010 D242FD105700     mov.b   &CALBC1_8MHZ, &BCSCTL1   ; Set
+                                                                     DCO
+    198    000016 D242FC105600     mov.b   &CALDCO_8MHZ, &DCOCTL    ; to 8
+                                                                     MHz.
+    199    00001C                
+    200    00001C F24006002600     mov.b   #006h, &P1SEL            ; Use
+                                                                     P1.1/P1.2
+                                                                     for
+                                                                     USCI_A0
+    201    000022 F24006004100     mov.b   #006h, &P1SEL2           ; Use
+                                                                     P1.1/P1.2
+                                                                     for
+                                                                     USCI_A0
+    202    000028              
+    203    000028              ; Configure UART (Koch) 
+    204    000028 F2D080006100     bis.b   #UCSSEL_2,&UCA0CTL1     ;db2
+                                                                    SMCLK
+    205    00002E F24041006200     mov.b   #65,&UCA0BR0            ;db3 8MHz
+                                                                    9600
+                                                                    Insgesamt
+                                                                    &833 =
+                                                                    $341
+    206    000034 F24003006300     mov.b   #3,&UCA0BR1             ;db4 8MHz
+                                                                    9600
+    207    00003A E2426400         mov.b   #UCBRS_2,&UCA0MCTL      ;db5
+                                                                    Modulation
+                                                                    UCBRSx =
+                                                                    2
+    208    00003E D2C36100         bic.b   #UCSWRST,&UCA0CTL1      ;db6
+                                                                    **Initializ
+                                                                   e USCI state
+                                                                    machine**
+    209    000042              */
+    210    000042              
+    211    000042              /*
+    212    000042              ; Prozessortakt 16 MHz
+    213    000042                  mov.b   &CALBC1_16MHZ, &BCSCTL1   ; Set
+                                DCO
+    214    000042                  mov.b   &CALDCO_16MHZ, &DCOCTL    ;
+                                
+    215    000042              
+    216    000042                  mov.b   #006h, &P1SEL            ; Use
+                                P1.1/P1.2 for USCI_A0
+    217    000042                  mov.b   #006h, &P1SEL2           ; Use
+                                P1.1/P1.2 for USCI_A0
+    218    000042              
+    219    000042              ; Configure UART 
+    220    000042                  bis.b   #006h, &P1SEL           ; Use
+                                P1.1/P1.2 for USCI_A0
+    221    000042                  bis.b   #006h, &P1SEL2          ; Use
+                                P1.1/P1.2 for USCI_A0
+    222    000042                  bis.b   #UCSSEL_2,&UCA0CTL1     ;db2
+                                SMCLK
+    223    000042                  mov.b   #0x82,&UCA0BR0          ;db3 16MHz
+                                9600 Insgesamt &1666 = $682
+    224    000042                  mov.b   #0x06,&UCA0BR1          ;db4 16MHz
+                                9600
+    225    000042                  mov.b   #UCBRS_2,&UCA0MCTL      ;db5
+                                Modulation UCBRSx = 2
+    226    000042                  bic.b   #UCSWRST,&UCA0CTL1      ;db6
+                                **Initialize USCI state machine**
+    227    000042              */
+    228    000042              
+    229    000042              
+    230    000042              
+    231    000042              
+    232    000042              ;    clr.b   &IE1 ; Lösche die Interrupt-Flags
+                                von Oscillator Fault,
+    233    000042              ;                 ; NMI, Flash-Violation.
+    234    000042 E2C30000         bic.b   #OFIE,&IE1
+    235    000046 B24000A52801     mov.w   #FWKEY, &FCTL1           ; Schreib-
+                                                                     &
+                                                                     Loeschzugr
+                                                                    iffe
+                                                                     ausgeschal
+                                                                    tet.
+    236    00004C B24053A52A01     mov.w   #FWKEY|FSSEL_1|19, &FCTL2 ; MCLK/20
+                                                                      for Flash
+                                                                      Timing
+                                                                      Generator
+    237    000052              
+    238    000052 B24010A52C01     mov.w   #FWKEY+LOCK, &FCTL3      ; Lock
+                                                                     Flash
+                                                                     memory
+                                                                     against
+                                                                     writing
+    239    000058              
+    240    000058              ; Enable port1 on Launchpad 
+    241    000058              ; P1.0 = LED1 red
+    242    000058              ; P1.3 = button
+    243    000058              ; P1.4 = free out (may be speaker+ )
+    244    000058              ; P1.5 = free out (amy be speaker- )
+    245    000058              ; P1.6 = LED2 green
+    246    000058 F2D071002200     BIS.B   #(BIT6+BIT5+BIT4+BIT0), &P1DIR
+    247    00005E F2D079002100     BIS.B   #(BIT6+BIT5+BIT4+BIT3+BIT0),
+  &P1OUT
+    248    000064 F2D22700         BIS.B   #(BIT3),&P1REN ; pullup for S2
+                                                           
+    249    000068              
+    250    000068              ; setup forth registers
+    251    000068 3140....         MOV     #RSTACK,SP              ; set up
+                                                                    return
+                                                                    stack
+    252    00006C 3440....         MOV     #PSTACK,PSP             ; set up
+                                                                    parameter
+                                                                    stack
+    253    000070 B240........     MOV     #UAREA,&UP              ; initial
+                                                                    user
+                                                                    pointer
+    254    000076 0743             MOV     #0,TOS                  ; clear top
+                                                                    of
+                                                                    pstack
+    255    000078 3540....         MOV     #COLDIP,IP              ; set IP of
+                                                                    starting
+                                                                    word
+    256    00007C                  
+    257    00007C              ;    MOV     #COLDIP,IP              ; set IP of
+                                starting word
+    258    00007C 3540....         MOV     #BOOTIP,IP              ; set IP of
+                                                                    starting
+                                                                    word
+                                                                    
+    259    000080              ;    MOV     #DEBUGIP,IP              ; set IP
+                                of starting word 
+    260    000080              
+    261    000080                  NEXT ; enter virtual forth maschine
+                                now
+    261.1  000080 3645                 MOV @IP+,W     // ; fetch word address
+  into W
+    261.2  000082 3046                 MOV @W+,PC     // ; fetch code address
+  into PC, W=PFA
+    261.3  000084                      ENDM
+    262    000084              
+    263    000084              init_end:
+    264    000084              
+    265    000084              ; ----------------------------------------------
+                               ------------------------
+    266    000084              ; DEFAULT INTERRUPT HANDLER nullirq
+    267    000000                       PUBLIC isr_null
+    268    000084              
+    269    000084 32C2         isr_null: DINT 
+    270    000086 0013                   RETI 
+    271    000088              isr_null_end: 
+    272    000088              
+    273    000088              ROMDICT:
+    274    000088                      END
+
+
+EOF                  DELIMITER 
+\n                   DELIMITER 
+                     DELIMITER 
+!                    OPERATOR 
+!=                   OPERATOR 
+%                    OPERATOR 
+&                    OPERATOR 
+&&                   OPERATOR 
+(                    OPERATOR 
+(                    DELIMITER 
+)                    OPERATOR 
+)                    DELIMITER 
+*                    OPERATOR 
++                    OPERATOR 
+,                    DELIMITER 
+-                    OPERATOR 
+.                    Target symbol: 24 
+.                    DELIMITER 
+.CFI                 DIRECTIVE 
+.DOUBLE              DIRECTIVE 
+.FLOAT               DIRECTIVE 
+.REQUIRE             DIRECTIVE 
+/                    OPERATOR 
+:                    DELIMITER 
+;                    DELIMITER 
+;                    Target symbol: 23 
+<                    OPERATOR 
+<<                   OPERATOR 
+<=                   OPERATOR 
+<>                   OPERATOR 
+<>                   DELIMITER 
+=                    OPERATOR 
+=                    DELIMITER 
+=                    DIRECTIVE 
+==                   OPERATOR 
+>                    OPERATOR 
+>=                   OPERATOR 
+>>                   OPERATOR 
+ACCVIE               #define, value: (0x20), line:     137:1  
+ACCVIFG              #define, value: (0x0004u), line:     453:1  
+ADC                  MNEMONIC 
+ADC10AE0_            #define, value: (0x004Au), line:     172:1      173:1
+ADC10B1              #define, value: (0x002), line:     276:1  
+ADC10BUSY            #define, value: (0x0001u), line:     216:1  
+ADC10CT              #define, value: (0x004), line:     277:1  
+ADC10CTL0_           #define, value: (0x01B0u), line:     175:1      176:1
+ADC10CTL1_           #define, value: (0x01B2u), line:     177:1      178:1
+ADC10DF              #define, value: (0x0200u), line:     225:1  
+ADC10DISABLE         #define, value: (0x000), line:     279:1  
+ADC10DIV0            #define, value: (0x0020u), line:     221:1  
+ADC10DIV1            #define, value: (0x0040u), line:     222:1  
+ADC10DIV2            #define, value: (0x0080u), line:     223:1  
+ADC10DIV_0           #define, value: (0*0x20u), line:     243:1  
+ADC10DIV_1           #define, value: (1*0x20u), line:     244:1  
+ADC10DIV_2           #define, value: (2*0x20u), line:     245:1  
+ADC10DIV_3           #define, value: (3*0x20u), line:     246:1  
+ADC10DIV_4           #define, value: (4*0x20u), line:     247:1  
+ADC10DIV_5           #define, value: (5*0x20u), line:     248:1  
+ADC10DIV_6           #define, value: (6*0x20u), line:     249:1  
+ADC10DIV_7           #define, value: (7*0x20u), line:     250:1  
+ADC10DTC0_           #define, value: (0x0048u), line:     168:1      169:1
+ADC10DTC1_           #define, value: (0x0049u), line:     170:1      171:1
+ADC10FETCH           #define, value: (0x001), line:     275:1  
+ADC10IE              #define, value: (0x008), line:     188:1  
+ADC10IFG             #define, value: (0x004), line:     187:1  
+ADC10MEM_            #define, value: (0x01B4u), line:     179:1      180:1
+ADC10ON              #define, value: (0x010), line:     189:1  
+ADC10SA_             #define, value: (0x01BCu), line:     181:1      182:1
+ADC10SC              #define, value: (0x001), line:     185:1  
+ADC10SHT0            #define, value: (0x800), line:     196:1  
+ADC10SHT1            #define, value: (0x1000u), line:     197:1  
+ADC10SHT_0           #define, value: (0*0x800u), line:     201:1  
+ADC10SHT_1           #define, value: (1*0x800u), line:     202:1  
+ADC10SHT_2           #define, value: (2*0x800u), line:     203:1  
+ADC10SHT_3           #define, value: (3*0x800u), line:     204:1  
+ADC10SR              #define, value: (0x400), line:     195:1  
+ADC10SSEL0           #define, value: (0x0008u), line:     219:1  
+ADC10SSEL1           #define, value: (0x0010u), line:     220:1  
+ADC10SSEL_0          #define, value: (0*8u), line:     238:1  
+ADC10SSEL_1          #define, value: (1*8u), line:     239:1  
+ADC10SSEL_2          #define, value: (2*8u), line:     240:1  
+ADC10SSEL_3          #define, value: (3*8u), line:     241:1  
+ADC10TB              #define, value: (0x008), line:     278:1  
+ADC10_VECTOR         #define, value: (5 * 2u), line:    1014:1  
+ADD                  MNEMONIC 
+ADDC                 MNEMONIC 
+ALIAS                DIRECTIVE 
+ALIGN                DIRECTIVE 
+ALIGNRAM             DIRECTIVE 
+AND                  OPERATOR 
+AND                  MNEMONIC 
+ASEG                 DIRECTIVE 
+ASEGN                DIRECTIVE 
+ASSIGN               DIRECTIVE 
+B                    SUFFIX 
+BCSCTL1_             #define, value: (0x0057u), line:     288:1      289:1
+BCSCTL2_             #define, value: (0x0058u), line:     290:1      291:1
+BCSCTL3_             #define, value: (0x0053u), line:     292:1      293:1
+BIC                  MNEMONIC 
+BIS                  MNEMONIC 
+BIT                  SEGMENT TYPE 
+BIT                  MNEMONIC 
+BIT0                 #define, value: (0x0001u), line:      62:1        246      247
+BIT1                 #define, value: (0x0002u), line:      63:1  
+BIT2                 #define, value: (0x0004u), line:      64:1  
+BIT3                 #define, value: (0x0008u), line:      65:1        247      248
+BIT4                 #define, value: (0x0010u), line:      66:1        246      247
+BIT5                 #define, value: (0x0020u), line:      67:1        246      247
+BIT6                 #define, value: (0x0040u), line:      68:1        246      247
+BIT7                 #define, value: (0x0080u), line:      69:1  
+BIT8                 #define, value: (0x0100u), line:      70:1  
+BIT9                 #define, value: (0x0200u), line:      71:1  
+BITA                 #define, value: (0x0400u), line:      72:1  
+BITAND               OPERATOR 
+BITB                 #define, value: (0x0800u), line:      73:1  
+BITC                 #define, value: (0x1000u), line:      74:1  
+BITD                 #define, value: (0x2000u), line:      75:1  
+BITE                 #define, value: (0x4000u), line:      76:1  
+BITF                 #define, value: (0x8000u), line:      77:1  
+BITNOT               OPERATOR 
+BITOR                OPERATOR 
+BITXOR               OPERATOR 
+BLKWRT               #define, value: (0x0080u), line:     428:1  
+BLOCK                DIRECTIVE 
+BR                   MNEMONIC 
+BRANCH               MNEMONIC 
+BUSY                 #define, value: (0x0001u), line:     451:1  
+BYTE                 Target symbol: 524288 
+C                    #define, value: (0x0001u), line:      83:1  
+CACTL1_              #define, value: (0x0059u), line:     370:1      371:1
+CACTL2_              #define, value: (0x005Au), line:     372:1      373:1
+CAEX                 #define, value: (0x80), line:     384:1  
+CAF                  #define, value: (0x02), line:     392:1  
+CAIE                 #define, value: (0x02), line:     378:1  
+CAIES                #define, value: (0x04), line:     379:1  
+CAIFG                #define, value: (0x01), line:     377:1  
+CALBC1_12MHZ_        #define, value: (0x10FBu), line:     953:1      954:1
+CALBC1_16MHZ_        #define, value: (0x10F9u), line:     949:1      950:1
+CALBC1_1MHZ_         #define, value: (0x10FFu), line:     961:1      962:1
+CALBC1_8MHZ_         #define, value: (0x10FDu), line:     957:1      958:1
+CALDCO_12MHZ_        #define, value: (0x10FAu), line:     951:1      952:1
+CALDCO_16MHZ_        #define, value: (0x10F8u), line:     947:1      948:1
+CALDCO_1MHZ_         #define, value: (0x10FEu), line:     959:1      960:1
+CALDCO_8MHZ_         #define, value: (0x10FCu), line:     955:1      956:1
+CALL                 MNEMONIC 
+CALL_GRAPH_ROOT      DIRECTIVE 
+CAL_ADC_15T30        #define, value: (0x0003u), line:     992:1  
+CAL_ADC_15T85        #define, value: (0x0004u), line:     991:1  
+CAL_ADC_15VREF_FACTOR #define, value: (0x0002u), line:     993:1  
+CAL_ADC_25T30        #define, value: (0x0006u), line:     989:1  
+CAL_ADC_25T85        #define, value: (0x0007u), line:     988:1  
+CAL_ADC_25VREF_FACTOR #define, value: (0x0005u), line:     990:1  
+CAL_ADC_GAIN_FACTOR  #define, value: (0x0000u), line:     995:1  
+CAL_ADC_OFFSET       #define, value: (0x0001u), line:     994:1  
+CAL_BC1_12MHZ        #define, value: (0x0003u), line:    1000:1  
+CAL_BC1_16MHZ        #define, value: (0x0001u), line:     998:1  
+CAL_BC1_1MHZ         #define, value: (0x0007u), line:    1004:1  
+CAL_BC1_8MHZ         #define, value: (0x0005u), line:    1002:1  
+CAL_DCO_12MHZ        #define, value: (0x0002u), line:     999:1  
+CAL_DCO_16MHZ        #define, value: (0x0000u), line:     997:1  
+CAL_DCO_1MHZ         #define, value: (0x0006u), line:    1003:1  
+CAL_DCO_8MHZ         #define, value: (0x0004u), line:    1001:1  
+CAON                 #define, value: (0x08), line:     380:1  
+CAOUT                #define, value: (0x01), line:     391:1  
+CAP                  #define, value: (0x0100u), line:     609:1  
+CAPD0                #define, value: (0x01), line:     400:1  
+CAPD1                #define, value: (0x02), line:     401:1  
+CAPD2                #define, value: (0x04), line:     402:1  
+CAPD3                #define, value: (0x08), line:     403:1  
+CAPD4                #define, value: (0x10), line:     404:1  
+CAPD5                #define, value: (0x20), line:     405:1  
+CAPD6                #define, value: (0x40), line:     406:1  
+CAPD7                #define, value: (0x80), line:     407:1  
+CAPD_                #define, value: (0x005Bu), line:     374:1      375:1
+CAREF0               #define, value: (0x10), line:     381:1  
+CAREF1               #define, value: (0x20), line:     382:1  
+CAREF_0              #define, value: (0x00), line:     386:1  
+CAREF_1              #define, value: (0x10), line:     387:1  
+CAREF_2              #define, value: (0x20), line:     388:1  
+CAREF_3              #define, value: (0x30), line:     389:1  
+CARSEL               #define, value: (0x40), line:     383:1  
+CASEOFF              DIRECTIVE 
+CASEON               DIRECTIVE 
+CASHORT              #define, value: (0x80), line:     398:1  
+CCI                  #define, value: (0x0008u), line:     614:1  
+CCIE                 #define, value: (0x0010u), line:     613:1  
+CCIFG                #define, value: (0x0001u), line:     617:1  
+CCIS0                #define, value: (0x1000u), line:     606:1  
+CCIS1                #define, value: (0x2000u), line:     605:1  
+CCIS_0               #define, value: (0*0x1000u), line:     627:1  
+CCIS_1               #define, value: (1*0x1000u), line:     628:1  
+CCIS_2               #define, value: (2*0x1000u), line:     629:1  
+CCIS_3               #define, value: (3*0x1000u), line:     630:1  
+CCR0                 #define, value: TACCR0, line:     570:1  
+CCR0_                #define, value: TACCR0_, line:     576:1  
+CCR1                 #define, value: TACCR1, line:     571:1  
+CCR1_                #define, value: TACCR1_, line:     577:1  
+CCR2                 #define, value: TACCR2, line:     572:1  
+CCR2_                #define, value: TACCR2_, line:     578:1  
+CCTL0                #define, value: TACCTL0, line:     567:1  
+CCTL0_               #define, value: TACCTL0_, line:     573:1  
+CCTL1                #define, value: TACCTL1, line:     568:1  
+CCTL1_               #define, value: TACCTL1_, line:     574:1  
+CCTL2                #define, value: TACCTL2, line:     569:1  
+CCTL2_               #define, value: TACCTL2_, line:     575:1  
+CFI                  DIRECTIVE 
+CG1                  REGISTER 
+CG2                  REGISTER 
+CLR                  MNEMONIC 
+CLRC                 MNEMONIC 
+CLRN                 MNEMONIC 
+CLRZ                 MNEMONIC 
+CM0                  #define, value: (0x4000u), line:     604:1  
+CM1                  #define, value: (0x8000u), line:     603:1  
+CMP                  MNEMONIC 
+CM_0                 #define, value: (0*0x4000u), line:     631:1  
+CM_1                 #define, value: (1*0x4000u), line:     632:1  
+CM_2                 #define, value: (2*0x4000u), line:     633:1  
+CM_3                 #define, value: (3*0x4000u), line:     634:1  
+CODE                 SEGMENT TYPE 
+COL                  DIRECTIVE 
+COMMON               DIRECTIVE 
+COMPARATORA_VECTOR   #define, value: (11 * 2u), line:    1020:1  
+CONSEQ0              #define, value: (0x0002u), line:     217:1  
+CONSEQ1              #define, value: (0x0004u), line:     218:1  
+CONSEQ_0             #define, value: (0*2u), line:     233:1  
+CONSEQ_1             #define, value: (1*2u), line:     234:1  
+CONSEQ_2             #define, value: (2*2u), line:     235:1  
+CONSEQ_3             #define, value: (3*2u), line:     236:1  
+CONST                SEGMENT TYPE 
+CONST                DIRECTIVE 
+COV                  #define, value: (0x0002u), line:     616:1  
+CPUOFF               #define, value: (0x0010u), line:      88:1  
+DADC                 MNEMONIC 
+DADD                 MNEMONIC 
+DATA                 SEGMENT TYPE 
+DATE                 OPERATOR 
+DB                   DIRECTIVE 
+DC16                 DIRECTIVE 
+DC24                 DIRECTIVE 
+DC32                 DIRECTIVE 
+DC8                  DIRECTIVE 
+DCO0                 #define, value: (0x20), line:     300:1  
+DCO1                 #define, value: (0x40), line:     301:1  
+DCO2                 #define, value: (0x80), line:     302:1  
+DCOCTL_              #define, value: (0x0056u), line:     286:1      287:1
+DEC                  MNEMONIC 
+DECD                 MNEMONIC 
+DEFC                 #define,            line:      47:1      133:1    140:1    148:1    156:1
+                                                                    169:1    171:1    173:1    287:1
+                                                                    289:1    291:1    293:1    371:1
+                                                                    373:1    375:1    467:1    469:1
+                                                                    471:1    473:1    475:1    477:1
+                                                                    479:1    481:1    483:1    486:1
+                                                                    488:1    490:1    492:1    494:1
+                                                                    496:1    498:1    500:1    502:1
+                                                                    510:1    512:1    514:1    516:1
+                                                                    518:1    520:1    684:1    686:1
+                                                                    688:1    690:1    692:1    694:1
+                                                                    696:1    698:1    700:1    702:1
+                                                                    704:1    709:1    711:1    713:1
+                                                                    715:1    717:1    719:1    721:1
+                                                                    723:1    948:1    950:1    952:1
+                                                                    954:1    956:1    958:1    960:1
+                                                                    962:1    979:1    981:1    983:1
+                                                                    985:1
+DEFINE               DIRECTIVE 
+DEFW                 #define,            line:      48:1      176:1    178:1    180:1    182:1
+                                                                    415:1    417:1    419:1    528:1
+                                                                    530:1    532:1    534:1    536:1
+                                                                    538:1    540:1    542:1    544:1
+                                                                    650:1    652:1    654:1    656:1
+                                                                    658:1    660:1    662:1    664:1
+                                                                    666:1    725:1    727:1    900:1
+                                                                    977:1
+DEST                 MACRO 
+DF                   DIRECTIVE 
+DF32                 DIRECTIVE 
+DF64                 DIRECTIVE 
+DFTI32               DIRECTIVE 
+DFTI40               DIRECTIVE 
+DINT                 MNEMONIC 
+DIVA0                #define, value: (0x10), line:     308:1  
+DIVA1                #define, value: (0x20), line:     309:1  
+DIVA_0               #define, value: (0x00), line:     313:1  
+DIVA_1               #define, value: (0x10), line:     314:1  
+DIVA_2               #define, value: (0x20), line:     315:1  
+DIVA_3               #define, value: (0x30), line:     316:1  
+DIVM0                #define, value: (0x10), line:     321:1  
+DIVM1                #define, value: (0x20), line:     322:1  
+DIVM_0               #define, value: (0x00), line:     331:1  
+DIVM_1               #define, value: (0x10), line:     332:1  
+DIVM_2               #define, value: (0x20), line:     333:1  
+DIVM_3               #define, value: (0x30), line:     334:1  
+DIVS0                #define, value: (0x02), line:     318:1  
+DIVS1                #define, value: (0x04), line:     319:1  
+DIVS_0               #define, value: (0x00), line:     326:1  
+DIVS_1               #define, value: (0x02), line:     327:1  
+DIVS_2               #define, value: (0x04), line:     328:1  
+DIVS_3               #define, value: (0x06), line:     329:1  
+DL                   DIRECTIVE 
+DS                   DIRECTIVE 
+DS16                 DIRECTIVE 
+DS24                 DIRECTIVE 
+DS32                 DIRECTIVE 
+DS8                  DIRECTIVE 
+DW                   DIRECTIVE 
+EINT                 MNEMONIC 
+ELIF                 DIRECTIVE 
+ELSE                 DIRECTIVE 
+EMEX                 #define, value: (0x0020u), line:     456:1  
+ENC                  #define, value: (0x002), line:     186:1  
+END                  DIRECTIVE 
+ENDIF                DIRECTIVE 
+ENDM                 DIRECTIVE 
+ENDMOD               DIRECTIVE 
+ENDR                 DIRECTIVE 
+EQ                   OPERATOR 
+EQU                  DIRECTIVE 
+ERASE                #define, value: (0x0002u), line:     425:1  
+EVEN                 DIRECTIVE 
+EXITM                DIRECTIVE 
+EXPORT               DIRECTIVE 
+EXTERN               DIRECTIVE 
+FAIL                 #define, value: (0x0080u), line:     458:1  
+FAR                  SEGMENT TYPE 
+FARCODE              SEGMENT TYPE 
+FARCONST             SEGMENT TYPE 
+FARDATA              SEGMENT TYPE 
+FCTL1_               #define, value: (0x0128u), line:     414:1      415:1
+FCTL2_               #define, value: (0x012Au), line:     416:1      417:1
+FCTL3_               #define, value: (0x012Cu), line:     418:1      419:1
+FN0                  #define, value: (0x0001u), line:     431:1  
+FN1                  #define, value: (0x0002u), line:     432:1  
+FN2                  #define, value: (0x0004u), line:     434:1  
+FN3                  #define, value: (0x0008u), line:     437:1  
+FN4                  #define, value: (0x0010u), line:     440:1  
+FN5                  #define, value: (0x0020u), line:     442:1  
+FRKEY                #define, value: (0x9600u), line:     421:1  
+FSSEL0               #define, value: (0x0040u), line:     443:1  
+FSSEL1               #define, value: (0x0080u), line:     444:1  
+FSSEL_0              #define, value: (0x0000u), line:     446:1  
+FSSEL_1              #define, value: (0x0040u), line:     447:1        236
+FSSEL_2              #define, value: (0x0080u), line:     448:1  
+FSSEL_3              #define, value: (0x00C0u), line:     449:1  
+FUNCTION             DIRECTIVE 
+FWKEY                #define, value: (0xA500u), line:     422:1        235      236      238
+FXKEY                #define, value: (0x3300u), line:     423:1  
+GE                   OPERATOR 
+GIE                  #define, value: (0x0008u), line:      87:1  
+GT                   OPERATOR 
+HEADER               MACRO 
+HEADERLESS           MACRO 
+HEADLESS             MACRO 
+HIGH                 OPERATOR 
+HUGE                 SEGMENT TYPE 
+HUGECODE             SEGMENT TYPE 
+HUGECONST            SEGMENT TYPE 
+HUGEDATA             SEGMENT TYPE 
+HWRD                 OPERATOR 
+ID0                  #define, value: (0x0040u), line:     583:1  
+ID1                  #define, value: (0x0080u), line:     582:1  
+IDATA                SEGMENT TYPE 
+ID_0                 #define, value: (0*0x40u), line:     594:1  
+ID_1                 #define, value: (1*0x40u), line:     595:1  
+ID_2                 #define, value: (2*0x40u), line:     596:1  
+ID_3                 #define, value: (3*0x40u), line:     597:1  
+IE1_                 #define, value: (0x0000u), line:     132:1      133:1
+IE2_                 #define, value: (0x0001u), line:     147:1      148:1
+IF                   DIRECTIVE 
+IFG1_                #define, value: (0x0002u), line:     139:1      140:1
+IFG2_                #define, value: (0x0003u), line:     155:1      156:1
+IMMED                MACRO 
+IMPORT               DIRECTIVE 
+INC                  MNEMONIC 
+INCD                 MNEMONIC 
+INCH0                #define, value: (0x1000u), line:     228:1  
+INCH1                #define, value: (0x2000u), line:     229:1  
+INCH2                #define, value: (0x4000u), line:     230:1  
+INCH3                #define, value: (0x8000u), line:     231:1  
+INCH_0               #define, value: (0*0x1000u), line:     257:1  
+INCH_1               #define, value: (1*0x1000u), line:     258:1  
+INCH_10              #define, value: (10*0x1000u), line:     267:1  
+INCH_11              #define, value: (11*0x1000u), line:     268:1  
+INCH_12              #define, value: (12*0x1000u), line:     269:1  
+INCH_13              #define, value: (13*0x1000u), line:     270:1  
+INCH_14              #define, value: (14*0x1000u), line:     271:1  
+INCH_15              #define, value: (15*0x1000u), line:     272:1  
+INCH_2               #define, value: (2*0x1000u), line:     259:1  
+INCH_3               #define, value: (3*0x1000u), line:     260:1  
+INCH_4               #define, value: (4*0x1000u), line:     261:1  
+INCH_5               #define, value: (5*0x1000u), line:     262:1  
+INCH_6               #define, value: (6*0x1000u), line:     263:1  
+INCH_7               #define, value: (7*0x1000u), line:     264:1  
+INCH_8               #define, value: (8*0x1000u), line:     265:1  
+INCH_9               #define, value: (9*0x1000u), line:     266:1  
+INDEX                #define, value: R8, line:      51:2  
+INFOEND              #define, value: (0x10FF), line:      28:2  
+INFOSEG              #define, value: (128), line:      36:2  
+INFOSTART            #define, value: (0x1000), line:      27:2  
+INV                  MNEMONIC 
+IP                   #define, value: R5, line:      46:2        255      258      261
+IRACL                #define, value: R12, line:      67:2  
+IRACM                #define, value: R13, line:      68:2  
+IRBT                 #define, value: W, line:      69:2  
+IROP1                #define, value: TOS, line:      64:2  
+IROP2L               #define, value: R10, line:      65:2  
+IROP2M               #define, value: R11, line:      66:2  
+ISREND               #define, value: (0xFFDF), line:      34:2  
+ISRSTART             #define, value: (0xFE00), line:      33:2  
+ISSH                 #define, value: (0x0100u), line:     224:1  
+JC                   MNEMONIC 
+JEQ                  MNEMONIC 
+JGE                  MNEMONIC 
+JHS                  MNEMONIC 
+JL                   MNEMONIC 
+JLO                  MNEMONIC 
+JMP                  MNEMONIC 
+JN                   MNEMONIC 
+JNC                  MNEMONIC 
+JNE                  MNEMONIC 
+JNZ                  MNEMONIC 
+JZ                   MNEMONIC 
+KEYV                 #define, value: (0x0002u), line:     452:1  
+LE                   OPERATOR 
+LFXT1OF              #define, value: (0x01), line:     341:1  
+LFXT1S0              #define, value: (0x10), line:     345:1  
+LFXT1S1              #define, value: (0x20), line:     346:1  
+LFXT1S_0             #define, value: (0x00), line:     355:1  
+LFXT1S_1             #define, value: (0x10), line:     356:1  
+LFXT1S_2             #define, value: (0x20), line:     357:1  
+LFXT1S_3             #define, value: (0x30), line:     358:1  
+LIBRARY              DIRECTIVE 
+LIMIT                #define, value: R9, line:      52:2  
+LOCAL                DIRECTIVE 
+LOCK                 #define, value: (0x0010u), line:     455:1        238
+LOCKA                #define, value: (0x0040u), line:     457:1  
+LOW                  OPERATOR 
+LPM0                 #define, value: (CPUOFF), line:      96:1  
+LPM1                 #define, value: (SCG0+CPUOFF), line:      97:1  
+LPM2                 #define, value: (SCG1+CPUOFF), line:      98:1  
+LPM3                 #define, value: (SCG1+SCG0+CPUOFF), line:      99:1  
+LPM4                 #define, value: (SCG1+SCG0+OSCOFF+CPUOFF), line:     100:1  
+LSTCND               DIRECTIVE 
+LSTCOD               DIRECTIVE 
+LSTEXP               DIRECTIVE 
+LSTMAC               DIRECTIVE 
+LSTOUT               DIRECTIVE 
+LSTPAG               DIRECTIVE 
+LSTREP               DIRECTIVE 
+LSTSAS               DIRECTIVE 
+LSTXRF               DIRECTIVE 
+LT                   OPERATOR 
+LWRD                 OPERATOR 
+MACRO                DIRECTIVE 
+MAINSEG              #define, value: (512), line:      35:2  
+MC0                  #define, value: (0x0010u), line:     585:1  
+MC1                  #define, value: (0x0020u), line:     584:1  
+MC_0                 #define, value: (0*0x10u), line:     590:1  
+MC_1                 #define, value: (1*0x10u), line:     591:1  
+MC_2                 #define, value: (2*0x10u), line:     592:1  
+MC_3                 #define, value: (3*0x10u), line:     593:1  
+MERAS                #define, value: (0x0004u), line:     426:1  
+MOD                  OPERATOR 
+MOD0                 #define, value: (0x01), line:     295:1  
+MOD1                 #define, value: (0x02), line:     296:1  
+MOD2                 #define, value: (0x04), line:     297:1  
+MOD3                 #define, value: (0x08), line:     298:1  
+MOD4                 #define, value: (0x10), line:     299:1  
+MODULE               DIRECTIVE 
+MOV                  MNEMONIC 
+MSC                  #define, value: (0x080), line:     192:1  
+N                    #define, value: (0x0004u), line:      85:1  
+NAME                 DIRECTIVE 
+NE                   OPERATOR 
+NEAR                 SEGMENT TYPE 
+NEARCODE             SEGMENT TYPE 
+NEARCONST            SEGMENT TYPE 
+NEARDATA             SEGMENT TYPE 
+NEXT                 MACRO 
+NMIIE                #define, value: (0x10), line:     136:1  
+NMIIFG               #define, value: (0x10), line:     145:1  
+NMI_VECTOR           #define, value: (14 * 2u), line:    1023:1  
+NOALLOC              SEGMENT TYPE 
+NOP                  MNEMONIC 
+NOROOT               SEGMENT TYPE 
+NOT                  OPERATOR 
+NPAGE                SEGMENT TYPE 
+ODD                  DIRECTIVE 
+OFIE                 #define, value: (0x02), line:     135:1        234
+OFIFG                #define, value: (0x02), line:     142:1  
+OR                   OPERATOR 
+ORG                  DIRECTIVE 
+OSCOFF               #define, value: (0x0020u), line:      89:1  
+OUT                  #define, value: (0x0004u), line:     615:1  
+OUTMOD0              #define, value: (0x0020u), line:     612:1  
+OUTMOD1              #define, value: (0x0040u), line:     611:1  
+OUTMOD2              #define, value: (0x0080u), line:     610:1  
+OUTMOD_0             #define, value: (0*0x20u), line:     619:1  
+OUTMOD_1             #define, value: (1*0x20u), line:     620:1  
+OUTMOD_2             #define, value: (2*0x20u), line:     621:1  
+OUTMOD_3             #define, value: (3*0x20u), line:     622:1  
+OUTMOD_4             #define, value: (4*0x20u), line:     623:1  
+OUTMOD_5             #define, value: (5*0x20u), line:     624:1  
+OUTMOD_6             #define, value: (6*0x20u), line:     625:1  
+OUTMOD_7             #define, value: (7*0x20u), line:     626:1  
+P1DIR_               #define, value: (0x0022u), line:     470:1      471:1
+P1IES_               #define, value: (0x0024u), line:     474:1      475:1
+P1IE_                #define, value: (0x0025u), line:     476:1      477:1
+P1IFG_               #define, value: (0x0023u), line:     472:1      473:1
+P1IN_                #define, value: (0x0020u), line:     466:1      467:1
+P1OUT_               #define, value: (0x0021u), line:     468:1      469:1
+P1REN_               #define, value: (0x0027u), line:     482:1      483:1
+P1SEL2_              #define, value: (0x0041u), line:     480:1      481:1
+P1SEL_               #define, value: (0x0026u), line:     478:1      479:1
+P2CA0                #define, value: (0x04), line:     393:1  
+P2CA1                #define, value: (0x08), line:     394:1  
+P2CA2                #define, value: (0x10), line:     395:1  
+P2CA3                #define, value: (0x20), line:     396:1  
+P2CA4                #define, value: (0x40), line:     397:1  
+P2DIR_               #define, value: (0x002Au), line:     489:1      490:1
+P2IES_               #define, value: (0x002Cu), line:     493:1      494:1
+P2IE_                #define, value: (0x002Du), line:     495:1      496:1
+P2IFG_               #define, value: (0x002Bu), line:     491:1      492:1
+P2IN_                #define, value: (0x0028u), line:     485:1      486:1
+P2OUT_               #define, value: (0x0029u), line:     487:1      488:1
+P2REN_               #define, value: (0x002Fu), line:     501:1      502:1
+P2SEL2_              #define, value: (0x0042u), line:     499:1      500:1
+P2SEL_               #define, value: (0x002Eu), line:     497:1      498:1
+P3DIR_               #define, value: (0x001Au), line:     513:1      514:1
+P3IN_                #define, value: (0x0018u), line:     509:1      510:1
+P3OUT_               #define, value: (0x0019u), line:     511:1      512:1
+P3REN_               #define, value: (0x0010u), line:     519:1      520:1
+P3SEL2_              #define, value: (0x0043u), line:     517:1      518:1
+P3SEL_               #define, value: (0x001Bu), line:     515:1      516:1
+PAGE                 DIRECTIVE 
+PAGSIZ               DIRECTIVE 
+PC                   REGISTER 
+POP                  MNEMONIC 
+PORIFG               #define, value: (0x04), line:     143:1  
+PORT1_VECTOR         #define, value: (2 * 2u), line:    1012:1  
+PORT2_VECTOR         #define, value: (3 * 2u), line:    1013:1  
+PROGRAM              DIRECTIVE 
+PSP                  #define, value: R4, line:      45:2        252
+PUBLIC               DIRECTIVE 
+PUBWEAK              DIRECTIVE 
+PUSH                 MNEMONIC 
+Q                    #define, value: R12, line:      57:2  
+R0                   REGISTER 
+R1                   REGISTER 
+R10                  REGISTER 
+R11                  REGISTER 
+R12                  REGISTER 
+R13                  REGISTER 
+R14                  REGISTER 
+R15                  REGISTER 
+R2                   REGISTER 
+R3                   REGISTER 
+R4                   REGISTER 
+R5                   REGISTER 
+R6                   REGISTER 
+R7                   REGISTER 
+R8                   REGISTER 
+R9                   REGISTER 
+RADIX                DIRECTIVE 
+RAMEND               #define, value: (0x0400), line:      30:2  
+RAMSTART             #define, value: (0x0200), line:      29:2  
+READ                 Target symbol: 2048 
+READ_ONLY            #define, value: const, line:      55:1      467:1    486:1    510:1    528:1
+                                                                    650:1    696:1    721:1    948:1
+                                                                    950:1    952:1    954:1    956:1
+                                                                    958:1    960:1    962:1    977:1
+                                                                    979:1    981:1    983:1    985:1
+REF2_5V              #define, value: (0x040), line:     191:1  
+REFBURST             #define, value: (0x100), line:     193:1  
+REFON                #define, value: (0x020), line:     190:1  
+REFOUT               #define, value: (0x200), line:     194:1  
+REGISTER             SEGMENT TYPE 
+REORDER              SEGMENT TYPE 
+REPT                 DIRECTIVE 
+REPTC                DIRECTIVE 
+REPTI                DIRECTIVE 
+REQUIRE              DIRECTIVE 
+RESET_VECTOR         #define, value: (15 * 2u), line:    1024:1  
+RET                  MNEMONIC 
+RETI                 MNEMONIC 
+RLA                  MNEMONIC 
+RLC                  MNEMONIC 
+ROOT                 SEGMENT TYPE 
+RRA                  MNEMONIC 
+RRC                  MNEMONIC 
+RSEG                 DIRECTIVE 
+RSEL0                #define, value: (0x01), line:     304:1  
+RSEL1                #define, value: (0x02), line:     305:1  
+RSEL2                #define, value: (0x04), line:     306:1  
+RSEL3                #define, value: (0x08), line:     307:1  
+RSP                  #define, value: SP, line:      42:2  
+RSTIFG               #define, value: (0x08), line:     144:1  
+RTMODEL              DIRECTIVE 
+SBC                  MNEMONIC 
+SCCI                 #define, value: (0x0400u), line:     608:1  
+SCG0                 #define, value: (0x0040u), line:      90:1  
+SCG1                 #define, value: (0x0080u), line:      91:1  
+SCS                  #define, value: (0x0800u), line:     607:1  
+SEGWRT               #define, value: (0x0080u), line:     429:1  
+SELM0                #define, value: (0x40), line:     323:1  
+SELM1                #define, value: (0x80), line:     324:1  
+SELM_0               #define, value: (0x00), line:     336:1  
+SELM_1               #define, value: (0x40), line:     337:1  
+SELM_2               #define, value: (0x80), line:     338:1  
+SELM_3               #define, value: (0xC0), line:     339:1  
+SELS                 #define, value: (0x08), line:     320:1  
+SET                  DIRECTIVE 
+SETC                 MNEMONIC 
+SETN                 MNEMONIC 
+SETZ                 MNEMONIC 
+SFB                  OPERATOR 
+SFE                  OPERATOR 
+SFRB                 DIRECTIVE 
+SFRTYPE              DIRECTIVE 
+SFRW                 DIRECTIVE 
+SHL                  OPERATOR 
+SHR                  OPERATOR 
+SHS0                 #define, value: (0x0400u), line:     226:1  
+SHS1                 #define, value: (0x0800u), line:     227:1  
+SHS_0                #define, value: (0*0x400u), line:     252:1  
+SHS_1                #define, value: (1*0x400u), line:     253:1  
+SHS_2                #define, value: (2*0x400u), line:     254:1  
+SHS_3                #define, value: (3*0x400u), line:     255:1  
+SIZEOF               OPERATOR 
+SORT                 SEGMENT TYPE 
+SP                   REGISTER 
+SR                   REGISTER 
+SREF0                #define, value: (0x2000u), line:     198:1  
+SREF1                #define, value: (0x4000u), line:     199:1  
+SREF2                #define, value: (0x8000u), line:     200:1  
+SREF_0               #define, value: (0*0x2000u), line:     206:1  
+SREF_1               #define, value: (1*0x2000u), line:     207:1  
+SREF_2               #define, value: (2*0x2000u), line:     208:1  
+SREF_3               #define, value: (3*0x2000u), line:     209:1  
+SREF_4               #define, value: (4*0x2000u), line:     210:1  
+SREF_5               #define, value: (5*0x2000u), line:     211:1  
+SREF_6               #define, value: (6*0x2000u), line:     212:1  
+SREF_7               #define, value: (7*0x2000u), line:     213:1  
+STACK                DIRECTIVE 
+SUB                  MNEMONIC 
+SUBC                 MNEMONIC 
+SUPPRESS_CPU40_WARNING DIRECTIVE 
+SUPPRESS_NOP_AFTER_DINT_WARNING DIRECTIVE 
+SUPPRESS_NOP_AFTER_LPM_WARNING DIRECTIVE 
+SUPPRESS_NOP_BEFORE_EINT_WARNING
+                     DIRECTIVE 
+SUPPRESS_THIS_GIE_NOP_WARNING DIRECTIVE 
+SWPB                 MNEMONIC 
+SXT                  MNEMONIC 
+SYMBOL               DIRECTIVE 
+T                    #define, value: R13, line:      58:2  
+TA0CCR0_             #define, value: (0x0172u), line:     539:1      540:1
+TA0CCR1_             #define, value: (0x0174u), line:     541:1      542:1
+TA0CCR2_             #define, value: (0x0176u), line:     543:1      544:1
+TA0CCTL0_            #define, value: (0x0162u), line:     531:1      532:1
+TA0CCTL1_            #define, value: (0x0164u), line:     533:1      534:1
+TA0CCTL2_            #define, value: (0x0166u), line:     535:1      536:1
+TA0CTL_              #define, value: (0x0160u), line:     529:1      530:1
+TA0IV_               #define, value: (0x012Eu), line:     527:1      528:1
+TA0IV_6              #define, value: (0x0006u), line:     640:1  
+TA0IV_8              #define, value: (0x0008u), line:     641:1  
+TA0IV_NONE           #define, value: (0x0000u), line:     637:1  
+TA0IV_TACCR1         #define, value: (0x0002u), line:     638:1  
+TA0IV_TACCR2         #define, value: (0x0004u), line:     639:1  
+TA0IV_TAIFG          #define, value: (0x000Au), line:     642:1  
+TA0R_                #define, value: (0x0170u), line:     537:1      538:1
+TA1CCR0_             #define, value: (0x0192u), line:     661:1      662:1
+TA1CCR1_             #define, value: (0x0194u), line:     663:1      664:1
+TA1CCR2_             #define, value: (0x0196u), line:     665:1      666:1
+TA1CCTL0_            #define, value: (0x0182u), line:     653:1      654:1
+TA1CCTL1_            #define, value: (0x0184u), line:     655:1      656:1
+TA1CCTL2_            #define, value: (0x0186u), line:     657:1      658:1
+TA1CTL_              #define, value: (0x0180u), line:     651:1      652:1
+TA1IV_               #define, value: (0x011Eu), line:     649:1      650:1
+TA1IV_6              #define, value: (0x0006u), line:     674:1  
+TA1IV_8              #define, value: (0x0008u), line:     675:1  
+TA1IV_NONE           #define, value: (0x0000u), line:     671:1  
+TA1IV_TACCR1         #define, value: (0x0002u), line:     672:1  
+TA1IV_TACCR2         #define, value: (0x0004u), line:     673:1  
+TA1IV_TAIFG          #define, value: (0x000Au), line:     676:1  
+TA1R_                #define, value: (0x0190u), line:     659:1      660:1
+TACCR0               #define, value: TA0CCR0, line:     553:1  
+TACCR0_              #define, value: TA0CCR0_, line:     562:1  
+TACCR1               #define, value: TA0CCR1, line:     554:1  
+TACCR1_              #define, value: TA0CCR1_, line:     563:1  
+TACCR2               #define, value: TA0CCR2, line:     555:1  
+TACCR2_              #define, value: TA0CCR2_, line:     564:1  
+TACCTL0              #define, value: TA0CCTL0, line:     549:1  
+TACCTL0_             #define, value: TA0CCTL0_, line:     558:1  
+TACCTL1              #define, value: TA0CCTL1, line:     550:1  
+TACCTL1_             #define, value: TA0CCTL1_, line:     559:1  
+TACCTL2              #define, value: TA0CCTL2, line:     551:1  
+TACCTL2_             #define, value: TA0CCTL2_, line:     560:1  
+TACLR                #define, value: (0x0004u), line:     586:1  
+TACTL                #define, value: TA0CTL, line:     548:1  
+TACTL_               #define, value: TA0CTL_, line:     557:1  
+TAG_ADC10_1          #define, value: (0x08), line:     972:1  
+TAG_DCO_30           #define, value: (0x01), line:     971:1  
+TAG_EMPTY            #define, value: (0xFE), line:     973:1  
+TAIE                 #define, value: (0x0002u), line:     587:1  
+TAIFG                #define, value: (0x0001u), line:     588:1  
+TAIV                 #define, value: TA0IV, line:     547:1  
+TAIV_                #define, value: TA0IV_, line:     556:1  
+TAR                  #define, value: TA0R, line:     552:1  
+TAR_                 #define, value: TA0R_, line:     561:1  
+TASSEL0              #define, value: (0x0100u), line:     581:1  
+TASSEL1              #define, value: (0x0200u), line:     580:1  
+TASSEL_0             #define, value: (0*0x100u), line:     598:1  
+TASSEL_1             #define, value: (1*0x100u), line:     599:1  
+TASSEL_2             #define, value: (2*0x100u), line:     600:1  
+TASSEL_3             #define, value: (3*0x100u), line:     601:1  
+TIMER0_A0_VECTOR     #define, value: (9 * 2u), line:    1018:1  
+TIMER0_A1_VECTOR     #define, value: (8 * 2u), line:    1017:1  
+TIMER1_A0_VECTOR     #define, value: (13 * 2u), line:    1022:1  
+TIMER1_A1_VECTOR     #define, value: (12 * 2u), line:    1021:1  
+TLV_ADC10_1_LEN_     #define, value: (0x10DBu), line:     984:1      985:1
+TLV_ADC10_1_TAG_     #define, value: (0x10DAu), line:     982:1      983:1
+TLV_CHECKSUM_        #define, value: (0x10C0u), line:     976:1      977:1
+TLV_DCO_30_LEN_      #define, value: (0x10F7u), line:     980:1      981:1
+TLV_DCO_30_TAG_      #define, value: (0x10F6u), line:     978:1      979:1
+TOS                  #define, value: R7, line:      48:2        254
+TRAPINT_VECTOR       #define, value: (0 * 2u), line:    1011:1  
+TST                  MNEMONIC 
+UC0IE                #define, value: IE2, line:     149:1  
+UC0IFG               #define, value: IFG2, line:     157:1  
+UC7BIT               #define, value: (0x10), line:     733:1  
+UCA0ABCTL_           #define, value: (0x005Du), line:     699:1      700:1
+UCA0BR0_             #define, value: (0x0062u), line:     687:1      688:1
+UCA0BR1_             #define, value: (0x0063u), line:     689:1      690:1
+UCA0CTL0_            #define, value: (0x0060u), line:     683:1      684:1
+UCA0CTL1_            #define, value: (0x0061u), line:     685:1      686:1
+UCA0IRRCTL_          #define, value: (0x005Fu), line:     703:1      704:1
+UCA0IRTCTL_          #define, value: (0x005Eu), line:     701:1      702:1
+UCA0MCTL_            #define, value: (0x0064u), line:     691:1      692:1
+UCA0RXBUF_           #define, value: (0x0066u), line:     695:1      696:1
+UCA0RXIE             #define, value: (0x01), line:     150:1  
+UCA0RXIFG            #define, value: (0x01), line:     158:1  
+UCA0STAT_            #define, value: (0x0065u), line:     693:1      694:1
+UCA0TXBUF_           #define, value: (0x0067u), line:     697:1      698:1
+UCA0TXIE             #define, value: (0x02), line:     151:1  
+UCA0TXIFG            #define, value: (0x02), line:     159:1  
+UCA10                #define, value: (0x80), line:     745:1  
+UCABDEN              #define, value: (0x01), line:     869:1  
+UCADDR               #define, value: (0x02), line:     823:1  
+UCALIE               #define, value: (0x01), line:     834:1  
+UCALIFG              #define, value: (0x01), line:     842:1  
+UCB0BR0_             #define, value: (0x006Au), line:     712:1      713:1
+UCB0BR1_             #define, value: (0x006Bu), line:     714:1      715:1
+UCB0CTL0_            #define, value: (0x0068u), line:     708:1      709:1
+UCB0CTL1_            #define, value: (0x0069u), line:     710:1      711:1
+UCB0I2CIE_           #define, value: (0x006Cu), line:     716:1      717:1
+UCB0I2COA_           #define, value: (0x0118u), line:     724:1      725:1
+UCB0I2CSA_           #define, value: (0x011Au), line:     726:1      727:1
+UCB0RXBUF_           #define, value: (0x006Eu), line:     720:1      721:1
+UCB0RXIE             #define, value: (0x04), line:     152:1  
+UCB0RXIFG            #define, value: (0x04), line:     160:1  
+UCB0STAT_            #define, value: (0x006Du), line:     718:1      719:1
+UCB0TXBUF_           #define, value: (0x006Fu), line:     722:1      723:1
+UCB0TXIE             #define, value: (0x08), line:     153:1  
+UCB0TXIFG            #define, value: (0x08), line:     161:1  
+UCBBUSY              #define, value: (0x10), line:     838:1  
+UCBRF0               #define, value: (0x10), line:     785:1  
+UCBRF1               #define, value: (0x20), line:     784:1  
+UCBRF2               #define, value: (0x40), line:     783:1  
+UCBRF3               #define, value: (0x80), line:     782:1  
+UCBRF_0              #define, value: (0x00), line:     791:1  
+UCBRF_1              #define, value: (0x10), line:     792:1  
+UCBRF_10             #define, value: (0xA0), line:     801:1  
+UCBRF_11             #define, value: (0xB0), line:     802:1  
+UCBRF_12             #define, value: (0xC0), line:     803:1  
+UCBRF_13             #define, value: (0xD0), line:     804:1  
+UCBRF_14             #define, value: (0xE0), line:     805:1  
+UCBRF_15             #define, value: (0xF0), line:     806:1  
+UCBRF_2              #define, value: (0x20), line:     793:1  
+UCBRF_3              #define, value: (0x30), line:     794:1  
+UCBRF_4              #define, value: (0x40), line:     795:1  
+UCBRF_5              #define, value: (0x50), line:     796:1  
+UCBRF_6              #define, value: (0x60), line:     797:1  
+UCBRF_7              #define, value: (0x70), line:     798:1  
+UCBRF_8              #define, value: (0x80), line:     799:1  
+UCBRF_9              #define, value: (0x90), line:     800:1  
+UCBRK                #define, value: (0x08), line:     821:1  
+UCBRKIE              #define, value: (0x10), line:     758:1  
+UCBRS0               #define, value: (0x02), line:     788:1  
+UCBRS1               #define, value: (0x04), line:     787:1  
+UCBRS2               #define, value: (0x08), line:     786:1  
+UCBRS_0              #define, value: (0x00), line:     808:1  
+UCBRS_1              #define, value: (0x02), line:     809:1  
+UCBRS_2              #define, value: (0x04), line:     810:1        207
+UCBRS_3              #define, value: (0x06), line:     811:1  
+UCBRS_4              #define, value: (0x08), line:     812:1  
+UCBRS_5              #define, value: (0x0A), line:     813:1  
+UCBRS_6              #define, value: (0x0C), line:     814:1  
+UCBRS_7              #define, value: (0x0E), line:     815:1  
+UCBTOE               #define, value: (0x04), line:     867:1  
+UCBUSY               #define, value: (0x01), line:     824:1  
+UCCKPH               #define, value: (0x80), line:     740:1  
+UCCKPL               #define, value: (0x40), line:     741:1  
+UCDELIM0             #define, value: (0x10), line:     865:1  
+UCDELIM1             #define, value: (0x20), line:     864:1  
+UCDORM               #define, value: (0x08), line:     759:1  
+UCFE                 #define, value: (0x40), line:     818:1  
+UCGC                 #define, value: (0x20), line:     837:1  
+UCGCEN               #define, value: (0x8000u), line:     871:1  
+UCIDLE               #define, value: (0x02), line:     825:1  
+UCIREN               #define, value: (0x01), line:     851:1  
+UCIRRXFE             #define, value: (0x01), line:     860:1  
+UCIRRXFL0            #define, value: (0x04), line:     858:1  
+UCIRRXFL1            #define, value: (0x08), line:     857:1  
+UCIRRXFL2            #define, value: (0x10), line:     856:1  
+UCIRRXFL3            #define, value: (0x20), line:     855:1  
+UCIRRXFL4            #define, value: (0x40), line:     854:1  
+UCIRRXFL5            #define, value: (0x80), line:     853:1  
+UCIRRXPL             #define, value: (0x02), line:     859:1  
+UCIRTXCLK            #define, value: (0x02), line:     850:1  
+UCIRTXPL0            #define, value: (0x04), line:     849:1  
+UCIRTXPL1            #define, value: (0x08), line:     848:1  
+UCIRTXPL2            #define, value: (0x10), line:     847:1  
+UCIRTXPL3            #define, value: (0x20), line:     846:1  
+UCIRTXPL4            #define, value: (0x40), line:     845:1  
+UCIRTXPL5            #define, value: (0x80), line:     844:1  
+UCLISTEN             #define, value: (0x80), line:     817:1  
+UCMM                 #define, value: (0x20), line:     747:1  
+UCMODE0              #define, value: (0x02), line:     736:1  
+UCMODE1              #define, value: (0x04), line:     735:1  
+UCMODE_0             #define, value: (0x00), line:     749:1  
+UCMODE_1             #define, value: (0x02), line:     750:1  
+UCMODE_2             #define, value: (0x04), line:     751:1  
+UCMODE_3             #define, value: (0x06), line:     752:1  
+UCMSB                #define, value: (0x20), line:     732:1  
+UCMST                #define, value: (0x08), line:     742:1  
+UCNACKIE             #define, value: (0x08), line:     831:1  
+UCNACKIFG            #define, value: (0x08), line:     839:1  
+UCOA0                #define, value: (0x0001u), line:     881:1  
+UCOA1                #define, value: (0x0002u), line:     880:1  
+UCOA2                #define, value: (0x0004u), line:     879:1  
+UCOA3                #define, value: (0x0008u), line:     878:1  
+UCOA4                #define, value: (0x0010u), line:     877:1  
+UCOA5                #define, value: (0x0020u), line:     876:1  
+UCOA6                #define, value: (0x0040u), line:     875:1  
+UCOA7                #define, value: (0x0080u), line:     874:1  
+UCOA8                #define, value: (0x0100u), line:     873:1  
+UCOA9                #define, value: (0x0200u), line:     872:1  
+UCOE                 #define, value: (0x20), line:     819:1  
+UCOS16               #define, value: (0x01), line:     789:1  
+UCPAR                #define, value: (0x40), line:     731:1  
+UCPE                 #define, value: (0x10), line:     820:1  
+UCPEN                #define, value: (0x80), line:     730:1  
+UCRXEIE              #define, value: (0x20), line:     757:1  
+UCRXERR              #define, value: (0x04), line:     822:1  
+UCSA0                #define, value: (0x0001u), line:     892:1  
+UCSA1                #define, value: (0x0002u), line:     891:1  
+UCSA2                #define, value: (0x0004u), line:     890:1  
+UCSA3                #define, value: (0x0008u), line:     889:1  
+UCSA4                #define, value: (0x0010u), line:     888:1  
+UCSA5                #define, value: (0x0020u), line:     887:1  
+UCSA6                #define, value: (0x0040u), line:     886:1  
+UCSA7                #define, value: (0x0080u), line:     885:1  
+UCSA8                #define, value: (0x0100u), line:     884:1  
+UCSA9                #define, value: (0x0200u), line:     883:1  
+UCSCLLOW             #define, value: (0x40), line:     836:1  
+UCSLA10              #define, value: (0x40), line:     746:1  
+UCSPB                #define, value: (0x08), line:     734:1  
+UCSSEL0              #define, value: (0x40), line:     756:1  
+UCSSEL1              #define, value: (0x80), line:     755:1  
+UCSSEL_0             #define, value: (0x00), line:     777:1  
+UCSSEL_1             #define, value: (0x40), line:     778:1  
+UCSSEL_2             #define, value: (0x80), line:     779:1        204
+UCSSEL_3             #define, value: (0xC0), line:     780:1  
+UCSTOE               #define, value: (0x08), line:     866:1  
+UCSTPIE              #define, value: (0x04), line:     832:1  
+UCSTPIFG             #define, value: (0x04), line:     840:1  
+UCSTTIE              #define, value: (0x02), line:     833:1  
+UCSTTIFG             #define, value: (0x02), line:     841:1  
+UCSWRST              #define, value: (0x01), line:     762:1        208
+UCSYNC               #define, value: (0x01), line:     737:1  
+UCTR                 #define, value: (0x10), line:     773:1  
+UCTXADDR             #define, value: (0x04), line:     760:1  
+UCTXBRK              #define, value: (0x02), line:     761:1  
+UCTXNACK             #define, value: (0x08), line:     774:1  
+UCTXSTP              #define, value: (0x04), line:     775:1  
+UCTXSTT              #define, value: (0x02), line:     776:1  
+UGT                  OPERATOR 
+ULT                  OPERATOR 
+UNTYPED              SEGMENT TYPE 
+USCIAB0RX_VECTOR     #define, value: (7 * 2u), line:    1016:1  
+USCIAB0TX_VECTOR     #define, value: (6 * 2u), line:    1015:1  
+USERFLASHEND         #define, value: (0xD1FF), line:      32:2  
+USERFLASHSTART       #define, value: (0xC000), line:      31:2  
+V                    #define, value: (0x0100u), line:      86:1  
+VAR                  DIRECTIVE 
+W                    #define, value: R6, line:      47:2        261      261
+WAIT                 #define, value: (0x0008u), line:     454:1  
+WDTCNTCL             #define, value: (0x0008u), line:     905:1  
+WDTCTL_              #define, value: (0x0120u), line:     899:1      900:1
+WDTHOLD              #define, value: (0x0080u), line:     909:1        172
+WDTIE                #define, value: (0x01), line:     134:1  
+WDTIFG               #define, value: (0x01), line:     141:1  
+WDTIS0               #define, value: (0x0001u), line:     902:1  
+WDTIS1               #define, value: (0x0002u), line:     903:1  
+WDTNMI               #define, value: (0x0020u), line:     907:1  
+WDTNMIES             #define, value: (0x0040u), line:     908:1  
+WDTPW                #define, value: (0x5A00u), line:     911:1        172
+WDTSSEL              #define, value: (0x0004u), line:     904:1  
+WDTTMSEL             #define, value: (0x0010u), line:     906:1  
+WDT_ADLY_1000        #define, value: (WDTPW+WDTTMSEL+WDTCNTCL+WDTSSEL), line:     920:1  
+WDT_ADLY_16          #define, value: (WDTPW+WDTTMSEL+WDTCNTCL+WDTSSEL+WDTIS1), line:     922:1  
+WDT_ADLY_1_9         #define, value: (WDTPW+WDTTMSEL+WDTCNTCL+WDTSSEL+WDTIS1+WDTIS0), line:     923:1  
+WDT_ADLY_250         #define, value: (WDTPW+WDTTMSEL+WDTCNTCL+WDTSSEL+WDTIS0), line:     921:1  
+WDT_ARST_1000        #define, value: (WDTPW+WDTCNTCL+WDTSSEL), line:     931:1  
+WDT_ARST_16          #define, value: (WDTPW+WDTCNTCL+WDTSSEL+WDTIS1), line:     933:1  
+WDT_ARST_1_9         #define, value: (WDTPW+WDTCNTCL+WDTSSEL+WDTIS1+WDTIS0), line:     934:1  
+WDT_ARST_250         #define, value: (WDTPW+WDTCNTCL+WDTSSEL+WDTIS0), line:     932:1  
+WDT_MDLY_0_064       #define, value: (WDTPW+WDTTMSEL+WDTCNTCL+WDTIS1+WDTIS0), line:     918:1  
+WDT_MDLY_0_5         #define, value: (WDTPW+WDTTMSEL+WDTCNTCL+WDTIS1), line:     917:1  
+WDT_MDLY_32          #define, value: (WDTPW+WDTTMSEL+WDTCNTCL), line:     915:1  
+WDT_MDLY_8           #define, value: (WDTPW+WDTTMSEL+WDTCNTCL+WDTIS0), line:     916:1  
+WDT_MRST_0_064       #define, value: (WDTPW+WDTCNTCL+WDTIS1+WDTIS0), line:     929:1  
+WDT_MRST_0_5         #define, value: (WDTPW+WDTCNTCL+WDTIS1), line:     928:1  
+WDT_MRST_32          #define, value: (WDTPW+WDTCNTCL), line:     926:1  
+WDT_MRST_8           #define, value: (WDTPW+WDTCNTCL+WDTIS0), line:     927:1  
+WDT_VECTOR           #define, value: (10 * 2u), line:    1019:1  
+WORD                 Target symbol: 1048576 
+WRITE                Target symbol: 4096 
+WRT                  #define, value: (0x0040u), line:     427:1  
+X                    #define, value: R10, line:      55:2  
+XCAP0                #define, value: (0x04), line:     343:1  
+XCAP1                #define, value: (0x08), line:     344:1  
+XCAP_0               #define, value: (0x00), line:     350:1  
+XCAP_1               #define, value: (0x04), line:     351:1  
+XCAP_2               #define, value: (0x08), line:     352:1  
+XCAP_3               #define, value: (0x0C), line:     353:1  
+XDATA                SEGMENT TYPE 
+XOR                  OPERATOR 
+XOR                  MNEMONIC 
+XT2OF                #define, value: (0x02), line:     342:1  
+XT2OFF               #define, value: (0x80), line:     311:1  
+XT2S0                #define, value: (0x40), line:     347:1  
+XT2S1                #define, value: (0x80), line:     348:1  
+XT2S_0               #define, value: (0x00), line:     360:1  
+XT2S_1               #define, value: (0x40), line:     361:1  
+XT2S_2               #define, value: (0x80), line:     362:1  
+XT2S_3               #define, value: (0xC0), line:     363:1  
+XTS                  #define, value: (0x40), line:     310:1  
+Y                    #define, value: R11, line:      56:2  
+Z                    #define, value: (0x0002u), line:      84:1  
+ZPAGE                SEGMENT TYPE 
+^                    OPERATOR 
+__430X_CORE__        #define, value: 1, line:         0  
+__430X__             #define, value: 1, line:         0  
+__430_CORE__         #define, value: 0, line:         0  
+__430__              #define, value: 0, line:         0  
+__A430__             #define, value: 1, line:         0  
+__BUILD_NUMBER__     #define,            line:         0  
+__CORE__             #define, value: 0, line:         0  
+__DATE__             #define,            line:         0  
+__FILE__             #define,            line:         0  
+__IAR_SYSTEMS_ASM    #define,            line:         0  
+__IAR_SYSTEMS_ASM__  #define,            line:         0  
+__LINE__             #define,            line:         0  
+__MSP430G2553        #define, value: , line:      18:1  
+__MSP430G2553__      #define, value: 1, line:         0  
+__MSP430_HAS_ADC10__ #define, value: , line:     166:1  
+__MSP430_HAS_BC2__   #define, value: , line:     284:1  
+__MSP430_HAS_CAPLUS__ #define, value: , line:     368:1  
+__MSP430_HAS_FLASH2__ #define, value: , line:     412:1  
+__MSP430_HAS_PORT1_R__ #define, value: , line:     463:1  
+__MSP430_HAS_PORT2_R__ #define, value: , line:     464:1  
+__MSP430_HAS_PORT3_R__ #define, value: , line:     507:1  
+__MSP430_HAS_T1A3__  #define, value: , line:     647:1  
+__MSP430_HAS_TA3__   #define, value: , line:     525:1  
+__MSP430_HAS_USCI__  #define, value: , line:     681:1  
+__MSP430_HAS_WDT__   #define, value: , line:     897:1  
+__MSP430_HEADER_VERSION__ #define, value: 1157, line:      20:1  
+__SUBVERSION__       #define,            line:         0  
+__TID__              #define,            line:         0       28:1
+__TIME__             #define,            line:         0  
+__VER__              #define,            line:         0  
+action               Target symbol: 0 
+address              Target symbol: 0 
+asmname              Target symbol: 0 
+define               PREPROCESSOR DIRECTIVE 
+defined              Target symbol: 0 
+elif                 PREPROCESSOR DIRECTIVE 
+else                 PREPROCESSOR DIRECTIVE 
+endif                PREPROCESSOR DIRECTIVE 
+error                PREPROCESSOR DIRECTIVE 
+if                   PREPROCESSOR DIRECTIVE 
+ifdef                PREPROCESSOR DIRECTIVE 
+ifndef               PREPROCESSOR DIRECTIVE 
+include              PREPROCESSOR DIRECTIVE 
+label                Target symbol: 0 
+length               Target symbol: 0 
+line                 PREPROCESSOR DIRECTIVE 
+litname              Target symbol: 0 
+message              PREPROCESSOR DIRECTIVE 
+pragma               PREPROCESSOR DIRECTIVE 
+undef                PREPROCESSOR DIRECTIVE 
+|                    OPERATOR 
+||                   OPERATOR 
+~                    OPERATOR 
+
+Segment             Type 	Mode
+----------------------------------------
+CODE                UNTYPED  	REL 
+DATA16_Z            UNTYPED  	REL 
+__EXTERNS           CODE  	ABS Org:0 
+
+Label               Mode   Type                   Segment    Value/Offset
+------------------------------------------------------------------------------
+ADC10AE0            ABS    CONST UNTYP.           ASEG       4A 
+ADC10CTL0           ABS    CONST UNTYP.           ASEG       1B0 
+ADC10CTL1           ABS    CONST UNTYP.           ASEG       1B2 
+ADC10DTC0           ABS    CONST UNTYP.           ASEG       48 
+ADC10DTC1           ABS    CONST UNTYP.           ASEG       49 
+ADC10MEM            ABS    CONST UNTYP.           ASEG       1B4 
+ADC10SA             ABS    CONST UNTYP.           ASEG       1BC 
+BCSCTL1             ABS    CONST UNTYP.           ASEG       57 
+BCSCTL2             ABS    CONST UNTYP.           ASEG       58 
+BCSCTL3             ABS    CONST UNTYP.           ASEG       53 
+BOOTIP              ABS    CONST EXT [001] UNTYP. __EXTERNS  Solved Extern 
+CACTL1              ABS    CONST UNTYP.           ASEG       59 
+CACTL2              ABS    CONST UNTYP.           ASEG       5A 
+CALBC1_12MHZ        ABS    CONST UNTYP.           ASEG       10FB 
+CALBC1_16MHZ        ABS    CONST UNTYP.           ASEG       10F9 
+CALBC1_1MHZ         ABS    CONST UNTYP.           ASEG       10FF 
+CALBC1_8MHZ         ABS    CONST UNTYP.           ASEG       10FD 
+CALDCO_12MHZ        ABS    CONST UNTYP.           ASEG       10FA 
+CALDCO_16MHZ        ABS    CONST UNTYP.           ASEG       10F8 
+CALDCO_1MHZ         ABS    CONST UNTYP.           ASEG       10FE 
+CALDCO_8MHZ         ABS    CONST UNTYP.           ASEG       10FC 
+CAPD                ABS    CONST UNTYP.           ASEG       5B 
+COLDIP              ABS    CONST EXT [000] UNTYP. __EXTERNS  Solved Extern 
+DCOCTL              ABS    CONST UNTYP.           ASEG       56 
+FCTL1               ABS    CONST UNTYP.           ASEG       128 
+FCTL2               ABS    CONST UNTYP.           ASEG       12A 
+FCTL3               ABS    CONST UNTYP.           ASEG       12C 
+HOLDAREA            REL    CONST UNTYP.           DATA16_Z   126 
+HOLD_SIZE           ABS    CONST UNTYP.           ASEG       22 
+IE1                 ABS    CONST UNTYP.           ASEG       0 
+IE2                 ABS    CONST UNTYP.           ASEG       1 
+IFG1                ABS    CONST UNTYP.           ASEG       2 
+IFG2                ABS    CONST UNTYP.           ASEG       3 
+LSTACK              REL    CONST PUB UNTYP.       DATA16_Z   2C 
+NOOP                ABS    CONST EXT [-001] UNTYP. __EXTERNS  Solved Extern 
+P1DIR               ABS    CONST UNTYP.           ASEG       22 
+P1IE                ABS    CONST UNTYP.           ASEG       25 
+P1IES               ABS    CONST UNTYP.           ASEG       24 
+P1IFG               ABS    CONST UNTYP.           ASEG       23 
+P1IN                ABS    CONST UNTYP.           ASEG       20 
+P1OUT               ABS    CONST UNTYP.           ASEG       21 
+P1REN               ABS    CONST UNTYP.           ASEG       27 
+P1SEL               ABS    CONST UNTYP.           ASEG       26 
+P1SEL2              ABS    CONST UNTYP.           ASEG       41 
+P2DIR               ABS    CONST UNTYP.           ASEG       2A 
+P2IE                ABS    CONST UNTYP.           ASEG       2D 
+P2IES               ABS    CONST UNTYP.           ASEG       2C 
+P2IFG               ABS    CONST UNTYP.           ASEG       2B 
+P2IN                ABS    CONST UNTYP.           ASEG       28 
+P2OUT               ABS    CONST UNTYP.           ASEG       29 
+P2REN               ABS    CONST UNTYP.           ASEG       2F 
+P2SEL               ABS    CONST UNTYP.           ASEG       2E 
+P2SEL2              ABS    CONST UNTYP.           ASEG       42 
+P3DIR               ABS    CONST UNTYP.           ASEG       1A 
+P3IN                ABS    CONST UNTYP.           ASEG       18 
+P3OUT               ABS    CONST UNTYP.           ASEG       19 
+P3REN               ABS    CONST UNTYP.           ASEG       10 
+P3SEL               ABS    CONST UNTYP.           ASEG       1B 
+P3SEL2              ABS    CONST UNTYP.           ASEG       43 
+PADAREA             REL    CONST PUB UNTYP.       DATA16_Z   126 
+PAD_SIZE            ABS    CONST UNTYP.           ASEG       54 
+PSTACK              REL    CONST PUB UNTYP.       DATA16_Z   98 
+PSTACK_SIZE         ABS    CONST UNTYP.           ASEG       36 
+RAMDICT             REL    CONST PUB UNTYP.       DATA16_Z   1CE 
+ROMDICT             REL    CONST PUB UNTYP.       CODE       88 
+RSTACK              REL    CONST PUB UNTYP.       DATA16_Z   104 
+RSTACK_SIZE         ABS    CONST UNTYP.           ASEG       36 
+TA0CCR0             ABS    CONST UNTYP.           ASEG       172 
+TA0CCR1             ABS    CONST UNTYP.           ASEG       174 
+TA0CCR2             ABS    CONST UNTYP.           ASEG       176 
+TA0CCTL0            ABS    CONST UNTYP.           ASEG       162 
+TA0CCTL1            ABS    CONST UNTYP.           ASEG       164 
+TA0CCTL2            ABS    CONST UNTYP.           ASEG       166 
+TA0CTL              ABS    CONST UNTYP.           ASEG       160 
+TA0IV               ABS    CONST UNTYP.           ASEG       12E 
+TA0R                ABS    CONST UNTYP.           ASEG       170 
+TA1CCR0             ABS    CONST UNTYP.           ASEG       192 
+TA1CCR1             ABS    CONST UNTYP.           ASEG       194 
+TA1CCR2             ABS    CONST UNTYP.           ASEG       196 
+TA1CCTL0            ABS    CONST UNTYP.           ASEG       182 
+TA1CCTL1            ABS    CONST UNTYP.           ASEG       184 
+TA1CCTL2            ABS    CONST UNTYP.           ASEG       186 
+TA1CTL              ABS    CONST UNTYP.           ASEG       180 
+TA1IV               ABS    CONST UNTYP.           ASEG       11E 
+TA1R                ABS    CONST UNTYP.           ASEG       190 
+TIBAREA             REL    CONST PUB UNTYP.       DATA16_Z   17A 
+TIB_SIZE            ABS    CONST PUB UNTYP.       ASEG       54 
+TID                 ABS    CONST UNTYP.           ASEG       2B00 
+TLV_ADC10_1_LEN     ABS    CONST UNTYP.           ASEG       10DB 
+TLV_ADC10_1_TAG     ABS    CONST UNTYP.           ASEG       10DA 
+TLV_CHECKSUM        ABS    CONST UNTYP.           ASEG       10C0 
+TLV_DCO_30_LEN      ABS    CONST UNTYP.           ASEG       10F7 
+TLV_DCO_30_TAG      ABS    CONST UNTYP.           ASEG       10F6 
+UAREA               REL    CONST PUB UNTYP.       DATA16_Z   2 
+UAREA_SIZE          ABS    CONST PUB UNTYP.       ASEG       12 
+UCA0ABCTL           ABS    CONST UNTYP.           ASEG       5D 
+UCA0BR0             ABS    CONST UNTYP.           ASEG       62 
+UCA0BR1             ABS    CONST UNTYP.           ASEG       63 
+UCA0CTL0            ABS    CONST UNTYP.           ASEG       60 
+UCA0CTL1            ABS    CONST UNTYP.           ASEG       61 
+UCA0IRRCTL          ABS    CONST UNTYP.           ASEG       5F 
+UCA0IRTCTL          ABS    CONST UNTYP.           ASEG       5E 
+UCA0MCTL            ABS    CONST UNTYP.           ASEG       64 
+UCA0RXBUF           ABS    CONST UNTYP.           ASEG       66 
+UCA0STAT            ABS    CONST UNTYP.           ASEG       65 
+UCA0TXBUF           ABS    CONST UNTYP.           ASEG       67 
+UCB0BR0             ABS    CONST UNTYP.           ASEG       6A 
+UCB0BR1             ABS    CONST UNTYP.           ASEG       6B 
+UCB0CTL0            ABS    CONST UNTYP.           ASEG       68 
+UCB0CTL1            ABS    CONST UNTYP.           ASEG       69 
+UCB0I2CIE           ABS    CONST UNTYP.           ASEG       6C 
+UCB0I2COA           ABS    CONST UNTYP.           ASEG       118 
+UCB0I2CSA           ABS    CONST UNTYP.           ASEG       11A 
+UCB0RXBUF           ABS    CONST UNTYP.           ASEG       6E 
+UCB0STAT            ABS    CONST UNTYP.           ASEG       6D 
+UCB0TXBUF           ABS    CONST UNTYP.           ASEG       6F 
+UP                  REL    CONST PUB UNTYP.       DATA16_Z   0 
+VARAREA             REL    CONST PUB UNTYP.       DATA16_Z   1CE 
+VAR_SIZE            ABS    CONST PUB UNTYP.       ASEG       10 
+WDTCTL              ABS    CONST UNTYP.           ASEG       120 
+cor                 REL    CONST PUB UNTYP.       DATA16_Z   26 
+fenceadr            ABS    CONST EXT [-001] UNTYP. __EXTERNS  Solved Extern 
+init_end            REL    CONST UNTYP.           CODE       84 
+isr_null            REL    CONST PUB UNTYP.       CODE       84 
+isr_null_end        REL    CONST UNTYP.           CODE       88 
+lastword            ABS    CONST EXT [-001] UNTYP. __EXTERNS  Solved Extern 
+main                REL    CONST PUB UNTYP.       CODE       0 
+reset               REL    CONST PUB UNTYP.       CODE       0 
+start_init          REL    CONST UNTYP.           CODE       0 
+time0               REL    CONST PUB UNTYP.       DATA16_Z   28 
+time1               REL    CONST PUB UNTYP.       DATA16_Z   2A 
+
+
+##############################
+#          CRC:CFAC          #
+#        Errors:   0         #
+#        Warnings: 0         #
+#         Bytes: 136         #
+##############################
+
+
+
+

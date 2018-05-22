@@ -6,57 +6,15 @@
 
 "0xFFE0" 
 
+"--odd_word_check" 
+
 "-d" 
 
-"fet" 
+"sim" 
 
-"--erase_main_and_info" 
-
-"--set_putchar_breakpoint" 
-
-"--set_getchar_breakpoint" 
-
-"--derivative" 
+"--derivativeSim" 
 
 "MSP430G2xx3" 
-
-"--protocol" 
-
-"automatic" 
-
-"--eem" 
-
-"EMEX_LOW" 
-
-"--port" 
-
-"Automatic" 
-
-"--connection" 
-
-"ti_usb" 
-
-"--settlingtime=0" 
-
-"--msp430_dll" 
-
-"msp430.dll" 
-
-"--vccDefault" 
-
-"3.3" 
-
-"--jtag_speed" 
-
-"medium" 
-
-"--memtype" 
-
-"F" 
-
-"--cycleCounter" 
-
-"0" 
 
 
 
